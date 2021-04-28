@@ -1,5 +1,6 @@
 ﻿using KhoaLuan.Data.Enums;
 using KhoaLuan.ViewModels.CodeManage;
+using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    public class ManageCodesController : Controller
+    public class ManageCodesController : BaseController
     {
         private readonly IManageCodeApiClient _manageCodeApiClient;
 

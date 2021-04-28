@@ -1,5 +1,6 @@
 ﻿using KhoaLuan.Data.Enums;
 using KhoaLuan.ViewModels.Recipe;
+using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    public class RecipesController : Controller
+    public class RecipesController : BaseController
     {
         private readonly IRecipeApiClient _recipeApiClient;
 

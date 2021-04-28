@@ -70,6 +70,22 @@ namespace KhoaLuan.Service.ManageCodeService
 
         public async Task<ApiResult<bool>> Update(UpdateCode bundle)
         {
+            if (bundle.Top)
+            {
+                var check = await _context.ManageCodes
+                    .AnyAsync(x => x.TypeCode == bundle.TypeCode && x.Top == true);
+                if (check)
+                {
+                    var bol = await _context.ManageCodes
+                    .Where(x => x.TypeCode == bundle.TypeCode && x.Top == true).ToListAsync();
+
+                    foreach (var i in bol)
+                    {
+                        i.Top = false;
+                        _context.ManageCodes.Update(i);
+                    }
+                }
+            }
             var code = await _context.ManageCodes.FindAsync(bundle.Id);
             if (code == null)
             {

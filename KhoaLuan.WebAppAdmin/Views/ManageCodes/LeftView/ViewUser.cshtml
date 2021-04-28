@@ -1,0 +1,328 @@
+﻿@using KhoaLuan.Data.Enums;
+<div class="card direct-chat direct-chat-primary">
+    <div class="card-header">
+        <h3 class="card-title">Nhân Viên</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="modal-body">
+            <form id="FormUser" method="post">
+                <div class="form-row">
+                    <input type="hidden" id="TypeUser" name="TypeCode" value="@CodeType.User" />
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameUser"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeUser()" required>
+                    </div>
+                    <span class="text-danger" id="showNameUser">
+                        Tên mã đã tồn tại
+                    </span>
+                    <div class="form-group col-md-6">
+                        <button type="submit" id="btnthemUser" class="btn btn-primary">Thêm Vào</button>
+                    </div>
+                    <small>Tên mã + số tự tăng: CODE1</small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-body">
+            <table id="Usertable" class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Tên Mã</th>
+                        <th class="text-center">Ưu Tiên</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="addUser">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--Modal xóa-->
+<div class="modal fade" id="exampleDeleteUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDeleteUser" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xóa dữ liệu đã chọn?</h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteUser()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Sửa-->
+<div class="modal fade" id="exampleEditUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idEditUser" />
+                <input type="hidden" id="TypeCodeUser" value="@CodeType.User" />
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameUserEdit"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeUserEdit()" required>
+                        <span class="text-danger" id="erroGroupUser">
+                            Tên đã tồn tại
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <select class="form-control" name="Top" id="TopEditUser">
+                            <option value="true">Bật</option>
+                            <option value="false">Tắt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxSaveUser()" id="btnEditUser" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Nhân Viên-->
+<script>
+    //kiểm tra tên
+    document.getElementById('showNameUser').style.display = "none";
+    function iCodeUser()
+    {
+        var nameUser = $('#NameUser').val().trim();
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameUser} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('showNameUser').style.display = "none";
+                    document.getElementById('btnthemUser').style.display = "block";
+                } else {
+                    document.getElementById('showNameUser').style.display = "block";
+                    document.getElementById('btnthemUser').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('showNameUser').style.display = "block";
+                    document.getElementById('btnthemUser').style.display = "none";
+
+                }
+            });
+    }
+
+    document.getElementById('erroGroupUser').style.display = "none";
+    document.getElementById('btnEditUser').style.display = "block";
+
+    function iCodeUserEdit()
+    {
+        var nameUser1 = $('#NameUserEdit').val().trim();
+        var id = $('#idEditUser').val().trim();
+        $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameUser1, id: id} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('erroGroupUser').style.display = "none";
+                    document.getElementById('btnEditUser').style.display = "block";
+                } else {
+                    document.getElementById('erroGroupUser').style.display = "block";
+                    document.getElementById('btnEditUser').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('erroGroupUser').style.display = "block";
+                 document.getElementById('btnEditUser').style.display = "none";
+
+                }
+            });
+    }
+    //
+   GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = $("#TypeUser").val();
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+
+                    var str = '<tr id="User-' + item.id +'">' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' +
+                        '<select class="form-control select2bs4" >';
+
+                    if (item.top) {
+                        str = str + '      <option  value="true">Bật</option>' ;
+                    } else {
+                        str = str + '      <option  value="false">Tắt</option>';
+                    }
+
+                    str = str + ' </select>' +
+                        '</td>' +
+                        '<td class="text-center py-0 align-middle">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEditUser"' +
+                        '   onclick="GetEditUser(' + item.id + ', \'' + item.name + '\',' + item.top +')" title="Sửa">' +
+                        '   <i class="fas fa-pencil-alt"></i>' +
+                        '</a>' +
+                        '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteUser"' +
+                        '   onclick="GetDeleteUser(' + item.id + ')" title="Xóa">' +
+                        '    <i class="fas fa-trash"></i>' +
+                        ' </a>' +
+                        '</div>' +
+                        ' </td>' +
+                        ' </tr >';
+                    $('#addUser').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+    }
+
+    // Thêm : btnthemUser,NameUser
+    var formUser = $('#FormUser');
+    formUser.submit(function (e) {
+        var nameUser = $('#NameUser').val().trim();
+        if (nameUser.length > 6) {
+            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        } else {
+             $.ajax({
+                type: "POST",
+                 url: "@Url.Action("Create")",
+                 data: formUser.serialize(),
+                dataType: "json",
+            success: function (msg) {
+                toastr.success('Thêm thành công')
+
+                $('#addUser').remove();
+                $('#Usertable').append('<tbody id="addUser"></tbody>');
+                GetUser();
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+        }
+        e.preventDefault();
+    });
+
+    // xóa
+    function GetDeleteUser(id) {
+        $("#idDeleteUser").val(id);
+    }
+
+    function ajaxDeleteUser() {
+        var id = $("#idDeleteUser").val();
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id:id},
+                dataType: "json",
+            success: function (msg) {
+                 if (msg.isSuccessed) {
+                     $('#exampleDeleteUser').modal("hide")
+                     toastr.success('Xóa thành công')
+                     var de = "#User-" + id;
+                     $(de).remove();
+                 } else {
+                     toastr.error('Xóa thất bại')
+                 }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại')
+
+                }
+            });
+    }
+
+    // CẬP nhật
+    function GetEditUser(id, name, top) {
+        document.getElementById('erroGroupUser').style.display = "none";
+        document.getElementById('btnEditUser').style.display = "block";
+        $("#idEditUser").val(id);
+        $("#NameUserEdit").val(name);
+        if (top) {
+            $("#TopEditUser").val("true");
+        } else {
+            $("#TopEditUser").val("false");
+        }
+    }
+
+    function ajaxSaveUser() {
+        var id = $("#idEditUser").val();
+        var name = $("#NameUserEdit").val();
+        var top = $("#TopEditUser").val();
+        var type = $("#TypeCodeUser").val();
+        if (name.length > 6) {
+            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        } else {
+             var data =
+            {
+                Id: id,
+                Name: name,
+                Top: top,
+                TypeCode: type
+            };
+            $.ajax({
+                    type: "PUT",
+                     url: "@Url.Action("Update")",
+                     data: data,
+                    dataType: "json",
+                success: function (msg) {
+                    $('#exampleEditUser').modal("hide")
+                    toastr.success('Cập nhật thành công');
+                    $('#addUser').remove();
+                    $('#Usertable').append('<tbody id="addUser"></tbody>');
+                    GetUser();
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại');
+
+                }
+            });
+        }
+
+    }
+</script>

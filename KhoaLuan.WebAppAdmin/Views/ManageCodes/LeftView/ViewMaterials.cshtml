@@ -1,0 +1,328 @@
+﻿@using KhoaLuan.Data.Enums;
+<div class="card direct-chat direct-chat-primary">
+    <div class="card-header">
+        <h3 class="card-title">Nguyên Vật Liệu</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="modal-body">
+            <form id="FormMaterials" method="post">
+                <div class="form-row">
+                    <input type="hidden" id="TypeMaterials" name="TypeCode" value="@CodeType.Materials" />
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameMaterials"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeMaterials()" required>
+                    </div>
+                    <span class="text-danger" id="showNameMaterials">
+                        Tên mã đã tồn tại
+                    </span>
+                    <div class="form-group col-md-6">
+                        <button type="submit" id="btnthemMaterials" class="btn btn-primary">Thêm Vào</button>
+                    </div>
+                    <small>Tên mã + số tự tăng: CODE1</small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-body">
+            <table id="Materialstable" class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Tên Mã</th>
+                        <th class="text-center">Ưu Tiên</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="addMaterials">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--Modal xóa-->
+<div class="modal fade" id="exampleDeleteMaterials" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDeleteMaterials" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xóa dữ liệu đã chọn?</h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteMaterials()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Sửa-->
+<div class="modal fade" id="exampleEditMaterials" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idEditMaterials" />
+                <input type="hidden" id="TypeCodeMaterials" value="@CodeType.Materials" />
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameMaterialsEdit"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeMaterialsEdit()" required>
+                        <span class="text-danger" id="erroGroupMaterials">
+                            Tên đã tồn tại
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <select class="form-control" name="Top" id="TopEditMaterials">
+                            <option value="true">Bật</option>
+                            <option value="false">Tắt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxSaveMaterials()" id="btnEditMaterials" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Nguyên Vật Liệu-->
+<script>
+    //kiểm tra tên
+    document.getElementById('showNameMaterials').style.display = "none";
+    function iCodeMaterials()
+    {
+        var nameMaterials = $('#NameMaterials').val().trim();
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameMaterials} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('showNameMaterials').style.display = "none";
+                    document.getElementById('btnthemMaterials').style.display = "block";
+                } else {
+                    document.getElementById('showNameMaterials').style.display = "block";
+                    document.getElementById('btnthemMaterials').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('showNameMaterials').style.display = "block";
+                    document.getElementById('btnthemMaterials').style.display = "none";
+
+                }
+            });
+    }
+
+    document.getElementById('erroGroupMaterials').style.display = "none";
+    document.getElementById('btnEditMaterials').style.display = "block";
+
+    function iCodeMaterialsEdit()
+    {
+        var nameMaterials1 = $('#NameMaterialsEdit').val().trim();
+        var id = $('#idEditMaterials').val().trim();
+        $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameMaterials1, id: id} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('erroGroupMaterials').style.display = "none";
+                    document.getElementById('btnEditMaterials').style.display = "block";
+                } else {
+                    document.getElementById('erroGroupMaterials').style.display = "block";
+                    document.getElementById('btnEditMaterials').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('erroGroupMaterials').style.display = "block";
+                 document.getElementById('btnEditMaterials').style.display = "none";
+
+                }
+            });
+    }
+    //
+   GetMaterials();
+    // Lấy giá trị của mã Materials
+    function GetMaterials() {
+        var typeMVL = $("#TypeMaterials").val();
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+
+                    var str = '<tr id="Materials-' + item.id +'">' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' +
+                        '<select class="form-control select2bs4" >';
+
+                    if (item.top) {
+                        str = str + '      <option  value="true">Bật</option>' ;
+                    } else {
+                        str = str + '      <option  value="false">Tắt</option>';
+                    }
+
+                    str = str + ' </select>' +
+                        '</td>' +
+                        '<td class="text-center py-0 align-middle">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEditMaterials"' +
+                        '   onclick="GetEditMaterials(' + item.id + ', \'' + item.name + '\',' + item.top +')" title="Sửa">' +
+                        '   <i class="fas fa-pencil-alt"></i>' +
+                        '</a>' +
+                        '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteMaterials"' +
+                        '   onclick="GetDeleteMaterials(' + item.id + ')" title="Xóa">' +
+                        '    <i class="fas fa-trash"></i>' +
+                        ' </a>' +
+                        '</div>' +
+                        ' </td>' +
+                        ' </tr >';
+                    $('#addMaterials').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+    }
+
+    // Thêm : btnthemMaterials,NameMaterials
+    var formMaterials = $('#FormMaterials');
+    formMaterials.submit(function (e) {
+        var nameMaterials = $('#NameMaterials').val().trim();
+        if (nameMaterials.length > 6) {
+            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        } else {
+             $.ajax({
+                type: "POST",
+                 url: "@Url.Action("Create")",
+                 data: formMaterials.serialize(),
+                dataType: "json",
+            success: function (msg) {
+                toastr.success('Thêm thành công')
+
+                $('#addMaterials').remove();
+                $('#Materialstable').append('<tbody id="addMaterials"></tbody>');
+                GetMaterials();
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+        }
+        e.preventDefault();
+    });
+
+    // xóa
+    function GetDeleteMaterials(id) {
+        $("#idDeleteMaterials").val(id);
+    }
+
+    function ajaxDeleteMaterials() {
+        var id = $("#idDeleteMaterials").val();
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id:id},
+                dataType: "json",
+            success: function (msg) {
+                 if (msg.isSuccessed) {
+                     $('#exampleDeleteMaterials').modal("hide")
+                     toastr.success('Xóa thành công')
+                     var de = "#Materials-" + id;
+                     $(de).remove();
+                 } else {
+                     toastr.error('Xóa thất bại')
+                 }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại')
+
+                }
+            });
+    }
+
+    // CẬP nhật
+    function GetEditMaterials(id, name, top) {
+        document.getElementById('erroGroupMaterials').style.display = "none";
+        document.getElementById('btnEditMaterials').style.display = "block";
+        $("#idEditMaterials").val(id);
+        $("#NameMaterialsEdit").val(name);
+        if (top) {
+            $("#TopEditMaterials").val("true");
+        } else {
+            $("#TopEditMaterials").val("false");
+        }
+    }
+
+    function ajaxSaveMaterials() {
+        var id = $("#idEditMaterials").val();
+        var name = $("#NameMaterialsEdit").val();
+        var top = $("#TopEditMaterials").val();
+        var type = $("#TypeCodeMaterials").val();
+        if (name.length > 6) {
+            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        } else {
+             var data =
+            {
+                Id: id,
+                Name: name,
+                Top: top,
+                TypeCode: type
+            };
+            $.ajax({
+                    type: "PUT",
+                     url: "@Url.Action("Update")",
+                     data: data,
+                    dataType: "json",
+                success: function (msg) {
+                    $('#exampleEditMaterials').modal("hide")
+                    toastr.success('Cập nhật thành công');
+                    $('#addMaterials').remove();
+                    $('#Materialstable').append('<tbody id="addMaterials"></tbody>');
+                    GetMaterials();
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại');
+
+                }
+            });
+        }
+
+    }
+</script>

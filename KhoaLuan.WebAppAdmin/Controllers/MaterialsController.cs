@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    public class MaterialsController : Controller
+    public class MaterialsController : BaseController
     {
         private readonly IMaterialApiClient _materialApiClient;
 
@@ -61,7 +61,6 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             {
                 var image = await _materialApiClient.UpdateImage(result.ResultObj.Id, bundle.Image);
                 result.ResultObj.Image = image.ResultObj;
-
             }
             return result;
         }
@@ -78,7 +77,6 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             };
             return data;
         }
-
 
         [HttpGet]
         public async Task<bool> iName(string name, int? id)
@@ -141,6 +139,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             data = result.ResultObj;
             return data;
         }
+
         [HttpPut]
         [Consumes("multipart/form-data")]
         public async Task<ApiResult<UpdateMaterialReturn>> Update([FromForm] MaterialUpdate bundle)

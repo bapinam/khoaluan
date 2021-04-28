@@ -1,0 +1,1839 @@
+﻿@using KhoaLuan.ViewModels.Common;
+@model PagedResult<KhoaLuan.ViewModels.Product.ProductVm>
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
+@{ ViewData["Title"] = "Sản Phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6" style="margin-bottom:8px; ">
+                <h1>Sản Phẩm</h1>
+            </div>
+            <div class="col-sm-6">
+                <div class="float-sm-right" style="margin-bottom:5px;">
+                    <button type="button" class="btn btn-block bg-gradient-success" data-toggle="modal" data-target="#modalThem">
+                        <i class="fas fa-plus"></i>
+                        Thêm Dữ Liệu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content" id="main">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh Sách</h3>
+                        <div class="col-md-7" style="float:right;">
+                            <form asp-action="Index" method="get">
+                                <div class="form-row">
+                                    <div class="form-group" style="margin-left: 5px;">
+                                        <select id="GroupType1" name="productType" class="form-control select2bs4"
+                                                style="width:230px; float:right;" required>
+                                            <option selected>Chọn loại sản phẩm... </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên sản phẩm" />
+                                    </div>
+                                    <div class="cold-md-5">
+                                        <button type="submit" class="btn btn-primary">Tìm</button>
+                                        <button type="button" onclick="window.location.href='/Products/Index'" class="btn btn-dark">
+                                            <i class="fa fa-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Tên</th>
+                                    <th>Hình Ảnh</th>
+                                    <th>Số Lượng</th>
+                                    <th>ĐVT</th>
+                                    <th>Nhắc Nhở</th>
+                                    <th>Loại</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addTR">
+
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr id="DeI-@Html.DisplayFor(modelItem => item.Id)">
+                                        <td id="Code-@Html.DisplayFor(modelItem => item.Id)">
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td id="Name-@Html.DisplayFor(modelItem => item.Id)">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td id="Image-@Html.DisplayFor(modelItem => item.Id)">
+                                            <div id="UpdateImage-@Html.DisplayFor(modelItem => item.Id)">
+                                                <img src="@(Configuration["BaseAddress"] + @item.Image)"
+                                                     style="width:50px; height:50px;" />
+                                            </div>
+
+                                        </td>
+                                        <td id="Amount-@Html.DisplayFor(modelItem => item.Id)">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-default">
+                                                    @Html.DisplayFor(modelItem => item.Amount)
+                                                </button>
+                                                <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                </button>
+                                                <div class="dropdown-menu" role="menu">
+                                                    <table class="table table-bordered">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="progress progress-xs">
+                                                                        <script>
+                                                            document.write('<div class="progress-bar progress-bar-danger" style="width: '+@Html.DisplayFor(modelItem => item.AmountPercent)+'%"></div>');
+                                                                        </script>
+                                                                    </div>
+                                                                </td>
+                                                                <td style="width: 40px;">
+                                                                    <span class="badge bg-danger">
+                                                                        @Html.DisplayFor(modelItem => item.AmountPercent) %
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td id="Pack-@Html.DisplayFor(modelItem => item.Id)">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-warning" id="TextPack-@Html.DisplayFor(modelItem => item.Id)">
+                                                    @Html.DisplayFor(modelItem => item.NamePackDefault)
+                                                </button>
+                                                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                </button>
+                                                <div class="dropdown-menu" role="menu">
+                                                    <a class="dropdown-item"
+                                                       data-toggle="modal" data-target="#examplePack"
+                                                       onclick="GetPack('@item.Id')">Thao Tác</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td id="Reminder-@Html.DisplayFor(modelItem => item.Id)">
+                                            @if (item.Reminder)
+                                            {
+                                                <div id="Re-@Html.DisplayFor(modelItem => item.Id)" class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-success">Bật</button>
+                                                    <button type="button" class="btn btn-success dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                        <span class="sr-only">Toggle Dropdown</span>
+                                                    </button>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <a class="dropdown-item"
+                                                           data-toggle="modal" data-target="#exampleNhacNho"
+                                                           onclick="GetNhacNho('@item.Id')">Thao Tác</a>
+                                                    </div>
+                                                </div>}
+                                            else
+                                            {
+                                                <div id="Re-@Html.DisplayFor(modelItem => item.Id)" class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-danger">Tắt</button>
+                                                    <button type="button" class="btn btn-danger dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                        <span class="sr-only">Toggle Dropdown</span>
+                                                    </button>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <a class="dropdown-item"
+                                                           data-toggle="modal" data-target="#exampleNhacNho"
+                                                           onclick="GetNhacNho('@item.Id')">Thao Tác</a>
+                                                    </div>
+                                                </div>}
+                                        </td>
+                                        <td id="ProductType-@Html.DisplayFor(modelItem => item.Id)">
+                                            @Html.DisplayFor(modelItem => item.NameProductType)
+                                        </td>
+                                        <td class="text-center py-0 align-middle">
+                                            <div class="btn-group btn-group-sm">
+                                                <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"
+                                                   onclick="GetView('@item.Id')" title="Xem">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a class="btn btn-primary" data-toggle="modal" data-target="#exampleEdit"
+                                                   onclick="GetEdit('@item.Id')" title="Sửa">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                                <a class="btn btn-danger" data-toggle="modal" data-target="#exampleDelete"
+                                                   onclick="GetDelete('@item.Id')" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Tên</th>
+                                    <th>Hình Ảnh</th>
+                                    <th>Số Lượng</th>
+                                    <th>ĐVT</th>
+                                    <th>Nhắc Nhở</th>
+                                    <th>Loại</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        @await Component.InvokeAsync("Pager", Model)
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<!--Modal thêm-->
+<div class="modal fade bd-example-modal-lg" id="modalThem" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sản Phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="formadd" enctype="multipart/form-data" method="post">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Mã Số</label>
+                            <input type="text" class="form-control" name="Code" placeholder="Mã số" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Tên</label>
+                            <input type="text" class="form-control" name="Name" id="Name" onkeyup="getNameAdd()" placeholder="Tên sản phẩm" required>
+                            <span class="text-danger" id="showName">
+                                Tên sản phẩm đã tồn tại
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Loại Sản Phẩm</label>
+                            <select id="GroupType" name="IdProductType" class="form-control select2bs4">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Hình Ảnh</label>
+                            <input type="file" class="form-control-file" id="ImageProudct" name="Image" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAddress">Mô Tả</label>
+                        <textarea class="form-control" name="Description" rows="3"></textarea>
+                    </div>
+                    <!--Đóng gói-->
+                    <div class="form-group">
+                        <label for="inputAddress">Tên Đóng Gói (mặc định)</label>
+                        <input type="text" class="form-control" id="Default" name="NamePackDefault" placeholder="Tên đóng gói" required>
+                    </div>
+                    <div id="result12"></div>
+
+                    <button type="button" onclick="add_element()" class="btn btn-success btn-sm" autocomplete="false">Thêm Đóng Gói</button>
+                    <!--Nhắc nhở-->
+                    <div class="icheck-primary">
+                        <input type="checkbox" name="Reminder" id="action" style="margin-top:30px;font-size:30px;">
+                        <label class="form-check-label" name="Reminder" for="defaultCheck1">
+                            <br />Nhắc Nhở Mức Tồn Kho
+                        </label>
+                    </div> <br />
+                    <div id="content">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mức Tồn Tối Thiểu</label>
+                                <input type="number" id="Min" min="0" max="999999999999" class="form-control" name="Min" placeholder="Mức tồn tối thiểu">
+                                <span class="text-danger" id="ShowMin">Vui lòng không bỏ trống</span>
+                                <span class="text-danger" id="ShowMinMax">Mức tối thiểu phải nhỏ hơn mức tối đa</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mức Tồn Tối Đa</label>
+                                <input type="number" id="Max" min="0" max="999999999999" class="form-control" name="Max" placeholder="Mức tồn tối đa">
+                                <span class="text-danger" id="ShowMax">Vui lòng không bỏ trống</span>
+                            </div>
+                        </div>
+
+                        <div class="example">
+                            <label for="inputEmail4">Ngày Nhắc Nhở</label>
+                            <div class="input-daterange input-group" id="date-range">
+                                <input type="text" class="form-control" id="Date" name="ReminderStartDate"> <span class="input-group-addon bg-info b-0 text-white">đến</span>
+                                <input type="text" class="form-control" name="ReminderEndDate">
+                            </div>
+                            <span class="text-danger" id="ShowDate1">Ngày lớn hơn hoặc bẳng hiện tại</span>
+                            <span class="text-danger" id="ShowDate">Vui lòng nhập ngày</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" id="btnthem" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Modal sửa-->
+<div class="modal fade bd-example-modal-lg" id="exampleEdit" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sản Phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formEDIT" enctype="multipart/form-data" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="IdE" name="Id" />
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Mã Số</label>
+                            <input type="text" class="form-control" name="Code" id="CodeE" placeholder="Mã số" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Tên</label>
+                            <input type="text" class="form-control" name="Name" id="NameE" onkeyup="getName()" placeholder="Tên sản phẩm" required>
+                            <span class="text-danger" id="showNameE">
+                                Tên sản phẩm đã tồn tại
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Loại Sản Phẩm</label>
+                            <div id="showGr">
+                                <div id="showGr2">
+                                    <select id="GroupTypeE" name="IdProductType" class="form-control select2bs4" required>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Hình Ảnh</label>
+                            <div id="showIm">
+                                <div id="ImageP">
+
+                                </div>
+                            </div>
+                            <div style="float:left;">
+                                Thay đổi ảnh:&nbsp;
+                            </div>
+                            <div style="float:left;">
+                                <input type="file" class="form-control-file" name="Image">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAddress">Mô Tả</label>
+                        <textarea class="form-control" id="DescriptionE" name="Description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" id="btnthemE" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Modal xóa-->
+<div class="modal fade" id="exampleDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sản Phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDelete" />
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Bạn có muốn xóa dữ liệu đã chọn?
+                    <br /><small style="color:red;">Bao gồm tất cả dữ liệu liên quan tới sản phẩm này</small>
+                </h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDelete()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal đóng gói-->
+<div class="modal fade bd-example-modal-lg" id="examplePack" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Đóng Gói</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="inputEmail4" style="float:left; margin-right:5px;">Tên Đóng Gói (mặc định)</label>
+                    <a id="EditDG" class="btn btn-primary btn-sm" style="float:left;"
+                       onclick="GetEditDG()" title="Sửa">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <a id="SaveDG" class="btn btn-success btn-sm" style="float:left;"
+                       onclick="GetSaveDG()" title="Lưu">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    <input type="text" class="form-control" id="PackShowDG" value="name" readonly>
+                    <input type="hidden" id="IdDGMD" />
+                    <input type="text" class="form-control" id="PackDefaultDG" name="PackDefault" onkeyup="CheckNameDG()" required>
+                    <span class="text-danger" id="ShowEnterT">Tên đóng gói đã tồn tại</span>
+
+                </div>
+                <br />
+                <!--Thêm ĐG-->
+                <button type="button" onclick="MoRong()" class="btn btn-success btn-sm" autocomplete="false">Thêm Đóng Gói</button>
+                <form id="FormAddDongGoi" method="post">
+                    <input type="hidden" id="IdDG" name="IdProduct" />
+                    <div class="form-row" id="AddDongGoi">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Tên Đóng Gói</label>
+                            <input type="text" id="NameDGShow" class="form-control" name="Name"
+                                   onkeyup="CheckNameDongGoi()" placeholder="Tên đóng gói" required>
+                            <span class="text-danger" id="ShowTenDongGoi">Tên đóng gói đã tồn tại</span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Giá Trị Chuyển Đổi</label>
+                            <input type="number" id="ValueDGShow" name="Value" min="0" max="999999999999" class="form-control"
+                                   placeholder="Giá trị chuyển đổi" required>
+                        </div>
+                    </div>
+                    <div style="float:right;">
+                        <button type="button" onclick="ThuGon()" class="btn btn-secondary btn-sm">Thu Gọn</button>
+                        <button type="submit" id="btn-dg" class="btn btn-primary btn-sm" style="float:right; margin-left:5px">Lưu Lại</button>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <br /><br /><br /><hr />
+                    <!--Show ĐG-->
+                    <table class="table table-bordered table-striped" id="tableDG">
+                        <tbody id="dgTR">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal nhắc nhở-->
+<div class="modal fade bd-example-modal-lg" id="exampleNhacNho" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhắc Nhở</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="formRe" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="idNhacNho" />
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn bg-olive active">
+                            <input type="radio" name="BoolReminder" id="option_a1" onclick="OnRe()" value="true" autocomplete="off" checked> Bật
+                        </label>
+                        <label class="btn bg-olive">
+                            <input type="radio" name="BoolReminder" id="option_a2" onclick="OffRe()" value="false" autocomplete="off"> Tắt
+                        </label>
+                    </div>
+                    <div id="showNhacNho">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mức Tồn Tối Thiểu</label>
+                                <input type="number" id="MinT" min="0" max="999999999999" class="form-control" name="Min" placeholder="Mức tồn tối thiểu">
+                                <span class="text-danger" id="ShowMinT">Vui lòng không bỏ trống</span>
+                                <span class="text-danger" id="ShowMinMaxT">Mức tối thiểu phải nhỏ hơn mức tối đa</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mức Tồn Tối Đa</label>
+                                <input type="number" id="MaxT" min="0" max="999999999999" class="form-control" name="Max" placeholder="Mức tồn tối đa">
+                                <span class="text-danger" id="ShowMaxT">Vui lòng không bỏ trống</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmail4">Ngày Nhắc Nhở</label>
+                            <input type="text" class="form-control" id="DateNhacNho" name="DateReminder">
+                            <span class="text-danger" id="ShowDateT">Ngày lớn hơn hoặc bẳng hiện tại</span>
+                        </div>
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Modal xóa đóng gói-->
+<div class="modal fade" id="dgDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Đóng Gói</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDeDG" />
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Bạn có muốn xóa dữ liệu đã chọn?
+                </h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="donggoiDelete()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hỏi cập nhật đóng gói-->
+<div class="modal fade" id="dgUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Đóng Gói</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idUpDG" />
+                <input type="hidden" id="nameUpDG" />
+                <input type="hidden" id="valueUpDG" />
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Bạn có muốn cập nhật dữ liệu đã chọn?
+                </h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="donggoiUp()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal View-->
+<div class="modal fade bd-example-modal-lg" id="exampleView" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><small>Thông Tin </small> Sản Phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div id="modView">
+                <div class="card-body row" id="ModelView">
+                    <div class="col-5 text-center d-flex align-items-center justify-content-center">
+                        <div class="" id="showImager">
+
+                        </div>
+                    </div>
+                    <div class="col-7" id="ShowInfor">
+
+                    </div>
+
+                </div>
+                <div id="ViewModal1">
+                    <label>&nbsp;  Chuyển Đổi Đơn Vị</label>
+                    <table class="table table-bordered table-striped" id="ViewModal">
+                        <thead>
+                            <tr>
+                                <td>Tên Đơn Vị</td>
+                                <td>Giá Trị</td>
+                                <td>Số Lượng</td>
+                            </tr>
+                        </thead>
+                        <tbody id="BangView">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function GetView(id) {
+         $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetByIdProduct")",
+                data: { id: id },
+                dataType: "json",
+             success: function (msg) {
+
+                 var my1 = document.getElementById("ModelView");
+                 my1.remove();
+
+                 var my = document.getElementById("ViewModal1");
+                 my.remove();
+
+                 var mod = '<div class="card-body row" id = "ModelView" >' +
+                 ' <div class="col-5 text-center d-flex align-items-center justify-content-center">' +
+                 '  <div class="" id="showImager">' +
+                 '   </div>' +
+                 ' </div>' +
+                 '<div class="col-7" id="ShowInfor">' +
+                 ' </div>' +
+                 '</div>' +
+                 ' <div id="ViewModal1">' +
+                 '    <label>&nbsp;  Chuyển Đổi Đơn Vị</label>' +
+                 '   <table class="table table-bordered table-striped" id="ViewModal">' +
+                 '      <thead>' +
+                 '        <tr>' + 
+                 '           <td>Tên Đơn Vị</td>' +
+                 '           <td>Giá Trị</td>' +
+                 '          <td>Số Lượng</td>' +
+                 ' </tr>' +
+                 '   </thead>' +
+                 '   <tbody id="BangView">' +
+                     '   </tbody>' +
+                        ' </table>'+
+                    ' </div>';
+
+                 $('#modView').append(mod);
+
+                var anh = '@(Configuration["BaseAddress"])' + msg.image;
+                var img = '<img src="'+anh+'"'+
+                    'style = "width:200px; height:220px;" />' +
+                    ' <h2>' + msg.code + '</h2>' +
+                    ' <p class="lead mb-5">' +msg.name+' </p>';
+                 $('#showImager').append(img);
+                 var nhac = "";
+                 if (msg.reminder) { nhac = "Đang nhắc nhở" } else { nhac = "Đã ngừng nhắc nhở" }
+                 if (msg.description == null) { msg.description = "" }
+                 var info = '<div class="form-group"><div><b>Loại Sản Phẩm: &nbsp; </b>' + msg.nameProductType + '</div> <hr/></div>' +
+                     '<div class="form-group"><div><b>Mô Tả: &nbsp; </b>' + msg.description + '</div><hr/></div>' +
+                     '<div class="form-group"><div><b>Số Lượng: &nbsp; </b>' + msg.amount+ '</div><hr/></div>' +
+                     '<div class="form-group"><div><b>Nhắc Nhở: &nbsp; </b>' + nhac+ '</div><hr/></div>' +
+                     '<div class="form-group"><div><b>Đơn Vị Tính: &nbsp; </b>' + msg.namePackDefault + '</div><hr/></div>';
+
+                 $('#ShowInfor').append(info);
+
+                 msg.pack.forEach(function (item) {
+
+                     var bang = '<tr><td>' + item.name + '</td><td>' + item.value + '<br/>' +
+                         ' <small> 1 ' + item.name + ' = ' + item.value + ' ' + msg.namePackDefault + '</small ></td> ' +
+                         '<td>'+item.change+'</td></tr>';
+                     $('#BangView').append(bang);
+                 });
+                 
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+
+<!--Thêm-->
+<script>
+
+    var frm = $('#formadd');
+
+    frm.submit(function (e) {
+        var p = 0;
+        var input = document.getElementsByName('NamePack[]');
+        for (var i = 0; i < input.length; i++) {
+            var a = input[i];
+            for (var j = 0; j < input.length; j++) {
+                var b = input[j]
+
+                if (i != j) {
+                    if (a.value == b.value) {
+                        p = 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (p == 1) {
+            toastr.error('Tên đóng gói không được trùng')
+        }
+        else {
+            var isRe = $('#action').is(":checked");
+            if (!isRe) {
+                addData(frm);
+            } else {
+                var showmin = document.getElementById("ShowMin");
+                var showmax = document.getElementById("ShowMax");
+                var showminmax = document.getElementById("ShowMinMax");
+                var showdate = document.getElementById("ShowDate");
+                var showdate1 = document.getElementById("ShowDate1");
+
+                var date = document.getElementById("Date");
+                var min = document.getElementById("Min");
+                var max = document.getElementById("Max");
+
+                showminmax.style.display = "none";
+
+                if (min.value == "") {
+                    showmin.style.display = "block";
+                }
+                else {
+                    showmin.style.display = "none";
+                }
+
+                if (max.value == "") {
+                    showmax.style.display = "block";
+                }
+                else {
+                    showmax.style.display = "none";
+                }
+
+                if (date.value == "") {
+                    showdate.style.display = "block";
+                } else {
+                    showdate.style.display = "none";
+
+                    if (min.value != "" && max.value != "") {
+                        const x = new Number(min.value);
+                        const y = new Number(max.value);
+                        if (x >= y) {
+                            showminmax.style.display = "block";
+                        }
+                        else {
+                            showminmax.style.display = "none";
+                            var d1 = new Date(date.value);
+                            var d2 = new Date();
+
+                            if (d1.getFullYear() >= d2.getFullYear()) {
+                                if (d1.getFullYear() > d2.getFullYear()) {
+                                    showdate1.style.display = "none";
+                                    addData(frm);
+                                    // thành công
+                                } else {
+                                    if (d1.getMonth() >= d2.getMonth()) {
+                                        if (d1.getMonth() > d2.getMonth()) {
+                                            showdate1.style.display = "none";
+                                            addData(frm);
+                                            // thành công
+                                        }
+                                        else {
+                                            if (d1.getDate() >= d2.getDate()) {
+                                                showdate1.style.display = "none";
+                                                addData(frm);
+                                                // thành công
+                                            } else {
+                                                showdate1.style.display = "block";
+                                            }
+                                        }
+
+                                    } else {
+                                        showdate1.style.display = "block";
+                                    }
+                                }
+                            }
+                            else {
+                                showdate1.style.display = "block";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        e.preventDefault();
+
+    });
+
+    function addData(frm) {
+        var form = $('#formadd')[0];
+        var data = new FormData(form);
+
+         $.ajax({
+             type: "POST",
+             enctype: 'multipart/form-data',
+             url: "@Url.Action("Create")",
+             data: data,
+             processData: false,
+             contentType: false,
+             cache: false,
+            success: function (msg) {
+                if (msg.isSuccessed) {
+                    $('#modalThem').modal('hide');
+                    $('#formadd').trigger("reset");
+
+                    document.getElementById("content").style.display = 'none';
+
+                    toastr.success('Thêm thành công!')
+                    var anh = '@(Configuration["BaseAddress"])' + msg.resultObj.image;
+                    var html = '<tr id="DeI-' + msg.resultObj.id + '">' +
+                        '<td id ="Code-' + msg.resultObj.id + '">'
+                        + msg.resultObj.code +
+                        '</td>' +
+                        '<td id="Name-' + msg.resultObj.id + '">'
+                        + msg.resultObj.name +
+                        '</td>' +
+                       '<td id="Image-' + msg.resultObj.id + '">' +
+                       '<div id="UpdateImage-' + msg.resultObj.id + '">' +
+                       '   <img src="' + anh + '" style="width:50px; height:50px;" />' +
+                       '<div/>'+
+                        '</td>' +
+                        '<td id="Amount-' + msg.resultObj.id + '">' +
+                        ' <div class="btn-group btn-group-sm">' +
+                        ' <button type="button" class="btn btn-default">' +
+                         msg.resultObj.amount +
+                        ' </button>' +
+                        ' <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">' +
+                        '<span class="sr-only">Toggle Dropdown</span>' +
+                        ' </button>' +
+                        '  <div class="dropdown-menu" role="menu">' +
+                        ' <table class="table table-bordered">' +
+                        '  <tbody>' +
+                        '  <tr>' +
+                        '  <td>' +
+                        ' <div class="progress progress-xs">' +
+                       '  <div class="progress-bar progress-bar-danger" style="width: ' + msg.resultObj.amountPercent +'%"></div>' +
+                        ' </div>' +
+                        ' </td>' +
+                       ' <td style="width: 40px;"><span class="badge bg-danger">' + msg.resultObj.amountPercent+'%</span></td>' +
+                        '</tr>' +
+                        ' </tbody>' +
+                        ' </table>' +
+                        '</div>' +
+                        '</div> ' +
+                        ' </td> ' +
+                        '<td id = "Pack-' + msg.resultObj.id + '" > ' +
+                        '<div class="btn-group btn-group-sm" > ' +
+                       ' <button type = "button" class="btn btn-warning" id="TextPack-' + msg.resultObj.id +'"> ' +
+                        msg.resultObj.namePackDefault +
+                        ' </button> ' +
+                        '<button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">' +
+                        ' <span class="sr-only">Toggle Dropdown</span>' +
+                        '</button>' +
+                        ' <div class="dropdown-menu" role="menu">' +
+                        '     <a class="dropdown-item" data-toggle="modal" data-target="#examplePack"'+
+                                       'onclick="GetPack('+ msg.resultObj.id +')">Thao Tác</a>' +
+                        '  </div>' +
+                        '</div>' +
+                        ' </td>' +
+                         ' <td id="Reminder-' + msg.resultObj.id + '">';
+
+                            if (msg.resultObj.reminder)
+                            {
+                                html = html + '<div id="Re-' + msg.resultObj.id+'" class="btn-group btn-group-sm">' +
+                                   ' <button type="button" class="btn btn-success">Bật</button>' +
+                                    '<button type="button" class="btn btn-success dropdown-toggle dropdown-icon" data-toggle="dropdown">' +
+                                    '  <span class="sr-only">Toggle Dropdown</span>' +
+                                   ' </button>' +
+                                   ' <div class="dropdown-menu" role="menu">' +
+                                    '  <a class="dropdown-item" data-toggle="modal" data-target="#exampleNhacNho"' +
+                                    ' onclick="GetNhacNho(' + msg.resultObj.id + ')">Thao Tác</a>' +                                   ' </div>' +
+                                                        ' </div>'
+                                    }
+                            else
+                            {
+                                html = html + '<div id="Re-' + msg.resultObj.id +'" class="btn-group btn-group-sm">' +
+                       ' <button type="button" class="btn btn-danger">Tắt</button>' +
+                        '<button type="button" class="btn btn-danger dropdown-toggle dropdown-icon" data-toggle="dropdown">' +
+                           ' <span class="sr-only">Toggle Dropdown</span>'+
+                            '</button>' +
+                            '<div class="dropdown-menu" role="menu">' +
+                                    '  <a class="dropdown-item" data-toggle="modal" data-target="#exampleNhacNho"' +
+                                    ' onclick="GetNhacNho(' + msg.resultObj.id +')">Thao Tác</a>' +
+                           ' </div>' +
+                                                            '</div>'
+                                    }
+
+                    html = html +  ' </td>' +
+                                   ' <td id="ProductType-' + msg.resultObj.id +'">' +
+                                       msg.resultObj.nameProductType +
+                                   ' </td>' +
+                                   ' <td class="text-center py-0 align-middle">' +
+                                   '<div class="btn-group btn-group-sm">' +
+                                   ' <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"' +
+                        '   onclick="GetView(' + msg.resultObj.id +')" title="Xem">' +
+                            '    <i class="fas fa-eye"></i>' +
+                            '  </a>' +
+                            ' <a class="btn btn-primary" data-toggle="modal" data-target="#exampleEdit"' +
+                        '    onclick="GetEdit(' + msg.resultObj.id +')" title="Sửa">' +
+                            '     <i class="fas fa-pencil-alt"></i>' +
+                            '  </a>' +
+                            ' <a class="btn btn-danger" data-toggle="modal" data-target="#exampleDelete"' +
+                        '  onclick="GetDelete(' + msg.resultObj.id +')" title="Xóa">' +
+                            '  <i class="fas fa-trash"></i>' +
+                            '  </a>' +
+                            ' </div>' +
+                            '</td>' +
+                    '</tr>';
+
+                    $("#addTR").prepend(html);
+
+                            } else {
+                    toastr.error('Thêm thất bại')
+                    $('#formadd').trigger("reset");
+                    document.getElementById("content").style.display = "none";
+                    $('#modalThem').modal('hide');
+
+                }
+
+            },
+            error: function (data) {
+                toastr.error('Thêm thất bại')
+                $('#formadd').trigger("reset");
+                document.getElementById("content").style.display = "none";
+                $('#modalThem').modal('hide');
+                var i = 0;
+                 for (i = t; i >= 0; i--)
+                 {
+                     var str = "userdata" + t;
+                    var myobj = document.getElementById(str);
+                    myobj.remove();
+                }
+            }
+        });
+    }
+</script>
+
+<!--Gửi name (add)-->
+<script>
+    var showAdd = document.getElementById("showName");
+    showAdd.style.display = 'none';
+    function getNameAdd()
+    {
+        var val = document.getElementById("Name").value;
+        var btn = document.getElementById("btnthem")
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("iName")",
+                data: { name: val },
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        showAdd.style.display = 'none';
+                        btn.style.display = 'block';
+
+                    } else {
+                        showAdd.style.display = 'block';
+                        btn.style.display = 'none';
+                    }
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+
+    }
+</script>
+
+<!--Lấy thông tin edit-->
+<script>
+    function GetEdit(id) {
+        var showNameE = document.getElementById("showNameE");
+        var btnT = document.getElementById("btnthemE")
+
+        showNameE.style.display = 'none';
+        btnT.style.display = 'block';
+
+        $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetByIdProduct")",
+                data: { id: id },
+                dataType: "json",
+            success: function (msg) {
+                var my = document.getElementById("showGr2");
+                my.remove();
+                $("#showGr").append(
+                    '<div id="showGr2">' +
+                    '<select id="GroupTypeE" name="IdProductType" class="form-control select2bs4" required>' +
+                    '</select>' +
+                    '</div>');
+
+                var my1 = document.getElementById("ImageP");
+                my1.remove();
+
+                var anh = '@(Configuration["BaseAddress"])' + msg.image;
+                $('#showIm').append('<div id="ImageP"><img src ="'+anh+'"' +
+                    'style = "width:50px; height: 50px;" /></div>');
+
+                    $("#IdE").val(id);
+                    $("#CodeE").val(msg.code);
+                    $("#NameE").val(msg.name);
+                $("#DescriptionE").val(msg.description);
+                $("#GroupTypeE").append('<option value="' + msg.idProductType + '">' + msg.nameProductType + '</option>');
+                getId(msg.idProductType);
+                $('.select2bs4').select2({
+                    theme: 'bootstrap4'
+                })
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!--Gửi name (edit)-->
+<script>
+    var show = document.getElementById("showNameE");
+    show.style.display = 'none';
+    function getName()
+    {
+        var val = document.getElementById("NameE").value;
+        var btn = document.getElementById("btnthemE")
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("iName")",
+                data: { name: val },
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        show.style.display = 'none';
+                        btn.style.display = 'block';
+
+                    } else {
+                        show.style.display = 'block';
+                        btn.style.display = 'none';
+                    }
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+
+    }
+</script>
+<!--Update edit-->
+<script>
+
+    var frEdit = $('#formEDIT');
+
+    frEdit.submit(function (e) {
+        var formE = $('#formEDIT')[0];
+        var dataE = new FormData(formE);
+         $.ajax({
+             type: "PUT",
+             enctype: 'multipart/form-data',
+             url: "@Url.Action("Update")",
+             data: dataE,
+             processData: false,
+             contentType: false,
+             cache: false,
+            success: function (msg) {
+                if (msg.isSuccessed) {
+                    $('#exampleEdit').modal('hide');
+                    $('#formEDIT').trigger("reset");
+
+                    toastr.success('Cập nhật thành công')
+
+                    var maso = "#Code-" + msg.resultObj.id;
+                    var ten = "#Name-" + msg.resultObj.id;
+
+
+                    var hinh = "#Image-" + msg.resultObj.id;
+                    var loai = "#ProductType-" + msg.resultObj.id;
+
+                    $(maso).text(msg.resultObj.code);
+                    $(ten).text(msg.resultObj.name);
+                    $(loai).text(msg.resultObj.nameProductType);
+
+
+                    var de = "UpdateImage-" + msg.resultObj.id;
+                    var my1 = document.getElementById(de);
+                    my1.remove();
+
+                    var str = '@(Configuration["BaseAddress"])' + msg.resultObj.image;
+                    $(hinh).append('<div id="UpdateImage-' + msg.resultObj.id+'">'+
+                                               ' <img src="'+str+'"'+
+                                                     'style="width:50px; height:50px;" />'+
+                        ' </div>');
+
+                            } else {
+                    toastr.error('Cập nhật thất bại')
+                    $('#exampleEdit').modal('hide');
+                    $('#formEDIT').trigger("reset");
+
+                }
+
+            },
+            error: function (data) {
+                toastr.error('Cập nhật thất bại')
+                $('#exampleEdit').modal('hide');
+                $('#formEDIT').trigger("reset");
+            }
+        });
+
+        e.preventDefault();
+
+    });
+</script>
+
+<!--delete-->
+<script>
+    function GetDelete(id) {
+        $("#idDelete").val(id);
+    }
+
+    function ajaxDelete() {
+        var id = document.getElementById("idDelete").value;
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: { Id: id },
+             dataType: "json",
+             success: function (msg) {
+
+                 $('#exampleDelete').modal('hide');
+                 if (msg.isSuccessed) {
+                     toastr.success('Xoá thành công')
+                     var  de = "#DeI-" + id;
+                     $(de).remove();
+
+                 } else {
+                     toastr.error('Xóa thất bại')
+                 }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại, vì dữ liệu đã tồn tại ở bảng khác')
+
+                }
+         });
+
+    }
+</script>
+
+<!--Thêm nhắc nhở-->
+<script language="javascript">
+    document.getElementById("content").style.display = 'none';
+    document.getElementById('action').onclick = function (e) {
+        if (this.checked) {
+            document.getElementById("content").style.display = 'block';
+            document.getElementById("ShowMin").style.display = 'none';
+            document.getElementById("ShowMax").style.display = 'none';
+            document.getElementById("ShowDate").style.display = 'none';
+            document.getElementById("ShowDate1").style.display = 'none';
+            document.getElementById("ShowMinMax").style.display = 'none';
+        }
+        else {
+            document.getElementById("content").style.display = 'none';
+        }
+    };
+</script>
+
+<!--Thêm đóng gói-->
+<script language="javascript">
+    var t = 0;
+    function add_element() {
+        var str = document.getElementById("Default").value;
+        if (!str.trim() || 0 === str.length) {
+            toastr.error('Chưa nhập tên đóng gói (mặc định)')
+        }
+        else {
+            t++;
+            var html = '<div id="userdata' + t + '" > ' +
+                '<div class="form-row">' +
+                '<div class="form-group col-md-6">' +
+                '<label for="inputEmail4">Tên Đóng Gói</label> ' +
+                '<input type="text" class="form-control"  name="NamePack[]" placeholder="Tên đóng gói" required> ' +
+                '<span class="text-danger namePack" id="ShowPack' + t + '">Tên đã tồn tại</span>' +
+                '</div> ' +
+                '<div class="form-group col-md-6"> ' +
+                ' <label for="inputEmail4">Giá Trị Chuyển Đổi</label> ' +
+                ' <div style="width:90%; float:left;"> ' +
+                ' <input type="number" class="form-control" min="0" max="999999999999"  name="ValuePack[]" placeholder="Giá trị chuyển đổi" required> ' +
+                ' </div> ' +
+                ' <div style="width:10%; float:left;"> ' +
+                ' <button  onclick="removeE(' + t + ')" class="btn btn-danger btn-sm" style="margin-top:3px; margin-left:5px;" data-toggle="tooltip" data-placement="top" title="Xóa"> ' +
+                ' <i class="fa fa-minus-square"></i> ' +
+                ' </button>' +
+                ' </div>' +
+                ' </div>' +
+                ' </div>' +
+                ' </div>';
+
+            $("#result12").append(html);
+            var s = "ShowPack" + t;
+            document.getElementById(s).style.display = "none";
+
+        }
+
+    }
+
+    function removeE(t) {
+        var str = "userdata" + t;
+        var myobj = document.getElementById(str);
+        myobj.remove();
+    }
+</script>
+
+<!--Lấy thông tin loại sản phẩm-->
+<script>
+  $.ajax({
+    type: "GET",
+    url: "@Url.Action("GetAll", "ProductTypes")",
+    data: { },
+    dataType: "json",
+    success: function (msg) {
+    msg.forEach(function (item) {
+    $("#GroupType").append(new Option(item.name, item.id));
+    $("#GroupType1").append(new Option(item.name, item.id));
+
+    });
+
+    },
+    error: function (req, status, error) {
+
+    }
+  });
+
+    function getId(id) {
+         $.ajax({
+    type: "GET",
+    url: "@Url.Action("GetAll", "ProductTypes")",
+    data: { },
+        dataType: "json",
+        success: function (msg) {
+            msg.forEach(function (item) {
+                if (item.id != id) {
+                    $("#GroupTypeE").append('<option value="' + item.id + '">' + item.name + '</option>');
+                }
+            });
+
+        },
+        error: function (req, status, error) {
+
+        }
+    });
+    }
+</script>
+
+<!--Update nhắc nhở-->
+<script>
+    var minT = document.getElementById("ShowMinT");
+    minT.style.display = "none";
+    var minmaxT = document.getElementById("ShowMinMaxT");
+    minmaxT.style.display = "none";
+    var maxT = document.getElementById("ShowMaxT");
+    maxT.style.display = "none";
+    var enter = document.getElementById("ShowEnterT");
+    enter.style.display = "none";
+    var dateT = document.getElementById("ShowDateT");
+    dateT.style.display = "none";
+    function OnRe() {
+
+        var re = document.getElementById("showNhacNho");
+        re.style.display = "block";
+        var minT = document.getElementById("ShowMinT");
+        minT.style.display = "none";
+        var minmaxT = document.getElementById("ShowMinMaxT");
+        minmaxT.style.display = "none";
+        var maxT = document.getElementById("ShowMaxT");
+        maxT.style.display = "none";
+        var enter = document.getElementById("ShowEnterT");
+        enter.style.display = "none";
+        var dateT = document.getElementById("ShowDateT");
+        dateT.style.display = "none";
+        var idN = $("#idNhacNho").val();
+        SetNhatNho(idN);
+
+    }
+
+    function OffRe() {
+        var re = document.getElementById("showNhacNho");
+        re.style.display = "none";
+       var idN =  $("#idNhacNho").val();
+        SetNhatNho(idN);
+    }
+
+    $(function () {
+        $('#DateNhacNho').daterangepicker({
+            opens: 'left'
+        }, function (start, end, label) {
+            console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+    });
+
+    function GetNhacNho(id) {
+        var minT = document.getElementById("ShowMinT");
+        minT.style.display = "none";
+        var minmaxT = document.getElementById("ShowMinMaxT");
+        minmaxT.style.display = "none";
+        var maxT = document.getElementById("ShowMaxT");
+        maxT.style.display = "none";
+        var enter = document.getElementById("ShowEnterT");
+        enter.style.display = "none";
+        var dateT = document.getElementById("ShowDateT");
+        dateT.style.display = "none";
+        $("#idNhacNho").val(id);
+        SetNhacNho(id);
+
+    }
+
+    function SetNhacNho(id) {
+        $.ajax({
+    type: "GET",
+    url: "@Url.Action("GetReminder", "Products")",
+    data: { id: id },
+        dataType: "json",
+            success: function (msg) {
+
+                var dateNN = msg.reminderStartDate + ' - ' + msg.reminderEndDate
+            $('#DateNhacNho').val(dateNN);
+            $('#MinT').val(msg.min);
+            $('#MaxT').val(msg.max);
+        },
+        error: function (req, status, error) {
+
+        }
+    });
+    }
+
+    var frRe = $('#formRe');
+    frRe.submit(function (e) {
+        var da = $('#DateNhacNho').val();
+        var mi = $('#MinT').val();
+        var ma = $('#MaxT').val();
+        var idN = $('#idNhacNho').val();
+        var checkbox = document.getElementsByName("BoolReminder");
+        var check;
+        for (var i = 0; i < checkbox.length; i++) {
+            if (checkbox[i].checked === true) {
+                check = checkbox[i].value;
+            }
+        }
+        //toastr.error('Xóa thất bại!')
+        if (check == "true") {
+            if (mi == "") {
+                document.getElementById("ShowMinT").style.display = "block";
+            } else {
+                document.getElementById("ShowMinT").style.display = "none";
+            }
+
+            if (ma == "") {
+                document.getElementById("ShowMaxT").style.display = "block";
+            } else {
+                document.getElementById("ShowMaxT").style.display = "none";
+            }
+
+            if (mi != "" && ma != "") {
+                const x = new Number(mi);
+                const y = new Number(ma);
+                if (x >= y) {
+                    document.getElementById("ShowMinMaxT").style.display = "block";
+                }
+                else {
+                    document.getElementById("ShowMinMaxT").style.display = "none";
+
+                    var ar = da.split(" - ");
+
+                    var d1 = new Date(ar[0]);
+                    var d2 = new Date();
+                    if (d1.getFullYear() >= d2.getFullYear()) {
+                        if (d1.getFullYear() > d2.getFullYear()) {
+                            document.getElementById("ShowDateT").style.display = "none";
+                            upReminder(frRe, idN, true);
+                            // thành công
+                        } else {
+                            if (d1.getMonth() >= d2.getMonth()) {
+                                if (d1.getMonth() > d2.getMonth()) {
+                                    document.getElementById("ShowDateT").style.display = "none";
+                                    upReminder(frRe, idN, true);
+                                    // thành công
+                                }
+                                else {
+                                    if (d1.getDate() >= d2.getDate()) {
+                                        document.getElementById("ShowDateT").style.display = "none";
+                                        upReminder(frRe, idN, true);
+                                        // thành công
+                                    } else {
+                                        document.getElementById("ShowDateT").style.display = "block";
+                                    }
+                                }
+
+                            } else {
+                                document.getElementById("ShowDateT").style.display = "block";
+                            }
+                        }
+                    }
+                    else {
+                        document.getElementById("ShowDateT").style.display = "block";
+                    }
+                }
+            }
+
+        }
+        else {
+            upReminder(frRe,idN,false);
+        }
+        e.preventDefault();
+    });
+
+    function upReminder(frRe,id,check) {
+        $.ajax({
+            type: "PUT",
+            url: "@Url.Action("UpdateReminder")",
+            data: frRe.serialize(),
+            success: function (msg) {
+                if (msg.isSuccessed) {
+                    $('#exampleNhacNho').modal('hide');
+                    toastr.success('Cập nhật thành công')
+
+                    var str = "Re-" + id;
+                    var myobj = document.getElementById(str);
+                    myobj.remove();
+
+                    var str;
+                    var sty;
+                    if (check) {
+                        str = "Bật";
+                        sty = "btn-success";
+                    } else {
+                        str = "Tắt";
+                        sty = "btn-danger";
+                    }
+                    html = '<div  id="Re-'+id+'" class="btn-group btn-group-sm">' +
+                    '<button type="button" class="btn '+sty+'">'+str+'</button>' +
+                        ' <button type="button" class="btn ' + sty +'  dropdown-toggle dropdown-icon" data-toggle="dropdown">' +
+                    ' <span class="sr-only">Toggle Dropdown</span>' +
+                    '</button>' +
+                    ' <div class="dropdown-menu" role="menu">' +
+                    ' <a class="dropdown-item"' +
+                    ' data-toggle="modal" data-target="#exampleNhacNho"' +
+                    ' onclick="GetNhacNho('+id+')">Thao Tác</a>' +
+                    '  </div>' +
+                        '</div>';
+                    var tu = "#Reminder-" + id;
+                    $(tu).append(html);
+
+                            } else {
+                    toastr.error('Cập nhậtthất bại')
+                }
+            },
+            error: function (data) {
+                toastr.error('Cập nhật thất bại')
+            }
+        });
+    }
+
+</script>
+
+<!--Đóng gói-->
+<script>
+    document.getElementById("EditDG").style.display = "block";
+    document.getElementById("PackShowDG").style.display = "block";
+
+    document.getElementById("SaveDG").style.display = "none";
+    document.getElementById("PackDefaultDG").style.display = "none";
+    function GetEditDG()
+    {
+        document.getElementById("EditDG").style.display = "none";
+        document.getElementById("PackShowDG").style.display = "none";
+
+        document.getElementById("SaveDG").style.display = "block";
+        document.getElementById("PackDefaultDG").style.display = "block";
+    }
+
+    function GetSaveDG()
+    {
+        var idSP = $('#IdDG').val();
+        var id = $('#IdDGMD').val();
+        var vl = $('#PackDefaultDG').val();
+        if (vl.length === 0 || !vl.trim()) {
+            toastr.error('Tên đóng gói (mặc định) không được bỏ trống')
+        }
+        else {
+            var bundle =
+            {
+                Id: id,
+                IdPorudct: idSP,
+                Name: vl,
+                Default: true,
+                Value:1
+            }
+            $.ajax({
+                type: "PUT",
+                url: "@Url.Action("UpdatePack")",
+                data: bundle,
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        toastr.success('Cập nhật thành công')
+
+                        document.getElementById("EditDG").style.display = "block";
+                        document.getElementById("PackShowDG").style.display = "block";
+
+                        document.getElementById("SaveDG").style.display = "none";
+                        document.getElementById("PackDefaultDG").style.display = "none";
+                        document.getElementById("ShowEnterT").style.display = "none";
+                        $('#PackShowDG').val(vl);
+                        $('#PackDefaultDG').val(vl);
+                        var text = '#TextPack-' + idSP;
+                        $(text).text(vl);
+
+                    } else {
+                        toastr.error('Cập nhật thất bại')
+
+                    }
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại')
+
+                }
+            });
+
+        }
+    }
+
+    function CheckNameDG() {
+        var idSP = $('#IdDG').val();
+        var val = document.getElementById("PackDefaultDG").value;
+        var btnDG = document.getElementById("SaveDG");
+        var enter = document.getElementById("ShowEnterT");
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("iNamePack")",
+                data: { name: val , idSP : idSP, status: false},
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        enter.style.display = 'none';
+                        btnDG.style.display = 'block';
+
+                    } else {
+                        enter.style.display = 'block';
+                        btnDG.style.display = 'none';
+                    }
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+
+</script>
+
+<!--Update Đóng gói-->
+<script>
+   function GetPack(id)
+   {
+       $('#FormAddDongGoi').trigger("reset");
+       document.getElementById("btn-dg").style.display = "block";
+       document.getElementById("ShowTenDongGoi").style.display = "none";
+       document.getElementById("FormAddDongGoi").style.display = "none";
+
+       document.getElementById("EditDG").style.display = "block";
+       document.getElementById("PackShowDG").style.display = "block";
+
+       document.getElementById("SaveDG").style.display = "none";
+       document.getElementById("PackDefaultDG").style.display = "none";
+       document.getElementById("ShowEnterT").style.display = "none";
+
+       var myobj = document.getElementById("dgTR");
+       myobj.remove();
+
+       var h = '<tbody id="dgTR"></tbody>';
+       $("#tableDG").append(h);
+
+       $('#IdDG').val(id);
+        $.ajax({
+    type: "GET",
+    url: "@Url.Action("GetPack", "Products")",
+    data: { id:id},
+    dataType: "json",
+    success: function (msg) {
+    msg.forEach(function (item) {
+
+        if (item.default) {
+            $('#PackShowDG').val(item.name)
+            $('#PackDefaultDG').val(item.name)
+            $('#IdDGMD').val(item.id)
+        } else {
+            var str = '<tr id="PackEdit-' + item.id +'">'+
+                '<td id = "Name-'+item.id+'" >' +
+                ' <div class="form-group"> ' +
+                '  <label for="inputEmail4">Tên Đóng Gói</label>' +
+                '<input type="hidden" id="DG-' + item.id + '" value="' + item.id +'" />' +
+                '    <input type="text" class="form-control" id="NameP' + item.id + '" ' +
+                'placeholder="Tên đóng gói" value="' + item.name + '"  required>' +
+                '   </div>' +
+                ' </td>' +
+                '   <td id="Value-' + item.id +'">' +
+                '       <div class="form-group">' +
+                '            <label for="inputEmail4">Giá Trị Chuyển Đổi</label>' +
+                '            <input type="text" class="form-control" id="ValueP' + item.id + '" ' +
+            'value="' + item.value + '" placeholder="Giá trị chuyển đổi" required>' +
+                '        </div>' +
+                '     </td>' +
+                '     <td class="text-center py-0 align-middle">' +
+                '        <div class="btn-group btn-group-sm">' +
+                '             <a class="btn btn-success" ' +
+                '                onclick="GetEditDG1(' + item.id +')" title="Sửa">' +
+                '                 <i class="fas fa-check"></i>' +
+                '            </a>' +
+                '            <a class="btn btn-danger" ' +
+                '              onclick="GetDeleteDG(' + item.id +')" title="Xóa">' +
+                '               <i class="fas fa-trash"></i>' +
+                '           </a>' +
+                '       </div>' +
+                '   </td>' +
+                ' </tr>';
+            $("#dgTR").append(str);
+        }
+
+    });
+
+    },
+    error: function (req, status, error) {
+
+    }
+  });
+    }
+
+    var fraddDG = $('#FormAddDongGoi');
+
+    fraddDG.submit(function (e) {
+
+        $.ajax({
+                type: "POST",
+            url: "@Url.Action("CreatePack")",
+            data: fraddDG.serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        toastr.success('Thêm thành công')
+                        ThuGon();
+                        var str = '<tr id="PackEdit-'+ msg.id +'">' +
+                            '<td id = "Name-' + msg.id + '" >' +
+                            ' <div class="form-group"> ' +
+                            '  <label for="inputEmail4">Tên Đóng Gói</label>' +
+                            '<input type="hidden" id="DG-' + msg.id + '" value="' + msg.id + '" />' +
+                            '    <input type="text" class="form-control" id="NameP'+msg.id+'" '+
+                            'placeholder = "Tên đóng gói" value = "' + msg.name + '" required > ' +
+                            '   </div>' +
+                            ' </td>' +
+                            '   <td id="Value-' + msg.id+ '">' +
+                            '       <div class="form-group">' +
+                            '            <label for="inputEmail4">Giá Trị Chuyển Đổi</label>' +
+                            '            <input type="text" class="form-control" id="ValueP' + msg.id + '" ' +
+                            'value = "' + msg.value + '" placeholder = "Giá trị chuyển đổi" required > ' +
+                            '        </div>' +
+                            '     </td>' +
+                            '     <td class="text-center py-0 align-middle">' +
+                            '        <div class="btn-group btn-group-sm">' +
+                            '             <a class="btn btn-success" ' +
+                            '                onclick="GetEditDG1(' + msg.id+ ')" title="Sửa">' +
+                            '                 <i class="fas fa-check"></i>' +
+                            '            </a>' +
+                            '            <a class="btn btn-danger" ' +
+                            '              onclick="GetDeleteDG(' + msg.id+ ')" title="Xóa">' +
+                            '               <i class="fas fa-trash"></i>' +
+                            '           </a>' +
+                            '       </div>' +
+                            '   </td>' +
+                            ' </tr>';
+                        $("#dgTR").prepend(str);
+                    } else {
+                        toastr.error('Thêm thất bại')
+                    }
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+        e.preventDefault();
+    });
+
+    document.getElementById("FormAddDongGoi").style.display = "none";
+    document.getElementById("ShowTenDongGoi").style.display = "none";
+
+    function MoRong() {
+        document.getElementById("btn-dg").style.display = "block";
+        document.getElementById("FormAddDongGoi").style.display = "block";
+        document.getElementById("ShowTenDongGoi").style.display = "none";
+    }
+
+    function ThuGon() {
+        $('#FormAddDongGoi').trigger("reset");
+        document.getElementById("FormAddDongGoi").style.display = "none";
+        document.getElementById("ShowTenDongGoi").style.display = "none";
+        document.getElementById("btn-dg").style.display = "block";
+    }
+
+     function CheckNameDongGoi() {
+         var idSPE = $('#IdDG').val();
+         var valE = document.getElementById("NameDGShow").value;
+         var btnDGE = document.getElementById("btn-dg");
+         var enterE = document.getElementById("ShowTenDongGoi");
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("iNamePack")",
+                data: { name: valE, idSP: idSPE, status:true},
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        enterE.style.display = 'none';
+                        btnDGE.style.display = 'block';
+
+                        html = '';
+                    } else {
+                        enterE.style.display = 'block';
+                        btnDGE.style.display = 'none';
+                    }
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+
+    function GetDeleteDG(id) {
+        $('#idDeDG').val(id);
+       $('#dgDelete').modal('show');
+    }
+
+    function donggoiDelete() {
+        var idD = $('#idDeDG').val();
+        $.ajax({
+                type: "DELETE",
+                url: "@Url.Action("DeletePack")",
+                data: { id: idD},
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        $('#dgDelete').modal('hide');
+                        toastr.success('Xóa thành công')
+                        var str = "PackEdit-" + idD;
+                        var myobj = document.getElementById(str);
+                        myobj.remove();
+                    } else {
+                        toastr.error('Xóa thất bại')
+
+                    }
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại')
+
+                }
+            });
+    }
+
+    function GetEditDG1(id) {
+        var na = '#NameP' + id;
+        var va = '#ValueP' + id;
+        $('#dgUpdate').modal('show');
+
+        $('#idUpDG').val(id);
+
+        var te = $(na).val();
+        var gi = $(va).val();
+        $('#nameUpDG').val(te);
+        $('#valueUpDG').val(gi);
+
+    }
+
+    function donggoiUp() {
+      var id =  $('#idUpDG').val();
+      var ten =  $('#nameUpDG').val();
+        var gia = $('#valueUpDG').val();
+        var idSPE = $('#IdDG').val();
+        if (ten.length === 0 || !ten.trim()) {
+            $('#dgUpdate').modal('hide');
+            toastr.error('Tên đóng gói không được bỏ trống')
+        } else {
+  var bundle =
+        {
+            Id: id,
+            Name: ten,
+            Value: gia,
+            Default: false,
+            IdProduct: idSPE
+        }
+         $.ajax({
+                type: "PUT",
+                url: "@Url.Action("UpdatePack")",
+                data: bundle,
+                dataType: "json",
+                success: function (msg) {
+                    if (msg) {
+                        var na = '#NameP' + id;
+                        var va = '#ValueP' + id;
+                        if (msg.isSuccessed) {
+                            $('#dgUpdate').modal('hide');
+                            toastr.success('Cập nhật thành công')
+
+                            $(na).val(ten);
+                            $(va).val(gia);
+                        } else {
+                            $('#dgUpdate').modal('hide');
+                            toastr.error('Tên đóng gói bị trùng')
+                            $(na).val(' ');
+                        }
+
+                    } else {
+                        toastr.error('Cập nhật thất bại')
+
+                    }
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại')
+
+                }
+            });
+        }
+
+    }
+
+</script>

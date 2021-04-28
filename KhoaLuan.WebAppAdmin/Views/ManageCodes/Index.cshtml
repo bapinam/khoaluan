@@ -1,0 +1,219 @@
+﻿@using KhoaLuan.Data.Enums;
+@{ ViewData["Title"] = "Quản Lý Mã Số";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6" style="margin-bottom:8px; ">
+                <h1>Quản Lý Mã Số</h1>
+            </div>
+            <div class="col-sm-6">
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row">
+            <!-- Left col -->
+            <!--Loại Nguyên Vật LIỆU-->
+            <section class="col-lg-4 connectedSortable">
+                <div class="card direct-chat direct-chat-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Loại Nguyên Vật Liệu</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="modal-body">
+                            <form id="FormNVL" method="post">
+                                <div class="form-row">
+                                    <input type="hidden" id="TypeNVL" name="TypeCode" value="@CodeType.MaterialsType" />
+                                    <div class="form-group col-md-6">
+                                        <input type="text" class="form-control" id="NameNVL"
+                                               name="Name" placeholder="Tên Mã" required>
+                                        <span class="text-danger" id="erroGroupSP">
+                                            Tên đã tồn tại
+                                        </span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <button type="submit" id="btnthemSP" class="btn btn-primary">Thêm Vào</button>
+                                    </div>
+                                    <small>Tên mã + số tự tăng: CODE1</small>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="modal-body">
+                            <table id="example2" class="table table-bordered ">
+                                <thead>
+                                    <tr>
+                                        <th>Tên Mã</th>
+                                        <th class="text-center">Ưu Tiên</th>
+                                        <th class="text-center">Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addNVL">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="col-lg-4 connectedSortable">
+
+                <div class="card direct-chat direct-chat-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Sản Phẩm</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        huhu
+                    </div>
+                </div>
+            </section>
+
+            <section class="col-lg-4 connectedSortable">
+
+                <div class="card direct-chat direct-chat-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Sản Phẩm</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        huhu
+                    </div>
+                </div>
+            </section>
+            <!-- right col -->
+        </div>
+        <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+</section>
+
+<!--Loại Nguyên Vật Liệu-->
+<script>
+   GetNVL();
+    // Lấy giá trị của mã NVL
+    function GetNVL() {
+        var typeMVL = $("#TypeNVL").val();
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+
+                msg.forEach(function (item) {
+
+                    var str = '<tr>' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' +
+                        '<select class="form-control select2bs4">';
+
+                    if (item.top) {
+                        str = str + '      <option value="true">Bật</option>' +
+                            '    <option value="false">Tắt</option>';
+                    } else {
+                        str = str + '      <option value="false">Tắt</option>' +
+                            '    <option value="true">Bật</option>';
+                    }
+
+                    str = str + ' </select>' +
+                        '</td>' +
+                        '<td class="text-center py-0 align-middle">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEdit"' +
+                        '   onclick="GetEditNVL(' + item.id + ')" title="Sửa">' +
+                        '   <i class="fas fa-pencil-alt"></i>' +
+                        '</a>' +
+                        '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDelete"' +
+                        '   onclick="GetDeleteNVL(' + item.id + ')" title="Xóa">' +
+                        '    <i class="fas fa-trash"></i>' +
+                        ' </a>' +
+                        '</div>' +
+                        ' </td>' +
+                        ' </tr >';
+                    $('#addNVL').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+    }
+
+    document.getElementById("erroGroupSP").style.display = "none";
+
+    // Thêm : btnthemSP,NameNVL
+    var formNVL = $('#FormNVL');
+    formNVL.submit(function (e) {
+        var nameSP = $('#NameNVL').val().trim();
+        if (nameSP.length > 6) {
+            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        } else {
+             $.ajax({
+                type: "POST",
+                 url: "@Url.Action("Create")",
+                 data: formNVL.serialize(),
+                dataType: "json",
+            success: function (msg) {
+                toastr.success('Thêm thành công')
+
+                var str = '<tr>'+
+                    '<td>' + nameSP+'</td>' +
+                    '<td>' +
+                    '<select class="form-control select2bs4">' +
+                    '      <option value="false">Tắt</option>' +
+                    '    <option value="true">Bật</option>' +
+                    ' </select>' +
+                    '</td>' +
+                    '<td class="text-center py-0 align-middle">' +
+                    '<div class="btn-group btn-group-sm">' +
+                    '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEdit"' +
+                    '   onclick="GetEdit()" title="Sửa">' +
+                    '   <i class="fas fa-pencil-alt"></i>' +
+                    '</a>' +
+                    '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDelete"' +
+                    '   onclick="GetDelete()" title="Xóa">' +
+                    '    <i class="fas fa-trash"></i>' +
+                    ' </a>' +
+                    '</div>' +
+                    ' </td>' +
+                    ' </tr >';
+                $('#addNVL').prepend(str);
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+        }
+        e.preventDefault();
+    });
+</script>

@@ -85,7 +85,6 @@
                                                 <img src="@(Configuration["BaseAddress"] + @item.Image)"
                                                      style="width:50px; height:50px;" />
                                             </div>
-
                                         </td>
                                         <td id="Amount-@Html.DisplayFor(modelItem => item.Id)">
                                             <div class="btn-group btn-group-sm">
@@ -338,7 +337,6 @@
                             <label for="inputEmail4">Hình Ảnh</label>
                             <div id="showIm">
                                 <div id="ImageP">
-
                                 </div>
                             </div>
                             <div style="float:left;">
@@ -415,7 +413,6 @@
                     <input type="hidden" id="IdDGMD" />
                     <input type="text" class="form-control" id="PackDefaultDG" name="PackDefault" onkeyup="CheckNameDG()" required>
                     <span class="text-danger" id="ShowEnterT">Tên đóng gói đã tồn tại</span>
-
                 </div>
                 <br />
                 <!--Thêm ĐG-->
@@ -580,13 +577,10 @@
                 <div class="card-body row" id="ModelView">
                     <div class="col-5 text-center d-flex align-items-center justify-content-center">
                         <div class="" id="showImager">
-
                         </div>
                     </div>
                     <div class="col-7" id="ShowInfor">
-
                     </div>
-
                 </div>
                 <div id="ViewModal1">
                     <label>&nbsp;  Chuyển Đổi Đơn Vị</label>
@@ -660,17 +654,17 @@
                  var nhac = "";
                  if (msg.reminder) { nhac = "Đang nhắc nhở" } else { nhac = "Đã ngừng nhắc nhở" }
                  if (msg.description == null) { msg.description = "" }
-                 var info = '<div class="form-group"><div><b>Loại Sản Phẩm: &nbsp; </b>' + msg.nameProductType + '</div> <hr/></div>' +
-                     '<div class="form-group"><div><b>Mô Tả: &nbsp; </b>' + msg.description + '</div><hr/></div>' +
-                     '<div class="form-group"><div><b>Số Lượng: &nbsp; </b>' + msg.amount+ '</div><hr/></div>' +
-                     '<div class="form-group"><div><b>Nhắc Nhở: &nbsp; </b>' + nhac+ '</div><hr/></div>' +
-                     '<div class="form-group"><div><b>Đơn Vị Tính: &nbsp; </b>' + msg.namePackDefault + '</div><hr/></div>';
+                 var info = '<div class="form-group"><div><b>Loại Sản Phẩm: &nbsp; </b>' + msg.nameProductType + '</div> <hr /></div>' +
+                     '<div class="form-group"><div><b>Mô Tả: &nbsp; </b>' + msg.description + '</div><hr /></div>' +
+                     '<div class="form-group"><div><b>Số Lượng: &nbsp; </b>' + msg.amount+ '</div><hr /></div>' +
+                     '<div class="form-group"><div><b>Nhắc Nhở: &nbsp; </b>' + nhac+ '</div><hr /></div>' +
+                     '<div class="form-group"><div><b>Đơn Vị Tính: &nbsp; </b>' + msg.namePackDefault + '</div><hr /></div>';
 
                  $('#ShowInfor').append(info);
 
                  msg.pack.forEach(function (item) {
 
-                     var bang = '<tr><td>' + item.name + '</td><td>' + item.value + '<br/>' +
+                     var bang = '<tr><td>' + item.name + '</td><td>' + item.value + '<br />' +
                          ' <small> 1 ' + item.name + ' = ' + item.value + ' ' + msg.namePackDefault + '</small ></td> ' +
                          '<td>'+item.change+'</td></tr>';
                      $('#BangView').append(bang);
@@ -683,7 +677,6 @@
             });
     }
 </script>
-
 
 <!--Thêm-->
 <script>
@@ -827,7 +820,7 @@
                        '<td id="Image-' + msg.resultObj.id + '">' +
                        '<div id="UpdateImage-' + msg.resultObj.id + '">' +
                        '   <img src="' + anh + '" style="width:50px; height:50px;" />' +
-                       '<div/>'+
+                       '<div />'+
                         '</td>' +
                         '<td id="Amount-' + msg.resultObj.id + '">' +
                         ' <div class="btn-group btn-group-sm">' +
@@ -1080,14 +1073,12 @@
                     var maso = "#Code-" + msg.resultObj.id;
                     var ten = "#Name-" + msg.resultObj.id;
 
-
                     var hinh = "#Image-" + msg.resultObj.id;
                     var loai = "#ProductType-" + msg.resultObj.id;
 
                     $(maso).text(msg.resultObj.code);
                     $(ten).text(msg.resultObj.name);
                     $(loai).text(msg.resultObj.nameProductType);
-
 
                     var de = "UpdateImage-" + msg.resultObj.id;
                     var my1 = document.getElementById(de);
@@ -1466,7 +1457,6 @@
             }
         });
     }
-
 </script>
 
 <!--Đóng gói-->
@@ -1561,7 +1551,6 @@
                 }
             });
     }
-
 </script>
 
 <!--Update Đóng gói-->
@@ -1835,7 +1824,6 @@
         }
 
     }
-
 </script>
 <!-- Lấy mã code-->
 <script>

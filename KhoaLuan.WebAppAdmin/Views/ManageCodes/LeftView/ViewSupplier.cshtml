@@ -222,7 +222,7 @@
     formNCC.submit(function (e) {
         var nameNCC = $('#NameNCC').val().trim();
         if (nameNCC.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameNCC.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -299,7 +299,7 @@
         var top = $("#TopEditNCC").val();
         var type = $("#TypeCodeNCC").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

@@ -222,7 +222,7 @@
     formLoaiSP.submit(function (e) {
         var nameLoaiSP = $('#NameLoaiSP').val().trim();
         if (nameLoaiSP.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameLoaiSP.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -300,7 +300,7 @@
         var top = $("#TopEditLoaiSP").val();
         var type = $("#TypeCodeLoaiSP").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

@@ -223,7 +223,7 @@
     formMaterials.submit(function (e) {
         var nameMaterials = $('#NameMaterials').val().trim();
         if (nameMaterials.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameMaterials.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -300,7 +300,7 @@
         var top = $("#TopEditMaterials").val();
         var type = $("#TypeCodeMaterials").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

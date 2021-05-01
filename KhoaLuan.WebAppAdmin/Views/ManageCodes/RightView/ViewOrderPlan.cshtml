@@ -222,7 +222,7 @@
     formKHDH.submit(function (e) {
         var nameKHDH = $('#NameKHDH').val().trim();
         if (nameKHDH.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameKHDH.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -299,7 +299,7 @@
         var top = $("#TopEditKHDH").val();
         var type = $("#TypeCodeKHDH").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

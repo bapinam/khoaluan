@@ -222,7 +222,7 @@
     formNSP.submit(function (e) {
         var nameNSP = $('#NameNSP').val().trim();
         if (nameNSP.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameNSP.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -299,7 +299,7 @@
         var top = $("#TopEditNSP").val();
         var type = $("#TypeCodeNSP").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

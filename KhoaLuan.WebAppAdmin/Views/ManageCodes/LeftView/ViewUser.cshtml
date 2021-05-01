@@ -222,7 +222,7 @@
     formUser.submit(function (e) {
         var nameUser = $('#NameUser').val().trim();
         if (nameUser.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (nameUser.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')
@@ -300,7 +300,7 @@
         var top = $("#TopEditUser").val();
         var type = $("#TypeCodeUser").val();
         if (name.length > 8) {
-            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
         } else {
             if (name.length < 4) {
                 toastr.error('Độ dài tên mã ít nhất 4 ký tự')

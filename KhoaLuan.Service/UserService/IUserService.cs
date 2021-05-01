@@ -17,18 +17,30 @@ namespace KhoaLuan.Service.UserService
 
         Task<ApiResult<bool>> iEmail(string email, Guid? id);
 
+        Task<ApiResult<bool>> iEmailName(string email, string name);
+
         Task<ApiResult<bool>> Update(Guid id, UserUpdateRequest bundle);
 
-        Task<ApiResult<bool>> UpdatePassword(Guid id, UserUpdatePassword bundle);
+        Task<ApiResult<bool>> UpdateInfor(UpdateInfor bundle);
+
+        Task<ApiResult<bool>> UpdatePassword(UserUpdatePassword bundle);
 
         Task<ApiResult<PagedResult<UserVm>>> GetUsersPaging(GetUserPagingRequest bundle);
 
         Task<ApiResult<GetByIdListUser>> GetById(Guid id);
 
+        Task<ApiResult<GetByIdListUser>> GetByName(string name);
+
         Task<ApiResult<UserNameVm>> GetByUserName(Guid id);
 
         Task<ApiResult<bool>> Delete(Guid id);
 
-        Task<ApiResult<bool>> RoleAssign(Guid id, RoleAssignRequest bundle);
+        Task<ApiResult<string>> UpdateJobStauts(UpdateJobStauts bundle);
+
+        Task<ApiResult<string>> UpdateImage(UpdateImageUser bundle);
+
+        Task<ApiResult<string>> GetImage(string name);
+
+        Task<ApiResult<bool>> ResetPassWord(Guid id);
     }
 }

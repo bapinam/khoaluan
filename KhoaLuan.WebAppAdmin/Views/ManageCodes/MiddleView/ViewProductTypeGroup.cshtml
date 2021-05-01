@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Nhóm Sản Phẩm</h3>
 
@@ -221,27 +221,31 @@
     var formNSP = $('#FormNSP');
     formNSP.submit(function (e) {
         var nameNSP = $('#NameNSP').val().trim();
-        if (nameNSP.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameNSP.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
-                type: "POST",
-                 url: "@Url.Action("Create")",
-                 data: formNSP.serialize(),
-                dataType: "json",
-            success: function (msg) {
-                toastr.success('Thêm thành công')
+            if (nameNSP.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            }else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formNSP.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
 
-                $('#addNSP').remove();
-                $('#NSPtable').append('<tbody id="addNSP"></tbody>');
-                GetNSP();
+                        $('#addNSP').remove();
+                        $('#NSPtable').append('<tbody id="addNSP"></tbody>');
+                        GetNSP();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Thêm thất bại')
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
 
-                }
-            });
+                    }
+                });
+            }
         }
         e.preventDefault();
     });
@@ -294,35 +298,38 @@
         var name = $("#NameNSPEdit").val();
         var top = $("#TopEditNSP").val();
         var type = $("#TypeCodeNSP").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameNSP.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (nameNSP.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEditNSP').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addNSP').remove();
-                    $('#NSPtable').append('<tbody id="addNSP"></tbody>');
-                    GetNSP();
+                    success: function (msg) {
+                        $('#exampleEditNSP').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addNSP').remove();
+                        $('#NSPtable').append('<tbody id="addNSP"></tbody>');
+                        GetNSP();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
-
     }
 </script>

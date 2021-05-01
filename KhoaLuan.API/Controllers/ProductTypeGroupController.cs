@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = ListRole.Records)]
     public class ProductTypeGroupController : ControllerBase
     {
         private readonly IProductTypeGroupService _productTypeGroupService;
@@ -59,6 +60,7 @@ namespace KhoaLuan.API.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

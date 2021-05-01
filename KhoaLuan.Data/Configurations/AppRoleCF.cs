@@ -13,7 +13,7 @@ namespace KhoaLuan.Data.Configurations
         {
             builder.ToTable("AppRoles");
 
-            builder.Property(x => x.Description).HasMaxLength(250).IsRequired();
+            builder.Property(x => x.Description).HasMaxLength(250);
         }
     }
 }

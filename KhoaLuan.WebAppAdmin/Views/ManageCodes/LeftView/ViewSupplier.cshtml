@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Nhà Cung Cấp</h3>
 
@@ -221,27 +221,31 @@
     var formNCC = $('#FormNCC');
     formNCC.submit(function (e) {
         var nameNCC = $('#NameNCC').val().trim();
-        if (nameNCC.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameNCC.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
-                type: "POST",
-                 url: "@Url.Action("Create")",
-                 data: formNCC.serialize(),
-                dataType: "json",
-            success: function (msg) {
-                toastr.success('Thêm thành công')
+            if (nameNCC.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formNCC.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
 
-                $('#addNCC').remove();
-                $('#NCCtable').append('<tbody id="addNCC"></tbody>');
-                GetNCC();
+                        $('#addNCC').remove();
+                        $('#NCCtable').append('<tbody id="addNCC"></tbody>');
+                        GetNCC();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Thêm thất bại')
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
 
-                }
-            });
+                    }
+                });
+            }
         }
         e.preventDefault();
     });
@@ -294,35 +298,38 @@
         var name = $("#NameNCCEdit").val();
         var top = $("#TopEditNCC").val();
         var type = $("#TypeCodeNCC").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameNCC.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (nameNCC.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEditNCC').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addNCC').remove();
-                    $('#NCCtable').append('<tbody id="addNCC"></tbody>');
-                    GetNCC();
+                    success: function (msg) {
+                        $('#exampleEditNCC').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addNCC').remove();
+                        $('#NCCtable').append('<tbody id="addNCC"></tbody>');
+                        GetNCC();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
-
     }
 </script>

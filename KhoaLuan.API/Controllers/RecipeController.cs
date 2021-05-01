@@ -4,12 +4,13 @@ using KhoaLuan.ViewModels.Recipe;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = ListRole.Records)]
     public class RecipeController : ControllerBase
     {
         private readonly IRecipeService _recipeService;
@@ -117,6 +118,7 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete("{id}/{idProduct}")]
         public async Task<IActionResult> Delete(int id, int idProduct)
         {

@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Công Thức</h3>
 
@@ -221,27 +221,31 @@
     var formCT = $('#FormCT');
     formCT.submit(function (e) {
         var nameCT = $('#NameCT').val().trim();
-        if (nameCT.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameCT.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
-                type: "POST",
-                 url: "@Url.Action("Create")",
-                 data: formCT.serialize(),
-                dataType: "json",
-            success: function (msg) {
-                toastr.success('Thêm thành công')
+            if (nameCT.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            }else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formCT.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
 
-                $('#addCT').remove();
-                $('#CTtable').append('<tbody id="addCT"></tbody>');
-                GetCT();
+                        $('#addCT').remove();
+                        $('#CTtable').append('<tbody id="addCT"></tbody>');
+                        GetCT();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Thêm thất bại')
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
 
-                }
-            });
+                    }
+                });
+            }
         }
         e.preventDefault();
     });
@@ -294,34 +298,38 @@
         var name = $("#NameCTEdit").val();
         var top = $("#TopEditCT").val();
         var type = $("#TypeCodeCT").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameCT.length > 7) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (nameCT.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEditCT').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addCT').remove();
-                    $('#CTtable').append('<tbody id="addCT"></tbody>');
-                    GetCT();
+                    success: function (msg) {
+                        $('#exampleEditCT').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addCT').remove();
+                        $('#CTtable').append('<tbody id="addCT"></tbody>');
+                        GetCT();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
 
     }

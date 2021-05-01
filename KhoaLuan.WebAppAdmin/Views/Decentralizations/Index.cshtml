@@ -1,0 +1,210 @@
+﻿@using KhoaLuan.ViewModels.Common;
+@model PagedResult<KhoaLuan.ViewModels.User.UserVm>
+@{ ViewData["Title"] = "Phân Quyền";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+<!-- icheck bootstrap -->
+<link rel="stylesheet" href="/lib/icheck-bootstrap/icheck-bootstrap.min.css">
+<style>
+    .mi:hover {
+        color: blue;
+    }
+</style>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6" style="margin-bottom:8px; ">
+                <h1>Phân Quyền</h1>
+            </div>
+            <div class="col-sm-6">
+                <div class="float-sm-right" style="margin-bottom:5px;">
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content" id="main">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh Sách</h3>
+                        <div class="col-md-5" style="float:right;">
+                            <form asp-action="Index" method="get">
+                                <div class="form-group">
+                                    <div class="col-md-9" style="float:left; margin-bottom:5px;">
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên nhân viên" />
+                                    </div>
+                                    <div class="cold-md-6" style="float:right; ">
+                                        <button type="submit" class="btn btn-primary">Tìm</button>
+                                        <button type="button" onclick="window.location.href='/Decentralizations/Index'" class="btn btn-dark">Reset</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-hover table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Chứng Minh Thư</th>
+                                    <th>Họ</th>
+                                    <th>Tên</th>
+                                    <th>Giới Tính</th>
+                                    <th>Tình Trạng</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addTR">
+
+                                @foreach (var item in Model.Items)
+                                {
+                    <tr id="@Html.DisplayFor(modelItem => item.Id)">
+                        <td id="Code-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td id="Card-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.Card)
+                        </td>
+                        <td id="Last-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.LastName)
+                        </td>
+                        <td id="First-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td id="Gender-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.Gender)
+                        </td>
+                        <td id="Job-@Html.DisplayFor(modelItem => item.Id)">
+                            @Html.DisplayFor(modelItem => item.JobStatus)
+                        </td>
+                        <td class="text-center py-0 align-middle">
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"
+                                   onclick="GetView('@item.Id')" title="Xem">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a class="btn btn-warning" data-toggle="modal" data-target="#exampleAssign"
+                                   onclick="GetAssign('@item.Id')" title="Giao Quyền">
+                                    <i class="fas fa-pencil-square-o"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Chứng Minh Thư</th>
+                                    <th>Họ</th>
+                                    <th>Tên</th>
+                                    <th>Giới Tính</th>
+                                    <th>Tình Trạng</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        @await Component.InvokeAsync("Pager", Model)
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<!--Giao quyền hạn-->
+<div class="modal fade bd-example-modal-lg" id="exampleAssign" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Giao Quyền</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="frmAssign" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="IdUser" name="IdUser" />
+
+                    <div class="card card-primary card-outline">
+                        <!--<div class="card-header">
+                        <h3 class="card-title">Loại Nguyên Vât Liệu</h3>-->
+                        <!-- /.card-tools -->
+                        <!--</div>-->
+                        <!-- /.card-header -->
+                        <div class="card-body p-0">
+                            <div class="mailbox-controls">
+                                <!-- Check all button -->
+                                <button type="button" class="btn btn-default btn-sm checkbox-toggle"
+                                        style="margin-left:15px;">
+                                    <i class="far fa-square"></i>
+                                </button>
+
+                                <!-- /.float-right -->
+                            </div>
+                            @await Html.PartialAsync("Assign")
+
+                            <!-- /.mail-box-messages -->
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!--//-->
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        //Enable check and uncheck all functionality
+        $('.checkbox-toggle').click(function () {
+            var clicks = $(this).data('clicks')
+            if (clicks) {
+                //Uncheck all checkboxes
+                $('.mailbox-messages input[type=\'checkbox\']').prop('checked', false)
+                $('.checkbox-toggle .far.fa-check-square').removeClass('fa-check-square').addClass('fa-square')
+            } else {
+                //Check all checkboxes
+                $('.mailbox-messages input[type=\'checkbox\']').prop('checked', true)
+                $('.checkbox-toggle .far.fa-square').removeClass('fa-square').addClass('fa-check-square')
+            }
+            $(this).data('clicks', !clicks)
+        })
+
+        //Handle starring for font awesome
+        $('.mailbox-star').click(function (e) {
+            e.preventDefault()
+            //detect type
+            var $this = $(this).find('a > i')
+            var fa = $this.hasClass('fa')
+
+            //Switch states
+            if (fa) {
+                $this.toggleClass('fa-star')
+                $this.toggleClass('fa-star-o')
+            }
+        })
+    })
+</script>
+
+<script>
+</script>

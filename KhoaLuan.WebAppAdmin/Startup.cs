@@ -41,8 +41,14 @@ namespace KhoaLuan.WebAppAdmin
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Login/Index"; // nếu chưa đăng nhập thì nó về trang login
-                    options.AccessDeniedPath = "/User/Forbidden/";
+                    options.AccessDeniedPath = "/Home/Index/";
                 });
+
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy(SystemConstants.PolicyRecorads.AddRecorads,
+            //        policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.RecordsManagementsRole.Add));
+            //});
 
             ///------
             services.AddTransient<IValidator<MaterialCreate>, MaterialCreateValidator>();
@@ -131,7 +137,7 @@ namespace KhoaLuan.WebAppAdmin
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Users}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Welcome}/{id?}");
             });
         }
     }

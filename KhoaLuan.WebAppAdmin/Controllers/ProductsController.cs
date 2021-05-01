@@ -2,15 +2,18 @@
 using KhoaLuan.ViewModels.Product;
 using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize(Roles = ListRole.Records)]
     public class ProductsController : BaseController
     {
         private readonly IProductApiClient _productApiClient;
@@ -52,16 +55,15 @@ namespace KhoaLuan.WebAppAdmin.Controllers
                 NamePackDefault = bundle.NamePackDefault,
                 Reminder = bundle.Reminder,
                 ReminderEndDate = bundle.ReminderEndDate,
-                ReminderStartDate= bundle.ReminderStartDate,
+                ReminderStartDate = bundle.ReminderStartDate,
                 ValuePack = bundle.ValuePack
             };
             var result = await _productApiClient.Create(proudct);
 
-            if (bundle.Image!=null)
+            if (bundle.Image != null)
             {
-                var image = await _productApiClient.UpdateImage(result.ResultObj.Id,bundle.Image);
+                var image = await _productApiClient.UpdateImage(result.ResultObj.Id, bundle.Image);
                 result.ResultObj.Image = image.ResultObj;
-
             }
             return result;
         }
@@ -79,7 +81,6 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return data;
         }
 
-
         [HttpGet]
         public async Task<bool> iName(string name, int? id)
         {
@@ -90,7 +91,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         [HttpGet]
         public async Task<bool> iNamePack(string name, int idSP, bool status, long? id)
         {
-            var data = await _productApiClient.iNamePack(name, idSP,status,id);
+            var data = await _productApiClient.iNamePack(name, idSP, status, id);
             return data.IsSuccessed;
         }
 
@@ -108,10 +109,10 @@ namespace KhoaLuan.WebAppAdmin.Controllers
                 Description = result.ResultObj.Description,
                 IdProductType = result.ResultObj.IdProductType,
                 NameProductType = result.ResultObj.NameProductType,
-                 Amount = result.ResultObj.Amount,
-                 Pack = result.ResultObj.Pack,
-                 Reminder = result.ResultObj.Reminder,
-                 NamePackDefault = result.ResultObj.NamePackDefault
+                Amount = result.ResultObj.Amount,
+                Pack = result.ResultObj.Pack,
+                Reminder = result.ResultObj.Reminder,
+                NamePackDefault = result.ResultObj.NamePackDefault
             };
             return data;
         }
@@ -141,6 +142,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             data = result.ResultObj;
             return data;
         }
+
         [HttpPut]
         [Consumes("multipart/form-data")]
         public async Task<ApiResult<UpdateReturn>> Update([FromForm] ProductUpdate bundle)
@@ -163,6 +165,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return data;
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete]
         public async Task<ApiResult<bool>> Delete(int id)
         {

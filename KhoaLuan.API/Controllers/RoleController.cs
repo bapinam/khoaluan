@@ -1,4 +1,5 @@
 ﻿using KhoaLuan.Service.RoleService;
+using KhoaLuan.ViewModels.Decentralization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +22,26 @@ namespace KhoaLuan.API.Controllers
             _roleService = roleService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetRole(Guid id)
+
         {
-            var roles = await _roleService.GetAll();
+            var roles = await _roleService.GetRole(id);
             return Ok(roles);
+        }
+
+        [HttpPost("assign")]
+        public async Task<IActionResult> Assign(AssignVm bundle)
+        {
+            var roles = await _roleService.Assign(bundle);
+            return Ok(roles);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            await _roleService.CreateRole();
+            return Ok();
         }
     }
 }

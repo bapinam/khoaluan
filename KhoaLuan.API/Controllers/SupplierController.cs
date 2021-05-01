@@ -8,12 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = ListRole.Records)]
     public class SupplierController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
@@ -53,6 +54,7 @@ namespace KhoaLuan.API.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

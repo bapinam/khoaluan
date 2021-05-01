@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = ListRole.Admin)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -69,6 +70,14 @@ namespace KhoaLuan.API.Controllers
             return Ok(resultId);
         }
 
+        [HttpGet("check-email-name")]
+        [AllowAnonymous]
+        public async Task<IActionResult> iEmailName(string email, string name)
+        {
+            var resultId = await _userService.iEmailName(email, name);
+            return Ok(resultId);
+        }
+
         ///api/users/paging?pageIndex=1&pageSize=10&keyword=
         [HttpGet("paging")]
         public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
@@ -81,6 +90,14 @@ namespace KhoaLuan.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetById(id);
+            return Ok(user);
+        }
+
+        [HttpGet("name/{name}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByName(string name)
+        {
+            var user = await _userService.GetByName(name);
             return Ok(user);
         }
 
@@ -112,13 +129,14 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("change-password/{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdatePassword request)
+        [HttpPut("infor")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Update([FromBody] UpdateInfor request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _userService.UpdatePassword(id, request);
+            var result = await _userService.UpdateInfor(request);
             if (!result.IsSuccessed)
             {
                 return BadRequest(result);
@@ -126,17 +144,56 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}/roles")]
-        public async Task<IActionResult> RoleAssign(Guid id, [FromBody] RoleAssignRequest request)
+        [HttpPut("change-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Update([FromBody] UserUpdatePassword request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _userService.RoleAssign(id, request);
+            var result = await _userService.UpdatePassword(request);
             if (!result.IsSuccessed)
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPut("job-stautus")]
+        public async Task<IActionResult> UpdateJobStauts([FromBody] UpdateJobStauts bundle)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _userService.UpdateJobStauts(bundle);
+            if (!result.IsSuccessed)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("image")]
+        [AllowAnonymous]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateImage([FromForm] UpdateImageUser bundle)
+        {
+            var result = await _userService.UpdateImage(bundle);
+            return Ok(result);
+        }
+
+        [HttpGet("get-image/{name}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetImage(string name)
+        {
+            var result = await _userService.GetImage(name);
+            return Ok(result);
+        }
+
+        [HttpGet("reset-password/{id}")]
+        public async Task<IActionResult> ResetPassWord(Guid id)
+        {
+            var result = await _userService.ResetPassWord(id);
             return Ok(result);
         }
     }

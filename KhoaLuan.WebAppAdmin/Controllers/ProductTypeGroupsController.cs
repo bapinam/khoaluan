@@ -2,14 +2,17 @@
 using KhoaLuan.ViewModels.ProductTypeGroup;
 using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize(Roles = ListRole.Records)]
     public class ProductTypeGroupsController : BaseController
     {
         private readonly IProductTypeGroupApiClient _productTypeGroupApiClient;
@@ -76,6 +79,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return data;
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete]
         public async Task<ApiResult<bool>> Delete(int id)
         {

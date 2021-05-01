@@ -7,6 +7,14 @@ namespace KhoaLuan.Data.Entities
 {
     public class AppRole : IdentityRole<Guid>
     {
+        public AppRole()
+        {
+        }
+
+        public AppRole(string roleName) : base(roleName)
+        {
+        }
+
         public string Description { get; set; }
     }
 }

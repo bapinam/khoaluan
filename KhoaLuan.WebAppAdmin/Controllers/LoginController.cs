@@ -62,7 +62,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             }
             var authProperties = new AuthenticationProperties
             {
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(240),
+                ExpiresUtc = DateTimeOffset.UtcNow.AddYears(1),
                 IsPersistent = remember
             };
 
@@ -75,7 +75,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
                         userPrincipal,
                         authProperties);
 
-            return RedirectToAction("Index", "Users");
+            return RedirectToAction("Welcome", "Home");
         }
 
         public IActionResult ForgotPassword()

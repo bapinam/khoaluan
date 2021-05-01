@@ -3,14 +3,17 @@ using KhoaLuan.ViewModels.MaterialsType;
 using KhoaLuan.ViewModels.MaterialsTypeViewModel;
 using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize(Roles = ListRole.Records)]
     public class MaterialsTypesController : BaseController
     {
         private readonly IMaterialsTypeApiClient _materialsTypeApiClient;
@@ -71,13 +74,13 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return data;
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete]
         public async Task<ApiResult<bool>> Delete(int id)
         {
             var data = await _materialsTypeApiClient.Delete(id);
             return data;
         }
-
 
         [HttpGet]
         public async Task<List<GetAllMaterialsType>> GetAll()

@@ -47,7 +47,7 @@
 
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-striped">
+                        <table id="example2" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Mã Số</th>
@@ -577,13 +577,14 @@
                      var cmt = "#Tax-" + id;
                      var ho = "#Name-" + id;
                      var ten = "#Phone-" + id;
-                     var gioitinh = "#Email-" + id;
+                     var thu = "#Email-" + id;
                      var diachi = "#Address-" + id;
                      $(maso).text(code);
                      $(cmt).text(tax);
                      $(ho).text(name);
                      $(ten).text(phone);
                      $(diachi).text(address);
+                     $(thu).text(email);
 
                  } else {
                      toastr.error('Cập nhật thất bại!')

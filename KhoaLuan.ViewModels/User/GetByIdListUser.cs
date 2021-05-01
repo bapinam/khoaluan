@@ -7,6 +7,8 @@ namespace KhoaLuan.ViewModels.User
 {
     public class GetByIdListUser
     {
+        public Guid Id { get; set; }
+
         [Display(Name = "Mã số")]
         public string Code { get; set; }
 
@@ -44,5 +46,8 @@ namespace KhoaLuan.ViewModels.User
 
         [Display(Name = "Tình Trạng Làm")]
         public string JobStatus { get; set; }
+
+        [Display(Name = "Hình ảnh")]
+        public string PathImage { get; set; }
     }
 }

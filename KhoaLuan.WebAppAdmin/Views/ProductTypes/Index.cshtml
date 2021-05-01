@@ -41,7 +41,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên sản phẩm" />
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên loại sản phẩm" />
                                     </div>
                                     <div class="cold-md-5">
                                         <button type="submit" class="btn btn-primary">Tìm</button>
@@ -56,7 +56,7 @@
 
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-striped">
+                        <table id="example2" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Mã Số</th>
@@ -91,7 +91,8 @@
                                 </a>
                             </div>
                         </td>
-                    </tr>}
+                    </tr>
+}
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -133,8 +134,8 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Mã Số</label>
-                            <input type="text" class="form-control" id="Code" name="Code" placeholder="Mã Số" required>
-                            <span class="text-danger"></span>
+                            <select id="Code" name="Code" class="form-control select2bs4" required>
+                            </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label>Nhóm Loại</label>
@@ -181,7 +182,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label>Mã Số</label>
-                        <input type="text" class="form-control" id="codeE" name="Code" placeholder="Mã Số" required>
+                        <input type="text" class="form-control" id="codeE" name="Code" placeholder="Mã Số" disabled>
                         <span class="text-danger"></span>
                     </div>
                     <div class="form-group col-md-6">
@@ -528,5 +529,32 @@
 
         }
     });
+    }
+</script>
+
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.ProductType";
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#Code').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
     }
 </script>

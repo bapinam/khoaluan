@@ -2,12 +2,15 @@
 using KhoaLuan.ViewModels.Recipe;
 using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize(Roles = ListRole.Records)]
     public class RecipesController : BaseController
     {
         private readonly IRecipeApiClient _recipeApiClient;
@@ -103,6 +106,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = ListRole.Admin)]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id, int idProduct)
         {

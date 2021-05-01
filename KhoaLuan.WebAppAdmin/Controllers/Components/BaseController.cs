@@ -6,10 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers.Components
 {
-    [Authorize]
     public class BaseController : Controller
     {
         public override void OnActionExecuting(ActionExecutingContext context)

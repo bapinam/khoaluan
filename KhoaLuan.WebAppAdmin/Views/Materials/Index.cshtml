@@ -1,4 +1,5 @@
 ﻿@using KhoaLuan.ViewModels.Common;
+@using KhoaLuan.Data.Enums;
 @model PagedResult<KhoaLuan.ViewModels.Material.MaterialVm>
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
 @{ ViewData["Title"] = "Nguyên Vật Liệu";
@@ -40,7 +41,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên sản phẩm" />
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên nguyên vật liệu" />
                                     </div>
                                     <div class="cold-md-5">
                                         <button type="submit" class="btn btn-primary">Tìm</button>
@@ -55,7 +56,7 @@
 
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-striped">
+                        <table id="example2" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Mã Số</th>
@@ -99,9 +100,8 @@
                                                             <tr>
                                                                 <td>
                                                                     <div class="progress progress-xs">
-                                                                        <script>
-                                                            document.write('<div class="progress-bar progress-bar-danger" style="width: '+@Html.DisplayFor(modelItem => item.AmountPercent)+'%"></div>');
-                                                                        </script>
+                                                                        <div class="progress-bar progress-bar-danger" style="width: @Html.DisplayFor(modelItem => item.AmountPercent)%"></div>');
+
                                                                     </div>
                                                                 </td>
                                                                 <td style="width: 40px;">
@@ -222,8 +222,9 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="inputEmail4">Mã Số</label>
-                            <input type="text" class="form-control" name="Code" placeholder="Mã số" required>
+                            <label>Mã Số</label>
+                            <select id="Code" name="Code" class="form-control select2bs4" required>
+                            </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="inputEmail4">Tên</label>
@@ -257,12 +258,17 @@
 
                     <button type="button" onclick="add_element()" class="btn btn-success btn-sm" autocomplete="false">Thêm Đóng Gói</button>
                     <!--Nhắc nhở-->
-                    <div class="icheck-primary">
-                        <input type="checkbox" name="Reminder" id="action" style="margin-top:30px;font-size:30px;">
-                        <label class="form-check-label" name="Reminder" for="defaultCheck1">
-                            <br />Nhắc Nhở Mức Tồn Kho
-                        </label>
-                    </div> <br />
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="icheck-primary">
+                                <input type="checkbox" name="Reminder" id="action" style="margin-top:30px;font-size:30px;">
+                                <label name="Reminder" for="defaultCheck1">
+                                    <br /><b>Nhắc Nhở Mức Tồn Kho</b>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
                     <div id="content">
                         <div class="form-row">
                             <div class="form-group col-md-6">
@@ -313,7 +319,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="inputEmail4">Mã Số</label>
-                            <input type="text" class="form-control" name="Code" id="CodeE" placeholder="Mã số" required>
+                            <input type="text" class="form-control" name="Code" id="CodeE" placeholder="Mã số" disabled>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="inputEmail4">Tên</label>
@@ -1024,11 +1030,11 @@
     {
         var val = document.getElementById("NameE").value;
         var btn = document.getElementById("btnthemE")
-
+        var idE = document.getElementById("IdE").value;
             $.ajax({
                 type: "GET",
                 url: "@Url.Action("iName")",
-                data: { name: val },
+                data: { name: val, id:idE },
                 dataType: "json",
                 success: function (msg) {
                     if (msg) {
@@ -1822,5 +1828,31 @@
             });
         }
 
+    }
+</script>
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.Materials";
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#Code').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
     }
 </script>

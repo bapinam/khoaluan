@@ -1,0 +1,83 @@
+﻿@using KhoaLuan.Utilities.Constants;
+<div class="table-responsive mailbox-messages">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td rowspan="0">
+                    <div class="icheck-primary">
+                        <input type="checkbox" value="@SystemConstants.ListRole.RecordsManagement" id="check1" name="RecordsManagement">
+                        <label for="check1"></label>
+                    </div>
+                </td>
+                <td class="mailbox-name mi" rowspan="0"><a>Quản lý hồ sơ</a></td>
+            </tr>
+            <tr>
+                <td class="mailbox-subject">
+                    <b>Xem</b> - Có chức năng xem danh sách hồ sơ
+                </td>
+            </tr>
+            <tr>
+                <td class="mailbox-subject">
+                    <b>Thêm</b> - Có chức năng thêm dữ liệu vào hồ sơ
+                </td>
+            </tr>
+            <tr>
+                <td class="mailbox-subject">
+                    <b>Sửa</b> - Có chức năng sửa dữ liệu trong hồ sơ
+                </td>
+            </tr>
+            <tr>
+                <td class="mailbox-subject">
+                    <b>Nhắc nhở</b> - Bật/tắt nhắc nhở mức tồn kho
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- /.table -->
+</div>
+
+<script>
+    // set id
+    function GetAssign(id) {
+        document.getElementById("check1").checked = false;
+
+        $("#IdUser").val(id);
+         $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetRole")",
+            data: {id:id},
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    if (item == '@SystemConstants.ListRole.RecordsManagement') {
+                        document.getElementById("check1").checked = true;
+                    }
+                });
+                },
+            error: function (req, status, error) {
+
+            }
+         });
+    }
+
+    var frm = $("#frmAssign");
+    frm.submit(function (e) {
+
+         $.ajax({
+                type: "POST",
+                url: "@Url.Action("Assign")",
+                data: frm.serialize(),
+                dataType: "json",
+            success: function (msg) {
+                $('#exampleAssign').modal('hide');
+
+                toastr.success('Giao quyền thành công')
+                },
+                error: function (req, status, error) {
+                    toastr.success('Giao quyền thất bại')
+                }
+            });
+
+        e.preventDefault();
+    });
+</script>

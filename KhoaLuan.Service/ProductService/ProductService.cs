@@ -132,6 +132,11 @@ namespace KhoaLuan.Service.ProductService
                 return new ApiErrorResult<bool>("Sản phẩmkhông tồn tại");
             }
 
+            if (product.Image != null)
+            {
+                await _storageService.DeleteFileAsync(product.Image);
+            }
+
             var reult = _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
@@ -160,7 +165,6 @@ namespace KhoaLuan.Service.ProductService
 
             product.IdProductType = bundle.IdProductType;
             product.Name = bundle.Name;
-            product.Code = bundle.Code;
             product.Description = bundle.Description;
 
             _context.Products.Update(product);

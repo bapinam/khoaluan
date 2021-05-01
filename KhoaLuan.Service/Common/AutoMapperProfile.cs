@@ -21,6 +21,7 @@ namespace KhoaLuan.Service.AutoMapper
             //User
             CreateMap<RegisterRequest, AppUser>();
             CreateMap<UserUpdateRequest, AppUser>();
+            CreateMap<UpdateInfor, AppUser>();
             CreateMap<AppUser, UserVm>();
             CreateMap<AppUser, UserNameVm>();
             CreateMap<AppUser, GetByIdListUser>();

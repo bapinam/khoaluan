@@ -131,6 +131,11 @@ namespace KhoaLuan.Service.MaterialService
                 return new ApiErrorResult<bool>("Nguyên vật liệu không tồn tại");
             }
 
+            if (product.Image != null)
+            {
+                await _storageService.DeleteFileAsync(product.Image);
+            }
+
             var reult = _context.Materials.Remove(product);
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
@@ -159,7 +164,6 @@ namespace KhoaLuan.Service.MaterialService
 
             product.IdMaterialsType = bundle.IdMaterialType;
             product.Name = bundle.Name;
-            product.Code = bundle.Code;
             product.Description = bundle.Description;
 
             _context.Materials.Update(product);

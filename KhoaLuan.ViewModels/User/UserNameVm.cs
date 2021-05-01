@@ -33,5 +33,8 @@ namespace KhoaLuan.ViewModels.User
 
         [Display(Name = "Mật khẩu")]
         public string Password { get; set; }
+
+        [Display(Name = "Tình trạng việc làm")]
+        public string JobStatus { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Kế Hoạch Chế Biến</h3>
 
@@ -221,27 +221,31 @@
     var formKHCB = $('#FormKHCB');
     formKHCB.submit(function (e) {
         var nameKHCB = $('#NameKHCB').val().trim();
-        if (nameKHCB.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameKHCB.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
-                type: "POST",
-                 url: "@Url.Action("Create")",
-                 data: formKHCB.serialize(),
-                dataType: "json",
-            success: function (msg) {
-                toastr.success('Thêm thành công')
+            if (nameKHCB.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formKHCB.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
 
-                $('#addKHCB').remove();
-                $('#KHCBtable').append('<tbody id="addKHCB"></tbody>');
-                GetKHCB();
+                        $('#addKHCB').remove();
+                        $('#KHCBtable').append('<tbody id="addKHCB"></tbody>');
+                        GetKHCB();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Thêm thất bại')
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
 
-                }
-            });
+                    }
+                });
+            }
         }
         e.preventDefault();
     });
@@ -294,35 +298,38 @@
         var name = $("#NameKHCBEdit").val();
         var top = $("#TopEditKHCB").val();
         var type = $("#TypeCodeKHCB").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (name.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (name.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEditKHCB').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addKHCB').remove();
-                    $('#KHCBtable').append('<tbody id="addKHCB"></tbody>');
-                    GetKHCB();
+                    success: function (msg) {
+                        $('#exampleEditKHCB').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addKHCB').remove();
+                        $('#KHCBtable').append('<tbody id="addKHCB"></tbody>');
+                        GetKHCB();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
-
     }
 </script>

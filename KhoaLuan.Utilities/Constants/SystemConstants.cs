@@ -22,5 +22,35 @@ namespace KhoaLuan.Utilities.Constants
             public const string Token = "Token";
             public const string BaseAddress = "BaseAddress";
         }
+
+        public class CustomClaimTypes
+        {
+            public const string Permission = "Application.Permission";
+        }
+
+        public class ListRole
+        {
+            public const string Admin = "admin";
+
+            public const string RecordsManagement = "RecordsManagement";
+
+            public const string Records = "admin, RecordsManagement";
+        }
+
+        public class RecordsManagementsRole
+        {
+            public const string View = "recorads.view";
+            public const string Add = "recorads.add";
+            public const string Edit = "recorads.edit";
+            public const string Reminder = "recorads.reminder";
+        }
+
+        public class PolicyRecorads
+        {
+            public const string ViewRecorads = "policy.recorads.view";
+            public const string AddRecorads = "policy.recorads.add";
+            public const string EditRecorads = "policy.recorads.edit";
+            public const string ReminderRecorads = "policy.recorads.reminder";
+        }
     }
 }

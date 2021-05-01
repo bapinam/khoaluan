@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using KhoaLuan.Utilities.Constants;
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8">
@@ -16,6 +18,7 @@
     <link rel="stylesheet" href="/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+
     <!-- Theme style -->
     <link rel="stylesheet" href="/css/adminlte.css">
     <link rel="stylesheet" href="/css/custom.css">
@@ -156,19 +159,19 @@
                         <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
                 </li>-->
-
                 <li class="nav-item dropdown open" style="padding-top: 8px;">
                     <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
 
                         <div style="width:30px; height:30px;" class="user-panel">
                             <div class="image">
-                                <img src="/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                <img id="ImageAvatar" src="/img/user2-160x160.jpg" class="img-circle" alt="User Image">
                             </div>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="javascript:;">@User.Identity.Name</a>
-                        <a class="dropdown-item" href="javascript:;">Đổi Mật Khẩu</a>
+                        <a class="dropdown-item" href="/Home/Welcome">Tài Khoản</a>
+                        <a class="dropdown-item" onclick="ChangePassWord()"
+                           data-toggle="modal" data-target="#examplePassWord">Đổi Mật Khẩu</a>
                         <form asp-controller="Users" asp-action="Logout" method="post">
                             <button class="dropdown-item"><i class="fa fa-sign-out pull-right"></i>Đăng Xuất</button>
                         </form>
@@ -176,6 +179,7 @@
                 </li>
             </ul>
         </nav>
+
         <!-- /.navbar -->
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-green">
@@ -204,48 +208,61 @@
                         <h3>Kế Hoạch</h3>
                         <ul class="nav side-menu">
                             <li>
-                                <a asp-controller="KeHoachDatHang" asp-action="Index"><i class="fa fa-truck" style="color:#00B2BF"></i> &nbsp;Kế Hoạch Đặt Hàng</a>
+                                <a asp-controller="OrderPlans" asp-action="Index"><i class="fa fa-truck" style="color:#00B2BF"></i> &nbsp;Kế Hoạch Đặt Hàng</a>
                             </li>
                             <li>
                                 <a asp-controller="KeHoachCheBien" asp-action="Index"><i class="fa fa-edit" style="color:#FF6600"></i> &nbsp;Kế Hoạch Chế Biến</a>
                             </li>
                         </ul>
                     </div>
+
+                    @{ var records = User.Claims.Any(x => x.Value == SystemConstants.ListRole.Admin
+                                                              || x.Value == SystemConstants.ListRole.RecordsManagement); }
                     <div class="menu_section">
-                        <h3>Hồ Sơ</h3>
+                        @{ if (records)
+                            { <h3>Hồ Sơ</h3>}}
+
                         <ul class="nav side-menu">
-                            <li>
-                                <a asp-controller="ManageCodes" asp-action="Index"><i class="fa fa-codepen" style="color:#00EEEE"></i> &nbsp;Quản Lý Mã Số</a>
-                            </li>
-                            <li>
-                                <a asp-controller="Suppliers" asp-action="Index"><i class="fa fa-home" style="color:#fffa37"></i> &nbsp;Nhà Cung Cấp</a>
-                            </li>
-                            <li>
-                                <a><i class="fa fa-cubes" style="color:#5BBD2B"></i> &nbsp;Nguyên Vật Liệu <span class="fa fa-chevron-down" style="float: right;"></span></a>
-                                <ul class="nav child_menu menu-a">
-                                    <li><a asp-controller="MaterialsTypes" asp-action="Index" style="color: #ffffff">Loại Nguyên Vật Liệu</a></li>
-                                    <li><a asp-controller="Materials" asp-action="Index" style="color: #ffffff">Nguyên Vật Liệu</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a><i class="fa fa-gift" style="color:#EE2C2C"></i> &nbsp;Sản Phẩm <span class="fa fa-chevron-down" style="float: right;"></span></a>
-                                <ul class="nav child_menu menu-a">
-                                    <li><a asp-controller="ProductTypeGroups" asp-action="Index" style="color:#ffffff;">Nhóm Loại Sản Phẩm</a></li>
-                                    <li><a asp-controller="ProductTypes" asp-action="Index" style="color:#ffffff;">Loại Sản Phẩm</a></li>
-                                    <li><a asp-controller="Products" asp-action="Index" style="color: #ffffff">Sản Phẩm</a></li>
-                                    <li><a asp-controller="Recipes" asp-action="Index" style="color: #ffffff">Công Thức</a></li>
-                                </ul>
-                            </li>
-                            @*<li>
-                                    <a asp-controller="CongViec" asp-action="Index"><i class="fa fa-sitemap" style="color:#FFEFD5"></i> &nbsp;Công Việc</a>
-                                </li>*@
-                            <li>
-                                <a><i class="fa fa-group" style="color:#FF0099"></i> &nbsp;Nhân Viên <span class="fa fa-chevron-down" style="float: right;"></span></a>
-                                <ul class="nav child_menu menu-a">
-                                    <li><a asp-controller="Users" asp-action="Index" style="color: #ffffff">Nhân Viên</a></li>
-                                    <li><a asp-controller="LoaiSanPham" asp-action="Index" style="color:#ffffff;">Phân Quyền</a></li>
-                                </ul>
-                            </li>
+                            @{ var ad = User.Claims.Any(x => x.Value == SystemConstants.ListRole.Admin);
+                                if (ad)
+                                {
+                    <li>
+                        <a asp-controller="ManageCodes" asp-action="Index"><i class="fa fa-codepen" style="color:#00EEEE"></i> &nbsp;Quản Lý Mã Số</a>
+                    </li>
+ } }
+                            @{ if (records)
+                                {
+                    <li>
+                        <a asp-controller="Suppliers" asp-action="Index"><i class="fa fa-home" style="color:#fffa37"></i> &nbsp;Nhà Cung Cấp</a>
+                    </li>
+                                    <li>
+                                        <a><i class="fa fa-cubes" style="color:#5BBD2B"></i> &nbsp;Nguyên Vật Liệu <span class="fa fa-chevron-down" style="float: right;"></span></a>
+                                        <ul class="nav child_menu menu-a">
+                                            <li><a asp-controller="MaterialsTypes" asp-action="Index" style="color: #ffffff">Loại Nguyên Vật Liệu</a></li>
+                                            <li><a asp-controller="Materials" asp-action="Index" style="color: #ffffff">Nguyên Vật Liệu</a></li>
+                                        </ul>
+                                    </li>
+                                                    <li>
+                                                        <a><i class="fa fa-gift" style="color:#EE2C2C"></i> &nbsp;Sản Phẩm <span class="fa fa-chevron-down" style="float: right;"></span></a>
+                                                        <ul class="nav child_menu menu-a">
+                                                            <li><a asp-controller="ProductTypeGroups" asp-action="Index" style="color:#ffffff;">Nhóm Loại Sản Phẩm</a></li>
+                                                            <li><a asp-controller="ProductTypes" asp-action="Index" style="color:#ffffff;">Loại Sản Phẩm</a></li>
+                                                            <li><a asp-controller="Products" asp-action="Index" style="color: #ffffff">Sản Phẩm</a></li>
+                                                            <li><a asp-controller="Recipes" asp-action="Index" style="color: #ffffff">Công Thức</a></li>
+                                                        </ul>
+                                                    </li>
+ } }
+
+                            @{ if (ad)
+                                {
+                    <li>
+                        <a><i class="fa fa-group" style="color:#FF0099"></i> &nbsp;Nhân Viên <span class="fa fa-chevron-down" style="float: right;"></span></a>
+                        <ul class="nav child_menu menu-a">
+                            <li><a asp-controller="Users" asp-action="Index" style="color: #ffffff">Nhân Viên</a></li>
+                            <li><a asp-controller="Decentralizations" asp-action="Index" style="color:#ffffff;">Phân Quyền</a></li>
+                        </ul>
+                    </li>
+ } }
                         </ul>
                     </div>
                 </div>
@@ -277,6 +294,67 @@
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
             <i class="fas fa-chevron-up"></i>
         </a>
+    </div>
+
+    <!--Modal Cập nhật mật khẩu-->
+    <div class="modal fade" id="examplePassWord" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Mật Khẩu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!---->
+                <form id="frmPassWord" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" value="@User.Identity.Name.ToString()" name="Name" id="NamePass" />
+                        <div class="form-group">
+                            <label for="inputAddress">Mật Khẩu Củ</label>
+                            <input type="password" class="form-control" id="PassWordOld" name="OldPassword" placeholder="Mật khẩu củ" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputAddress">Mật Khẩu Mới</label>
+                            <input type="password" class="form-control" id="PassWordNew" name="Password" placeholder="Mật khẩu mới" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputAddress">Nhập Lại Mật Khẩu Mới</label>
+                            <input type="password" class="form-control" id="PassWord" name="ConfirmPassword" placeholder="Nhập lại mật khẩu mới" required>
+                        </div>
+                    </div>
+                    <!---->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Đồng Ý</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal ĐĂNG xuất-->
+    <div class="modal fade" id="exampleOut" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Mật Khẩu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!---->
+                <div class="modal-body">
+                    <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn đăng xuất để xác nhận lại mật khẩu?</h5>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <form asp-controller="Users" asp-action="Logout" method="post">
+                        <button class="btn btn-primary">Đăng Xuất</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -355,6 +433,76 @@
                 theme: 'bootstrap4'
             })
         })
+    </script>
+
+    <script>
+        var frmPassWord = $("#frmPassWord");
+        frmPassWord.submit(function (e) {
+            var passNew = $("#PassWordNew").val();
+            var pass = $("#PassWord").val();
+
+            if (passNew.length < 6) {
+                toastr.error('Mật khẩu phải ít nhất 6 ký tự');
+            }
+            else {
+                if (passNew != pass) {
+                    toastr.error('Mật khẩu mới nhập không khớp');
+                }
+                else {
+
+         $.ajax({
+                type: "PUT",
+             url: "@Url.Action("UpdatePassword", "Users")",
+             data: frmPassWord.serialize(),
+             dataType: "json",
+             success: function (msg) {
+                 $('#exampleEdit').modal('hide');
+
+                 if (msg.isSuccessed) {
+                     $("#examplePassWord").modal("hide");
+                     toastr.success('Cập nhật thành công!')
+                     $("#exampleOut").modal("show");
+                 } else {
+                     toastr.error(msg.message)
+
+                 }
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại!')
+                    $('#exampleEdit').modal('hide');
+
+                }
+         });
+                }
+            }
+
+            e.preventDefault();
+        });
+    </script>
+    <script>
+    SetImage();
+    function SetImage() {
+          $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetImage","Users")",
+              data: { name: '@User.Identity.Name.ToString()' },
+              dataType: "json",
+            success: function (msg) {
+                if (msg.isSuccessed) {
+
+                    var img = "@Configuration["BaseAddress"]" + msg.resultObj;
+                        $("#ImageAvatar").attr("src", img);
+                        $("#ImageAvatar12").attr("src", img);
+
+                }
+
+            },
+            error: function (data) {
+                toastr.error('Thay đổi ảnh thất bại');
+            }
+        });
+
+    }
     </script>
     @RenderSection("Scripts", required: false)
 </body>

@@ -30,5 +30,8 @@ namespace KhoaLuan.ViewModels.User
 
         [Display(Name = "Địa chỉ")]
         public string Address { get; set; }
+
+        [Display(Name = "Tình trạng việc làm")]
+        public string JobStatus { get; set; }
     }
 }

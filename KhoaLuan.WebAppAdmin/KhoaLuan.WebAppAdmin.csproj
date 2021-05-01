@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\lib\icheck-bootstrap\LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
@@ -15,10 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\KhoaLuan.Utilities\KhoaLuan.Utilities.csproj" />
     <ProjectReference Include="..\KhoaLuan.ViewModels\KhoaLuan.ViewModels.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\OrderPlans\" />
   </ItemGroup>
 
 </Project>

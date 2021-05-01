@@ -8,9 +8,7 @@ namespace KhoaLuan.ViewModels.Supplier
     public class SupplierUpdateValidator : AbstractValidator<SupplierUpdate>
     {
         public SupplierUpdateValidator()
-        {
-            RuleFor(x => x.Code).NotEmpty().WithMessage("Vui lòng nhập Mã số")
-                .MaximumLength(20).WithMessage("Mã số không vượt quá 20 ký tự");
+        {           
 
             RuleFor(x => x.Tax).NotEmpty().WithMessage("Vui lòng nhập Mã số thuế");
 

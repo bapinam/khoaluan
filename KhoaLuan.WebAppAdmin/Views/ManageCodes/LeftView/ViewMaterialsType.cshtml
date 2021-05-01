@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Loại Nguyên Vật Liệu</h3>
 
@@ -221,27 +221,31 @@
     var formNhomNVL = $('#FormNhomNVL');
     formNhomNVL.submit(function (e) {
         var nameSP = $('#NameNhomNVL').val().trim();
-        if (nameSP.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameSP.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
-                type: "POST",
-                 url: "@Url.Action("Create")",
-                 data: formNhomNVL.serialize(),
-                dataType: "json",
-            success: function (msg) {
-                toastr.success('Thêm thành công')
+            if (nameSP.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formNhomNVL.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
 
-                $('#addNhomNVL').remove();
-                $('#NhomNVLtable').append('<tbody id="addNhomNVL"></tbody>');
-                GetNhomNVL();
+                        $('#addNhomNVL').remove();
+                        $('#NhomNVLtable').append('<tbody id="addNhomNVL"></tbody>');
+                        GetNhomNVL();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Thêm thất bại')
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
 
-                }
-            });
+                    }
+                });
+            }
         }
         e.preventDefault();
     });
@@ -294,35 +298,38 @@
         var name = $("#NameNhomNVLEdit").val();
         var top = $("#TopEdit").val();
         var type = $("#TypeCodeNhomNVL").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (name.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (name.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEdit').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addNhomNVL').remove();
-                    $('#NhomNVLtable').append('<tbody id="addNhomNVL"></tbody>');
-                    GetNhomNVL();
+                    success: function (msg) {
+                        $('#exampleEdit').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addNhomNVL').remove();
+                        $('#NhomNVLtable').append('<tbody id="addNhomNVL"></tbody>');
+                        GetNhomNVL();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
-
     }
 </script>

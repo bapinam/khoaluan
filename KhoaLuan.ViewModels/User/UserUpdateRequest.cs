@@ -9,6 +9,9 @@ namespace KhoaLuan.ViewModels.User
     {
         public Guid Id { get; set; }
 
+        [Display(Name = "Chứng minh thư")]
+        public string Card { get; set; }
+
         [Display(Name = "Họ")]
         public string LastName { get; set; }
 

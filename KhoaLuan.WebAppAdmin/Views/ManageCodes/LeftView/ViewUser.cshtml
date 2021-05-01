@@ -1,5 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
-<div class="card direct-chat direct-chat-primary">
+<div class="card direct-chat direct-chat-primary table-hover12">
     <div class="card-header">
         <h3 class="card-title">Nhân Viên</h3>
 
@@ -221,10 +221,13 @@
     var formUser = $('#FormUser');
     formUser.submit(function (e) {
         var nameUser = $('#NameUser').val().trim();
-        if (nameUser.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (nameUser.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             $.ajax({
+            if (nameUser.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                 $.ajax({
                 type: "POST",
                  url: "@Url.Action("Create")",
                  data: formUser.serialize(),
@@ -242,6 +245,8 @@
 
                 }
             });
+            }
+
         }
         e.preventDefault();
     });
@@ -294,34 +299,38 @@
         var name = $("#NameUserEdit").val();
         var top = $("#TopEditUser").val();
         var type = $("#TypeCodeUser").val();
-        if (name.length > 6) {
-            toastr.error('Độ dài tên mã không vượt quá 6 ký tự')
+        if (name.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 7 ký tự')
         } else {
-             var data =
-            {
-                Id: id,
-                Name: name,
-                Top: top,
-                TypeCode: type
-            };
-            $.ajax({
+            if (name.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
                     type: "PUT",
-                     url: "@Url.Action("Update")",
-                     data: data,
+                    url: "@Url.Action("Update")",
+                    data: data,
                     dataType: "json",
-                success: function (msg) {
-                    $('#exampleEditUser').modal("hide")
-                    toastr.success('Cập nhật thành công');
-                    $('#addUser').remove();
-                    $('#Usertable').append('<tbody id="addUser"></tbody>');
-                    GetUser();
+                    success: function (msg) {
+                        $('#exampleEditUser').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addUser').remove();
+                        $('#Usertable').append('<tbody id="addUser"></tbody>');
+                        GetUser();
 
-                },
-                error: function (req, status, error) {
-                    toastr.error('Cập nhật thất bại');
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
 
-                }
-            });
+                    }
+                });
+            }
         }
 
     }

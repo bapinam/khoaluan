@@ -44,12 +44,14 @@ namespace KhoaLuan.Service.ManageCodeService
             var code = _context.ManageCodes
                 .Where(x => x.TypeCode == bundle);
 
-            var data = await code.Select(x => new GetAllCode()
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Top = x.Top
-            }).ToListAsync();
+            var data = await code
+                .OrderByDescending(x => x.Top)
+                .Select(x => new GetAllCode()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Top = x.Top
+                }).ToListAsync();
 
             return new List<GetAllCode>(data);
         }

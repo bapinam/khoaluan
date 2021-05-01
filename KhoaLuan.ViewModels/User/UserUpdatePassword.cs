@@ -7,7 +7,9 @@ namespace KhoaLuan.ViewModels.User
 {
     public class UserUpdatePassword
     {
-        public Guid Id { get; set; }
+        [Display(Name = "Tên tài khoản")]
+        [DataType(DataType.Password)]
+        public string Name { get; set; }
 
         [Display(Name = "Mật khẩu mới củ")]
         [DataType(DataType.Password)]

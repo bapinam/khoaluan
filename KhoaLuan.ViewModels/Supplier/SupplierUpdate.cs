@@ -10,9 +10,6 @@ namespace KhoaLuan.ViewModels.Supplier
         [Display(Name = "Id")]
         public int Id { get; set; }
 
-        [Display(Name = "Mã số")]
-        public string Code { get; set; }
-
         [Display(Name = "Mã thuế")]
         public string Tax { get; set; }
 

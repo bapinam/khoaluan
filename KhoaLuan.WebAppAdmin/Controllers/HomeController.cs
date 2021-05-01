@@ -1,4 +1,5 @@
 ﻿using KhoaLuan.WebAppAdmin.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -23,7 +25,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Welcome()
         {
             return View();
         }

@@ -1,14 +1,17 @@
 ﻿using KhoaLuan.Utilities.Constants;
 using KhoaLuan.ViewModels.Common;
 using KhoaLuan.ViewModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Services
 {
@@ -149,11 +152,6 @@ namespace KhoaLuan.WebAppAdmin.Services
             return JsonConvert.DeserializeObject<ApiErrorResult<UserNameVm>>(result);
         }
 
-        public Task<ApiResult<bool>> RoleAssign(Guid id, RoleAssignRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ApiResult<bool>> UpdateUser(Guid id, UserUpdateRequest request)
         {
             var client = _httpClientFactory.CreateClient();
@@ -171,6 +169,162 @@ namespace KhoaLuan.WebAppAdmin.Services
                 return JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(result);
 
             return JsonConvert.DeserializeObject<ApiErrorResult<bool>>(result);
+        }
+
+        public async Task<ApiResult<string>> UpdateJobStauts(UpdateJobStauts bundle)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"/api/user/job-stautus", httpContent);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<ApiSuccessResult<string>>(result);
+
+            return JsonConvert.DeserializeObject<ApiErrorResult<string>>(result);
+        }
+
+        public async Task<ApiResult<GetByIdListUser>> GetByName(string name)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+
+            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var response = await client.GetAsync($"/api/user/name/" + $"{name}");
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<ApiSuccessResult<GetByIdListUser>>(body);
+
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> iEmailName(string email, string name)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+
+            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var response = await client.GetAsync($"/api/user/check-email-name?email=" + $"{email}&name={name}");
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<ApiResult<bool>>(body);
+
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> UpdateInfor(UpdateInfor bundle)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"/api/user/infor", httpContent);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(result);
+
+            return JsonConvert.DeserializeObject<ApiErrorResult<bool>>(result);
+        }
+
+        public async Task<ApiResult<bool>> UpdatePassword(UserUpdatePassword bundle)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"/api/user/change-password", httpContent);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(result);
+
+            return JsonConvert.DeserializeObject<ApiErrorResult<bool>>(result);
+        }
+
+        public async Task<ApiResult<string>> UpdateImage(UpdateImageUser bundle)
+        {
+            var requestContent = new MultipartFormDataContent();
+
+            byte[] data;
+            using (var br = new BinaryReader(bundle.File.OpenReadStream()))
+            {
+                data = br.ReadBytes((int)bundle.File.OpenReadStream().Length);
+            }
+            ByteArrayContent bytes = new ByteArrayContent(data);
+            requestContent.Add(bytes, "file", bundle.File.FileName);
+
+            requestContent.Add(new StringContent(bundle.Name.ToString()), "name");
+
+            var sessions = _httpContextAccessor
+              .HttpContext
+              .Session
+              .GetString(SystemConstants.AppSettings.Token);
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(SystemConstants.Bearer, sessions);
+
+            var url = $"/api/User/image/";
+            var response = await client.PutAsync(url, requestContent);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<ApiSuccessResult<string>>(result);
+
+            return JsonConvert.DeserializeObject<ApiErrorResult<string>>(result);
+        }
+
+        public async Task<ApiResult<string>> GetImage(string name)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+
+            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var response = await client.GetAsync($"/api/user/get-image/" + $"{name}");
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<ApiSuccessResult<string>>(body);
+
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> ResetPassWord(Guid id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+
+            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+
+            var response = await client.GetAsync($"/api/user/reset-password/" + $"{id}");
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(body);
+
+            return result;
         }
     }
 }

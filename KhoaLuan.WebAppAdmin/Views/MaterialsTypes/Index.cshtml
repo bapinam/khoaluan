@@ -35,7 +35,7 @@
                             <form asp-action="Index" method="get">
                                 <div class="form-group">
                                     <div class="col-md-9" style="float:left; margin-bottom:5px;">
-                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên nhà cung cấp" />
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập mã số hoặc tên loại " />
                                     </div>
                                     <div class="cold-md-6" style="float:right; ">
                                         <button type="submit" class="btn btn-primary">Tìm</button>
@@ -48,7 +48,7 @@
 
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-striped">
+                        <table id="example2" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Mã Số</th>
@@ -83,8 +83,7 @@
                                 </a>
                             </div>
                         </td>
-                    </tr>
-}
+                    </tr>}
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -126,8 +125,8 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Mã Số</label>
-                            <input type="text" class="form-control" id="Code" name="Code" placeholder="Mã Số" required>
-                            <span class="text-danger"></span>
+                            <select id="Code" name="Code" class="form-control select2bs4" required>
+                            </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label>Loại Nguyên Vật Liệu</label>
@@ -177,7 +176,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label>Mã Số</label>
-                        <input type="text" class="form-control" id="codeE" name="Code" placeholder="Mã Số" required>
+                        <input type="text" class="form-control" id="codeE" name="Code" placeholder="Mã Số" disabled>
                         <span class="text-danger"></span>
                     </div>
                     <div class="form-group col-md-6">
@@ -196,7 +195,7 @@
                 <div class="form-row">
                     <label>Tên</label>
                     <input type="text" pattern="([A-Za-z]).{1,149}" title="Vui lòng nhập không quá 150 chữ"
-                           id="nameE" name="Name" onkeyup="getNameE()"
+                           id="nameE" name="Name" onkeyup="getNameEditNVL()"
                            class="form-control" placeholder="Tên" required>
                     <span class="text-danger" id="erroNameE">
                         Tên loại đã tồn tại
@@ -370,8 +369,8 @@
 
     var showNameE = document.getElementById("erroNameE");
     showNameE.style.display = 'none';
-    function getNameE()
-    {
+    function getNameEditNVL()
+    { 
         var btnE = document.getElementById("btnthemE")
         var valNameE = document.getElementById("nameE").value;
         var idEdit = document.getElementById("idE").value;
@@ -491,5 +490,31 @@
                 }
          });
 
+    }
+</script>
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.MaterialsType";
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#Code').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
     }
 </script>

@@ -2,14 +2,17 @@
 using KhoaLuan.ViewModels.CodeManage;
 using KhoaLuan.WebAppAdmin.Controllers.Components;
 using KhoaLuan.WebAppAdmin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
+    [Authorize(Roles = ListRole.Admin)]
     public class ManageCodesController : BaseController
     {
         private readonly IManageCodeApiClient _manageCodeApiClient;

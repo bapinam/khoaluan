@@ -128,6 +128,23 @@ namespace KhoaLuan.Service.MaterialsTypeService
         public async Task<ApiResult<int>> Create(CreateMaterialsType bundle)
         {
             var materialsType = _mapper.Map<MaterialsType>(bundle);
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.MaterialsTypes.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                goto Location;
+            }
+
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            materialsType.Code = str;
             _context.MaterialsTypes.Add(materialsType);
             await _context.SaveChangesAsync(); // số bản ghi nếu return
             return new ApiSuccessResult<int>(materialsType.Id);

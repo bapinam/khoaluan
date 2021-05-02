@@ -27,6 +27,24 @@ namespace KhoaLuan.Service.SupplierService
         public async Task<ApiResult<int>> Create(SupplierCreate bundle)
         {
             var supplier = _mapper.Map<Supplier>(bundle);
+
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var check = await _context.Suppliers.AnyAsync(x => x.Code == str);
+            if (check)
+            {
+                goto Location;
+            }
+
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            supplier.Code = str;
             _context.Suppliers.Add(supplier);
             await _context.SaveChangesAsync(); // số bản ghi nếu return
 

@@ -261,13 +261,30 @@ namespace KhoaLuan.Service.RecipeService
 
             var recipe = new Recipe()
             {
-                Code = bundle.Code,
                 Name = bundle.Name,
                 Note = bundle.Note,
                 Prioritize = bundle.Prioritize,
                 IdProduct = bundle.IdProduct,
                 RecipeDetails = recipeDetail
             };
+
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.Recipes.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                goto Location;
+            }
+
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            recipe.Code = str;
 
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();

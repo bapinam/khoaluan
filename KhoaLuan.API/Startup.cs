@@ -42,6 +42,7 @@ using KhoaLuan.ViewModels.Product;
 using KhoaLuan.ViewModels.Material;
 using KhoaLuan.Service.RecipeService;
 using KhoaLuan.Service.ManageCodeService;
+using KhoaLuan.Service.OrderPlanService;
 
 namespace KhoaLuan.API
 {
@@ -98,6 +99,7 @@ namespace KhoaLuan.API
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddTransient<IMaterialsTypeService, MaterialsTypeService>();
+            services.AddTransient<IOrderPlanService, OrderPlanService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IRoleService, RoleService>();
 

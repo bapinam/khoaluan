@@ -9,12 +9,14 @@
             </div>
             <div class="col-sm-6">
                 <div class="float-sm-right" style="margin-bottom:5px;">
-                    <button type="button" class="btn btn-block bg-gradient-success" data-toggle="modal" data-target="#modalThem">
-                        <i class="fas fa-plus"></i>
-                        Tạo Kế Hoạch
+                    <button type="button" onclick="window.location.href='/OrderPlans/Index'" class="btn btn-dark">
+                        <i class="fa fa-refresh"></i>
                     </button>
                 </div>
             </div>
         </div>
     </div><!-- /.container-fluid -->
 </section>
+
+<!--Tạo kế hoạch đặt hàng-->
+@await Html.PartialAsync("CreateOrderPlans")

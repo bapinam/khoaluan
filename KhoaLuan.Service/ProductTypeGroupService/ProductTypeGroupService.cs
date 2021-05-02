@@ -122,6 +122,23 @@ namespace KhoaLuan.Service.ProductTypeGroupService
         public async Task<ApiResult<int>> Create(CreateProductTypeGroup bundle)
         {
             var productTypeGroup = _mapper.Map<ProductTypeGroup>(bundle);
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.ProductTypeGroups.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                goto Location;
+            }
+
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            productTypeGroup.Code = str;
             _context.ProductTypeGroups.Add(productTypeGroup);
             await _context.SaveChangesAsync(); // số bản ghi nếu return
             return new ApiSuccessResult<int>(productTypeGroup.Id);
@@ -147,7 +164,6 @@ namespace KhoaLuan.Service.ProductTypeGroupService
                     Id = i.Id,
                     Name = i.Name
                 }).ToListAsync();
- 
 
             return result;
         }

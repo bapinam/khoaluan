@@ -25,6 +25,11 @@ namespace KhoaLuan.Service.ManageCodeService
 
         public async Task<ApiResult<bool>> Create(CreateCode bundle)
         {
+            var check = await _context.ManageCodes.AnyAsync(x => x.Name == bundle.Name);
+            if (check)
+            {
+                return new ApiErrorResult<bool>("Mã số đã tồn tại");
+            }
             var code = _context.ManageCodes;
 
             var data = new ManageCode()

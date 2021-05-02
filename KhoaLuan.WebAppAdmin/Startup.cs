@@ -115,6 +115,7 @@ namespace KhoaLuan.WebAppAdmin
             services.AddTransient<IProductTypeApiClient, ProductTypeApiClient>();
             services.AddTransient<IProductTypeGroupApiClient, ProductTypeGroupApiClient>();
             services.AddTransient<IProductApiClient, ProductApiClient>();
+            services.AddTransient<IOrderPlanApiClient, OrderPlanApiClient>();
 
             //---
             IMvcBuilder builder = services.AddRazorPages();

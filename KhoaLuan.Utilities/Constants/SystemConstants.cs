@@ -16,6 +16,8 @@ namespace KhoaLuan.Utilities.Constants
 
         public const string Environment = "ASPNETCORE_ENVIRONMENT";
 
+        public const string ImageFolder = "product-content";
+
         public class AppSettings
         {
             public const string DefaultLanguageId = "DefaultLanguageId";

@@ -1,0 +1,219 @@
+﻿@using KhoaLuan.Data.Enums;
+<style>
+    .va:hover {
+        box-shadow: #ECECEC 2px 2px;
+    }
+
+    .va1 {
+        box-shadow: #BBBBBB 2px 2px;
+    }
+</style>
+
+<section class="content">
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Tạo Kế Hoạch Đặt Hàng</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+                    <div class="row">
+                        <div class="col-12 col-sm-4">
+                            <div class="info-box bg-light">
+                                <div class="info-box-content va" onclick="addClassFunc1()" id="class1">
+                                    <a class="btn">
+                                        <h4 class="text-center text-muted">Nguyên Liệu</h4>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="info-box bg-light">
+                                <div class="info-box-content va" onclick="addClassFunc2()" id="class2">
+                                    <a class="btn">
+                                        <h4 class="text-center text-muted">Vật Liệu</h4>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="info-box bg-light">
+                                <div class="info-box-content va" onclick="addClassFunc3()" id="class3">
+                                    <a class="btn">
+                                        <h4 class="text-center text-muted">Nhiên Liệu</h4>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail4">Loại Nguyên Vật Liệu</label>
+                        <div id="DeMT">
+                            <select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>Danh Sách</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!--//////////////////////////////////////////////////////////////////////////////////////////////////-->
+                <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                    <h3 class="text-primary"><i class="fas fa-paint-brush"></i>Phiếu Kế Hoạch</h3>
+                    <h5 class="mt-5 text-muted"></h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Mã Số</label>
+                            <select id="Code" name="Code" class="form-control selectMater" required>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Tên</label>
+                            <input type="text" class="form-control" name="Name" id="Name" placeholder="Tên kế hoạch" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail4">Ngày Dự Kiến</label>
+                        <input type="date" class="form-control" name="ExpectedDate" id="Date" placeholder="Tên kế hoạch" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputAddress">Ghi Chú</label>
+                        <input type="text" class="form-control" name="Note" id="Note" placeholder="Ghi chú">
+                    </div>
+
+                    <h5 class="mt-5 text-muted">Project files</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
+                        </li>
+                        <li>
+                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
+                        </li>
+                        <li>
+                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
+                        </li>
+                        <li>
+                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-image "></i> Logo.png</a>
+                        </li>
+                        <li>
+                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
+                        </li>
+                    </ul>
+                    <div class="text-center mt-5 mb-3">
+                        <a href="#" class="btn btn-sm btn-primary">Add files</a>
+                        <a href="#" class="btn btn-sm btn-warning">Report contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+</section>
+
+<script>
+
+    function addClassFunc1() {
+        var id1 = document.getElementById('class1');
+        var id2 = document.getElementById('class2');
+        var id3 = document.getElementById('class3');
+        id1.classList.add('va1');
+        id2.classList.remove("va1");
+        id3.classList.remove("va1");
+        document.getElementById("MaterialsTypeLoai").remove();
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        $("#DeMT").append(de);
+        SetNVL(1);
+        $('.selectMater').select2({
+            theme: 'bootstrap4'
+        });
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        });
+    }
+    function addClassFunc2() {
+        var id1 = document.getElementById('class1');
+        var id2 = document.getElementById('class2');
+        var id3 = document.getElementById('class3');
+        id2.classList.add('va1');
+        id1.classList.remove("va1");
+        id3.classList.remove("va1");
+
+        document.getElementById("MaterialsTypeLoai").remove();
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        $("#DeMT").append(de);
+        SetNVL(2);
+        $('.selectMater').select2({
+            theme: 'bootstrap4'
+        });
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        });
+    }
+    function addClassFunc3() {
+        var id1 = document.getElementById('class1');
+        var id2 = document.getElementById('class2');
+        var id3 = document.getElementById('class3');
+        id3.classList.add('va1');
+        id2.classList.remove("va1");
+        id1.classList.remove("va1");
+        document.getElementById("MaterialsTypeLoai").remove();
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        $("#DeMT").append(de);
+        SetNVL(3);
+        $('.selectMater').select2({
+            theme: 'bootstrap4'
+        });
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        });
+    }
+
+    addClassFunc1();
+
+    function SetNVL(type) {
+        var typeGroup;
+        switch (type) {
+            case 1:
+                typeGroup = '@GroupType.NguyenLieu';
+                break;
+            case 2:
+                typeGroup = '@GroupType.VatLieu';
+                break;
+            case 3:
+                typeGroup = '@GroupType.NhienLieu';
+                break;
+        }
+         $.ajax({
+            type: "GET",
+             url: "@Url.Action("GetMaterialsType")",
+             data: { group: typeGroup },
+            dataType: "json",
+             success: function (data) {
+                 if (data != null) {
+                     data.forEach(function (item) {
+                         var op = '<option  value="' + item.id + '">' + item.name + '</option>';
+                         $("#MaterialsTypeLoai").append(op);
+                     });
+                 }
+
+            }
+        });
+    }
+</script>
+<script>
+    window.onload = function (event) {
+        addClassFunc1();
+    };
+</script>

@@ -3,12 +3,11 @@ using KhoaLuan.ViewModels.OrderPlan;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace KhoaLuan.Service.OrderPlanService
+namespace KhoaLuan.WebAppAdmin.Services
 {
-    public interface IOrderPlanService
+    public interface IOrderPlanApiClient
     {
         Task<List<GetMaterialsTypePlan>> GetMaterialsType(GroupType group);
     }

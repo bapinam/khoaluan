@@ -22,7 +22,7 @@ namespace KhoaLuan.Service.MaterialService
         private readonly EnterpriseDbContext _context;
         private readonly IMapper _mapper;
         private readonly IStorageService _storageService;
-        private const string PRODUCT_CONTENT_FOLDER_NAME = "product-content";
+        private const string PRODUCT_CONTENT_FOLDER_NAME = SystemConstants.ImageFolder;
 
         public MaterialService(EnterpriseDbContext context, IMapper mapper, IStorageService storageService)
         {
@@ -58,7 +58,7 @@ namespace KhoaLuan.Service.MaterialService
                 }
             }
 
-            var product = new Material()
+            var materials = new Material()
             {
                 Code = bundle.Code,
                 Name = bundle.Name,
@@ -69,17 +69,33 @@ namespace KhoaLuan.Service.MaterialService
 
             if (bundle.Min != null && bundle.Max != null)
             {
-                product.Reminder = true;
-                product.Min = bundle.Min;
-                product.Max = bundle.Max;
-                product.ReminderStartDate = (DateTime)bundle.ReminderStartDate;
-                product.ReminderEndDate = (DateTime)bundle.ReminderEndDate;
+                materials.Reminder = true;
+                materials.Min = bundle.Min;
+                materials.Max = bundle.Max;
+                materials.ReminderStartDate = (DateTime)bundle.ReminderStartDate;
+                materials.ReminderEndDate = (DateTime)bundle.ReminderEndDate;
+            }
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.Materials.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                goto Location;
             }
 
-            _context.Materials.Add(product);
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            materials.Code = str;
+            _context.Materials.Add(materials);
             await _context.SaveChangesAsync(); // số bản ghi nếu return
 
-            return new ApiSuccessResult<int>(product.Id);
+            return new ApiSuccessResult<int>(materials.Id);
         }
 
         public async Task<ApiResult<GetIdPackMaterial>> CreatePack(PackMaterialCreate bundle)
@@ -105,38 +121,38 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<string>> UpdateImage(int id, ImageMaterial bundle)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<string>("Nguyên vật liệu không tồn tại");
             }
             // xóa ảnh củ
-            if (product.Image != null)
+            if (materials.Image != null)
             {
-                await _storageService.DeleteFileAsync(product.Image);
+                await _storageService.DeleteFileAsync(materials.Image);
             }
 
             // lưu lại ảnh mới
-            product.Image = await this.SaveFile(bundle.Image);
-            _context.Materials.Update(product);
+            materials.Image = await this.SaveFile(bundle.Image);
+            _context.Materials.Update(materials);
             await _context.SaveChangesAsync();
-            return new ApiSuccessResult<string>(product.Image);
+            return new ApiSuccessResult<string>(materials.Image);
         }
 
         public async Task<ApiResult<bool>> Delete(int id)
         {
-            var product = await _context.Materials.Include(x => x.Packs).FirstAsync(x => x.Id == id);
-            if (product == null)
+            var materials = await _context.Materials.Include(x => x.Packs).FirstAsync(x => x.Id == id);
+            if (materials == null)
             {
                 return new ApiErrorResult<bool>("Nguyên vật liệu không tồn tại");
             }
 
-            if (product.Image != null)
+            if (materials.Image != null)
             {
-                await _storageService.DeleteFileAsync(product.Image);
+                await _storageService.DeleteFileAsync(materials.Image);
             }
 
-            var reult = _context.Materials.Remove(product);
+            var reult = _context.Materials.Remove(materials);
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
         }
@@ -156,46 +172,46 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<int>> Update(int id, MaterialUpdate bundle)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<int>("Nguyên vật liệu không tồn tại");
             }
 
-            product.IdMaterialsType = bundle.IdMaterialType;
-            product.Name = bundle.Name;
-            product.Description = bundle.Description;
+            materials.IdMaterialsType = bundle.IdMaterialType;
+            materials.Name = bundle.Name;
+            materials.Description = bundle.Description;
 
-            _context.Materials.Update(product);
+            _context.Materials.Update(materials);
             await _context.SaveChangesAsync();
 
-            return new ApiSuccessResult<int>(product.Id);
+            return new ApiSuccessResult<int>(materials.Id);
         }
 
         public async Task<ApiResult<bool>> UpdateReminder(UpdateMaterialReminder bundle)
         {
-            var product = await _context.Materials.FindAsync(bundle.Id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(bundle.Id);
+            if (materials == null)
             {
                 return new ApiErrorResult<bool>("Nguyên vật liệu không tồn tại");
             }
 
             if (bundle.BoolReminder)
             {
-                product.Reminder = true;
-                product.Min = bundle.Min;
-                product.Max = bundle.Max;
+                materials.Reminder = true;
+                materials.Min = bundle.Min;
+                materials.Max = bundle.Max;
 
                 var str = bundle.DateReminder.Split(" - ");
-                product.ReminderStartDate = Convert.ToDateTime(str[0]);
-                product.ReminderEndDate = Convert.ToDateTime(str[1]);
+                materials.ReminderStartDate = Convert.ToDateTime(str[0]);
+                materials.ReminderEndDate = Convert.ToDateTime(str[1]);
             }
             else
             {
-                product.Reminder = false;
+                materials.Reminder = false;
             }
 
-            _context.Materials.Update(product);
+            _context.Materials.Update(materials);
             await _context.SaveChangesAsync();
 
             return new ApiSuccessResult<bool>();
@@ -322,8 +338,8 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<GetByIdListMaterial>> GetById(int id)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<GetByIdListMaterial>("Nguyên vật liệu không tồn tại");
             }
@@ -351,8 +367,8 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<GetByIdMaterial>> GetByIdMaterial(int id)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<GetByIdMaterial>("Nguyên vật liệu không tồn tại");
             }
@@ -365,15 +381,15 @@ namespace KhoaLuan.Service.MaterialService
 
             var result = new GetByIdMaterial()
             {
-                Id = product.Id,
-                Code = product.Code,
-                Name = product.Name,
-                Image = product.Image,
-                IdMaterialType = product.IdMaterialsType,
+                Id = materials.Id,
+                Code = materials.Code,
+                Name = materials.Name,
+                Image = materials.Image,
+                IdMaterialType = materials.IdMaterialsType,
                 NameMaterialType = query.g.Name,
-                Description = product.Description,
-                Amount = product.Amount,
-                Reminder = product.Reminder
+                Description = materials.Description,
+                Amount = materials.Amount,
+                Reminder = materials.Reminder
             };
 
             result.NamePackDefault = query.s.Packs.Where(x => x.Default == true).Select(x => x.Name).First();
@@ -397,8 +413,8 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<UpdateMaterialReturn>> GetByUpdateMaterial(int id)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<UpdateMaterialReturn>("Nguyên vật liệu không tồn tại");
             }
@@ -410,12 +426,12 @@ namespace KhoaLuan.Service.MaterialService
 
             var result = new UpdateMaterialReturn()
             {
-                Id = product.Id,
-                Code = product.Code,
-                Name = product.Name,
-                Image = product.Image,
+                Id = materials.Id,
+                Code = materials.Code,
+                Name = materials.Name,
+                Image = materials.Image,
                 NameMaterialType = query.Name,
-                Description = product.Description
+                Description = materials.Description
             };
 
             return new ApiSuccessResult<UpdateMaterialReturn>(result);
@@ -423,19 +439,19 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<GetMaterialReminder>> GetReminder(int id)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<GetMaterialReminder>("Nguyên vật liệu không tồn tại");
             }
 
             var result = new GetMaterialReminder()
             {
-                Reminder = product.Reminder,
-                Min = product.Min,
-                Max = product.Max,
-                ReminderStartDate = product.ReminderStartDate.ToString("MM/dd/yyyy"),
-                ReminderEndDate = product.ReminderEndDate.ToString("MM/dd/yyyy"),
+                Reminder = materials.Reminder,
+                Min = materials.Min,
+                Max = materials.Max,
+                ReminderStartDate = materials.ReminderStartDate.ToString("MM/dd/yyyy"),
+                ReminderEndDate = materials.ReminderEndDate.ToString("MM/dd/yyyy"),
             };
 
             return new ApiSuccessResult<GetMaterialReminder>(result);
@@ -443,8 +459,8 @@ namespace KhoaLuan.Service.MaterialService
 
         public async Task<ApiResult<List<GetMaterialPack>>> GetPack(int id)
         {
-            var product = await _context.Materials.FindAsync(id);
-            if (product == null)
+            var materials = await _context.Materials.FindAsync(id);
+            if (materials == null)
             {
                 return new ApiErrorResult<List<GetMaterialPack>>("Nguyên vật liệu không tồn tại");
             }

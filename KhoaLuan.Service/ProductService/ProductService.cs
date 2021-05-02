@@ -22,7 +22,7 @@ namespace KhoaLuan.Service.ProductService
         private readonly EnterpriseDbContext _context;
         private readonly IMapper _mapper;
         private readonly IStorageService _storageService;
-        private const string PRODUCT_CONTENT_FOLDER_NAME = "product-content";
+        private const string PRODUCT_CONTENT_FOLDER_NAME = SystemConstants.ImageFolder;
 
         public ProductService(EnterpriseDbContext context, IMapper mapper, IStorageService storageService)
         {
@@ -75,6 +75,24 @@ namespace KhoaLuan.Service.ProductService
                 product.ReminderStartDate = (DateTime)bundle.ReminderStartDate;
                 product.ReminderEndDate = (DateTime)bundle.ReminderEndDate;
             }
+
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            Location:
+            var location = code.Location + 1;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.Products.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                goto Location;
+            }
+
+            code.Location = location;
+            _context.ManageCodes.Update(code);
+            await _context.SaveChangesAsync();
+
+            product.Code = str;
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync(); // số bản ghi nếu return

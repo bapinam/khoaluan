@@ -18,8 +18,8 @@ namespace KhoaLuan.Data.Extensions
             modelBuilder.Entity<AppRole>().HasData(new AppRole
             {
                 Id = roleId,
-                Name = "admin",
-                NormalizedName = "admin",
+                Name = "Admin",
+                NormalizedName = "Admin",
                 Description = "Vai trò Administrator"
             });
 

@@ -64,6 +64,31 @@ namespace KhoaLuan.API
                 .AddEntityFrameworkStores<EnterpriseDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddAuthorization(options =>
+            {
+                //Employee
+
+                options.AddPolicy(SystemConstants.PolicyEmployee.EditEmployee,
+                    policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.EmployeeRoleClaims.Edit,
+                      SystemConstants.AdminRoleClaims.Admin));
+
+                options.AddPolicy(SystemConstants.PolicyEmployee.ViewEmployee,
+                    policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.EmployeeRoleClaims.View,
+                      SystemConstants.AdminRoleClaims.Admin));
+
+                // Recorads
+                options.AddPolicy(SystemConstants.PolicyRecorads.Recorads, policy =>
+                {
+                    policy.RequireRole(SystemConstants.ListRole.Admin, SystemConstants.ListRole.RecordsManagement);
+                });
+
+                // admin
+                options.AddPolicy(SystemConstants.PolicyRecorads.Admin, policy =>
+                {
+                    policy.RequireRole(SystemConstants.ListRole.Admin);
+                });
+            });
+
             //Declare DI
             services.AddTransient<IManageCodeService, ManageCodeService>();
             services.AddTransient<IRecipeService, RecipeService>();

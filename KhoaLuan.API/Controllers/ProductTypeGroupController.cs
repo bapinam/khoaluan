@@ -13,7 +13,7 @@ namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = ListRole.Records)]
+    [Authorize(Policy = PolicyRecorads.Recorads)]
     public class ProductTypeGroupController : ControllerBase
     {
         private readonly IProductTypeGroupService _productTypeGroupService;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace KhoaLuan.Data.Migrations
 {
-    public partial class Verson1 : Migration
+    public partial class Verson11 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace KhoaLuan.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -55,6 +55,22 @@ namespace KhoaLuan.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ManageCodes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Top = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    TypeCode = table.Column<int>(type: "int", nullable: false),
+                    Location = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ManageCodes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -221,8 +237,8 @@ namespace KhoaLuan.Data.Migrations
                     Order = table.Column<bool>(type: "bit", nullable: false),
                     Censorship = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Status = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 716, DateTimeKind.Local).AddTicks(3988)),
-                    ExpectedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 716, DateTimeKind.Local).AddTicks(4495)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 302, DateTimeKind.Local).AddTicks(2506)),
+                    ExpectedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 302, DateTimeKind.Local).AddTicks(3659)),
                     Note = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     IdCreator = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IdResponsible = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -252,8 +268,8 @@ namespace KhoaLuan.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 706, DateTimeKind.Local).AddTicks(6233)),
-                    ExpectedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 706, DateTimeKind.Local).AddTicks(6664)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 286, DateTimeKind.Local).AddTicks(6368)),
+                    ExpectedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 286, DateTimeKind.Local).AddTicks(6955)),
                     Note = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Censorship = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -290,8 +306,8 @@ namespace KhoaLuan.Data.Migrations
                     Max = table.Column<long>(type: "bigint", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReminderStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 735, DateTimeKind.Local).AddTicks(581)),
-                    ReminderEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 735, DateTimeKind.Local).AddTicks(991)),
+                    ReminderStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 328, DateTimeKind.Local).AddTicks(4409)),
+                    ReminderEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 328, DateTimeKind.Local).AddTicks(8293)),
                     Reminder = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IdMaterialsType = table.Column<int>(type: "int", nullable: false)
                 },
@@ -335,8 +351,8 @@ namespace KhoaLuan.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CodeBill = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     StorageCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 701, DateTimeKind.Local).AddTicks(5126)),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 700, DateTimeKind.Local).AddTicks(1274)),
+                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 277, DateTimeKind.Local).AddTicks(4867)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 275, DateTimeKind.Local).AddTicks(3261)),
                     Tax = table.Column<int>(type: "int", nullable: true),
                     PaymentStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m),
@@ -419,8 +435,8 @@ namespace KhoaLuan.Data.Migrations
                     Max = table.Column<long>(type: "bigint", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReminderStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 740, DateTimeKind.Local).AddTicks(7756)),
-                    ReminderEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 4, 25, 12, 18, 41, 740, DateTimeKind.Local).AddTicks(8158)),
+                    ReminderStartDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 338, DateTimeKind.Local).AddTicks(2916)),
+                    ReminderEndDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 5, 2, 15, 46, 5, 338, DateTimeKind.Local).AddTicks(3342)),
                     Reminder = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IdProductType = table.Column<int>(type: "int", nullable: false)
                 },
@@ -579,12 +595,12 @@ namespace KhoaLuan.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
-                values: new object[] { new Guid("88a28f0b-99cd-4893-ab70-0189c8c7fec5"), "28b0e88a-6100-42b7-9d93-8226f56bb1a1", "Vai trò Administrator", "admin", "admin" });
+                values: new object[] { new Guid("88a28f0b-99cd-4893-ab70-0189c8c7fec5"), "423b985b-2fb9-475e-a845-e02864d77565", "Vai trò Administrator", "Admin", "Admin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AccountType", "Address", "BirthDay", "Card", "Code", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "Gender", "JobStatus", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PathImage", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), 0, true, "Cần Thơ", new DateTime(2020, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), "0123456789", "Admin123456789", "a448c9ba-717e-4cc4-9e88-28e4d3b01fce", "khoaluan@gmail.com", true, "Nam", true, 1, "Lương Nhựt", false, null, "khoaluan@gmail.com", "admin", "AQAAAAEAACcQAAAAEE+Z0p4r9SPAFfPqqRJT1AxNbBimCdoL9tnXEB7JVJbiH+Oj06MJWyoRYVz5+LZmUw==", null, null, false, "", false, "admin" });
+                values: new object[] { new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), 0, true, "Cần Thơ", new DateTime(2020, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), "0123456789", "Admin123456789", "03bc3144-c525-4a1f-9781-b02a930b2fbd", "khoaluan@gmail.com", true, "Nam", true, 1, "Lương Nhựt", false, null, "khoaluan@gmail.com", "admin", "AQAAAAEAACcQAAAAEB0EijTNTy+LRa4GJKEqaE0XAm1vBE2jY19uec0461PFSXz8rlO0JCkKySL40TIz8Q==", null, null, false, "", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "MaterialsTypes",
@@ -615,19 +631,19 @@ namespace KhoaLuan.Data.Migrations
                 columns: new[] { "Id", "Amount", "Code", "Description", "IdMaterialsType", "Image", "Max", "Min", "Name", "ReminderEndDate", "ReminderStartDate" },
                 values: new object[,]
                 {
-                    { 1, 10L, "NVL1", "Bột gạo dùng để làm bánh", 1, null, 100L, 1L, "Bột gạo", new DateTime(2021, 4, 25, 12, 18, 41, 780, DateTimeKind.Local).AddTicks(3841), new DateTime(2021, 4, 25, 12, 18, 41, 780, DateTimeKind.Local).AddTicks(3118) },
-                    { 2, 10L, "NVL2", "Bột gạo dùng để làm bánh", 2, null, 100L, 10L, "Cam", new DateTime(2021, 4, 25, 12, 18, 41, 780, DateTimeKind.Local).AddTicks(5046), new DateTime(2021, 4, 25, 12, 18, 41, 780, DateTimeKind.Local).AddTicks(5039) }
+                    { 1, 10L, "NVL1", "Bột gạo dùng để làm bánh", 1, null, 100L, 1L, "Bột gạo", new DateTime(2021, 5, 2, 15, 46, 5, 406, DateTimeKind.Local).AddTicks(5350), new DateTime(2021, 5, 2, 15, 46, 5, 406, DateTimeKind.Local).AddTicks(4624) },
+                    { 2, 10L, "NVL2", "Bột gạo dùng để làm bánh", 2, null, 100L, 10L, "Cam", new DateTime(2021, 5, 2, 15, 46, 5, 406, DateTimeKind.Local).AddTicks(6572), new DateTime(2021, 5, 2, 15, 46, 5, 406, DateTimeKind.Local).AddTicks(6566) }
                 });
 
             migrationBuilder.InsertData(
                 table: "OrderPlans",
                 columns: new[] { "Id", "Censorship", "Code", "CreatedDate", "ExpectedDate", "IdCreator", "IdResponsible", "Name", "Note", "Order", "Status" },
-                values: new object[] { 1L, true, "KHDH1", new DateTime(2021, 4, 25, 12, 18, 41, 783, DateTimeKind.Local).AddTicks(234), new DateTime(2021, 4, 25, 12, 18, 41, 783, DateTimeKind.Local).AddTicks(865), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), "Đặt hàng bột gạo và cam", null, false, true });
+                values: new object[] { 1L, true, "KHDH1", new DateTime(2021, 5, 2, 15, 46, 5, 409, DateTimeKind.Local).AddTicks(2508), new DateTime(2021, 5, 2, 15, 46, 5, 409, DateTimeKind.Local).AddTicks(3149), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), "Đặt hàng bột gạo và cam", null, false, true });
 
             migrationBuilder.InsertData(
                 table: "ProcessPlans",
                 columns: new[] { "Id", "Code", "CreatedDate", "ExpectedDate", "IdCreator", "IdResponsible", "Name", "Note" },
-                values: new object[] { 1L, "KHCB1", new DateTime(2021, 4, 25, 12, 18, 41, 785, DateTimeKind.Local).AddTicks(9564), new DateTime(2021, 4, 25, 12, 18, 41, 786, DateTimeKind.Local).AddTicks(195), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), "Chế Biến bánh cam", null });
+                values: new object[] { 1L, "KHCB1", new DateTime(2021, 5, 2, 15, 46, 5, 413, DateTimeKind.Local).AddTicks(3860), new DateTime(2021, 5, 2, 15, 46, 5, 413, DateTimeKind.Local).AddTicks(4883), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), "Chế Biến bánh cam", null });
 
             migrationBuilder.InsertData(
                 table: "ProductTypes",
@@ -637,7 +653,7 @@ namespace KhoaLuan.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Bills",
                 columns: new[] { "Id", "AmountPaid", "CodeBill", "CreatedDate", "IdCreator", "IdPlan", "IdSupplier", "Images", "PaymentStatus", "PurchaseDate", "StorageCode", "Tax" },
-                values: new object[] { 1L, 50000m, "01", new DateTime(2021, 4, 25, 12, 18, 41, 784, DateTimeKind.Local).AddTicks(1613), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), 1L, 1, null, 1, new DateTime(2021, 4, 25, 12, 18, 41, 784, DateTimeKind.Local).AddTicks(990), "AP1", null });
+                values: new object[] { 1L, 50000m, "01", new DateTime(2021, 5, 2, 15, 46, 5, 410, DateTimeKind.Local).AddTicks(3689), new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"), 1L, 1, null, 1, new DateTime(2021, 5, 2, 15, 46, 5, 410, DateTimeKind.Local).AddTicks(3068), "AP1", null });
 
             migrationBuilder.InsertData(
                 table: "OrderDetails",
@@ -661,7 +677,7 @@ namespace KhoaLuan.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "Amount", "Code", "Description", "IdProductType", "Image", "Max", "Min", "Name", "ReminderEndDate", "ReminderStartDate" },
-                values: new object[] { 1, 10L, "SP1", "Bánh làm từ cam vắt", 1, null, 10L, 0L, "Bánh Cam", new DateTime(2021, 4, 25, 12, 18, 41, 781, DateTimeKind.Local).AddTicks(6637), new DateTime(2021, 4, 25, 12, 18, 41, 781, DateTimeKind.Local).AddTicks(6007) });
+                values: new object[] { 1, 10L, "SP1", "Bánh làm từ cam vắt", 1, null, 10L, 0L, "Bánh Cam", new DateTime(2021, 5, 2, 15, 46, 5, 407, DateTimeKind.Local).AddTicks(8613), new DateTime(2021, 5, 2, 15, 46, 5, 407, DateTimeKind.Local).AddTicks(7959) });
 
             migrationBuilder.InsertData(
                 table: "BillDetails",
@@ -866,6 +882,9 @@ namespace KhoaLuan.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "BillDetails");
+
+            migrationBuilder.DropTable(
+                name: "ManageCodes");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");

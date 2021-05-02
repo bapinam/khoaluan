@@ -30,19 +30,29 @@ namespace KhoaLuan.Utilities.Constants
 
         public class ListRole
         {
-            public const string Admin = "admin";
+            public const string Admin = "Admin";
 
             public const string RecordsManagement = "RecordsManagement";
-
-            public const string Records = "admin, RecordsManagement";
         }
 
-        public class RecordsManagementsRole
+        public class RecordsRoleClaims
         {
             public const string View = "recorads.view";
             public const string Add = "recorads.add";
             public const string Edit = "recorads.edit";
             public const string Reminder = "recorads.reminder";
+        }
+
+        public class EmployeeRoleClaims
+        {
+            public const string View = "employees.view";
+            public const string Add = "employees.add";
+            public const string Edit = "employees.edit";
+        }
+
+        public class AdminRoleClaims
+        {
+            public const string Admin = "admin.admin";
         }
 
         public class PolicyRecorads
@@ -51,6 +61,16 @@ namespace KhoaLuan.Utilities.Constants
             public const string AddRecorads = "policy.recorads.add";
             public const string EditRecorads = "policy.recorads.edit";
             public const string ReminderRecorads = "policy.recorads.reminder";
+
+            public const string Recorads = "Recorads";
+            public const string Admin = "Admin";
+        }
+
+        public class PolicyEmployee
+        {
+            public const string ViewEmployee = "policy.employees.view";
+            public const string AddEmployee = "policy.employees.add";
+            public const string EditEmployee = "policy.employees.edit";
         }
     }
 }

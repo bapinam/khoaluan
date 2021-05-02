@@ -12,7 +12,7 @@ using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    [Authorize(Roles = ListRole.Admin)]
+    [Authorize(Policy = PolicyRecorads.Admin)]
     public class ManageCodesController : BaseController
     {
         private readonly IManageCodeApiClient _manageCodeApiClient;

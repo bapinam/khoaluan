@@ -14,7 +14,7 @@ namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = ListRole.Admin)]
+    [Authorize(Policy = PolicyRecorads.Admin)]
     public class ManageCodeController : ControllerBase
     {
         private readonly IManageCodeService _manageCodeService;

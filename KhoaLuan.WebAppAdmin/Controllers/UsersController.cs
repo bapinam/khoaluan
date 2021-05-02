@@ -17,7 +17,6 @@ using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    [Authorize(Roles = ListRole.Admin)]
     public class UsersController : BaseController
     {
         private readonly IUserApiClient _userApiClient;
@@ -30,6 +29,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             _configuration = configuration;
         }
 
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> Index(string keyword, int pageIndex = 1, int pageSize = 5)
         {
             var request = new GetUserPagingRequest()
@@ -67,6 +67,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<ApiResult<UserNameVm>> Create(RegisterRequest bundle)
         {
             var result = await _userApiClient.RegisterUser(bundle);
@@ -74,6 +75,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<bool> iCard(string card, Guid? id)
         {
             var data = await _userApiClient.iCard(card, id);
@@ -81,6 +83,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<bool> iEmail(string email, Guid? id)
         {
             var data = await _userApiClient.iEmail(email, id);
@@ -88,7 +91,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<bool> iEmailName(string email, string name)
         {
             var data = await _userApiClient.iEmailName(email, name);
@@ -96,6 +99,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<GetByIdListUser> GetById(Guid id)
         {
             var user = await _userApiClient.GetById(id);
@@ -120,7 +124,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<GetByIdListUser> GetByName(string name)
         {
             var user = await _userApiClient.GetByName(name);
@@ -146,6 +150,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<ApiResult<bool>> Update(UserUpdateRequest bundle)
         {
             var data = await _userApiClient.UpdateUser(bundle.Id, bundle);
@@ -153,7 +158,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPut]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         public async Task<ApiResult<bool>> UpdateInfor(UpdateInfor bundle)
         {
             var data = await _userApiClient.UpdateInfor(bundle);
@@ -161,6 +166,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<ApiResult<bool>> Delete(Guid id)
         {
             var data = await _userApiClient.Delete(id);
@@ -168,6 +174,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> UpdateJobStauts(UpdateJobStauts bundle)
         {
             var result = await _userApiClient.UpdateJobStauts(bundle);
@@ -175,7 +182,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPut]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         public async Task<IActionResult> UpdatePassword(UserUpdatePassword bundle)
         {
             var result = await _userApiClient.UpdatePassword(bundle);
@@ -183,7 +190,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpPut]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateImage([FromForm] UpdateImageUser bundle)
         {
@@ -192,7 +199,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<IActionResult> GetImage(string name)
         {
             var result = await _userApiClient.GetImage(name);
@@ -200,6 +207,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> ResetPassWord(Guid id)
         {
             var result = await _userApiClient.ResetPassWord(id);

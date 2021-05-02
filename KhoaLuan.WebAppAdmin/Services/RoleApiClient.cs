@@ -45,22 +45,6 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
-        public async Task CreateRole()
-        {
-            var url = $"/api/Role";
-            var sessions = _httpContextAccessor
-             .HttpContext
-             .Session
-             .GetString(SystemConstants.AppSettings.Token);
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(_configuration[SystemConstants.AppSettings.BaseAddress]);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(SystemConstants.Bearer, sessions);
-
-            var response = await client.GetAsync(url);
-
-            await response.Content.ReadAsStringAsync();
-        }
-
         public async Task<List<string>> GetRole(Guid id)
         {
             var url = $"/api/Role/{id}";

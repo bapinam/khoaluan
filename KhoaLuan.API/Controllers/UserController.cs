@@ -13,7 +13,6 @@ namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = ListRole.Admin)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -40,6 +39,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             if (!ModelState.IsValid)
@@ -57,6 +57,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("check-card")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> iCard(string card, Guid? id)
         {
             var resultId = await _userService.iCard(card, id);
@@ -64,6 +65,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("check-email")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> iEmail(string email, Guid? id)
         {
             var resultId = await _userService.iEmail(email, id);
@@ -71,7 +73,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("check-email-name")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<IActionResult> iEmailName(string email, string name)
         {
             var resultId = await _userService.iEmailName(email, name);
@@ -80,6 +82,7 @@ namespace KhoaLuan.API.Controllers
 
         ///api/users/paging?pageIndex=1&pageSize=10&keyword=
         [HttpGet("paging")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
         {
             var result = await _userService.GetUsersPaging(request);
@@ -87,6 +90,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetById(id);
@@ -94,7 +98,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("name/{name}")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<IActionResult> GetByName(string name)
         {
             var user = await _userService.GetByName(name);
@@ -102,6 +106,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("user-name/{id}")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> GetByUserName(Guid id)
         {
             var user = await _userService.GetByUserName(id);
@@ -109,6 +114,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _userService.Delete(id);
@@ -116,6 +122,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdateRequest request)
         {
             if (!ModelState.IsValid)
@@ -130,7 +137,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPut("infor")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         public async Task<IActionResult> Update([FromBody] UpdateInfor request)
         {
             if (!ModelState.IsValid)
@@ -145,7 +152,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPut("change-password")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         public async Task<IActionResult> Update([FromBody] UserUpdatePassword request)
         {
             if (!ModelState.IsValid)
@@ -160,6 +167,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPut("job-stautus")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> UpdateJobStauts([FromBody] UpdateJobStauts bundle)
         {
             if (!ModelState.IsValid)
@@ -174,7 +182,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpPut("image")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.EditEmployee)]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateImage([FromForm] UpdateImageUser bundle)
         {
@@ -183,7 +191,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("get-image/{name}")]
-        [AllowAnonymous]
+        [Authorize(Policy = PolicyEmployee.ViewEmployee)]
         public async Task<IActionResult> GetImage(string name)
         {
             var result = await _userService.GetImage(name);
@@ -191,6 +199,7 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("reset-password/{id}")]
+        [Authorize(Policy = PolicyRecorads.Admin)]
         public async Task<IActionResult> ResetPassWord(Guid id)
         {
             var result = await _userService.ResetPassWord(id);

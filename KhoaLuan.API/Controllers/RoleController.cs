@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = PolicyRecorads.Admin)]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
@@ -35,13 +36,6 @@ namespace KhoaLuan.API.Controllers
         {
             var roles = await _roleService.Assign(bundle);
             return Ok(roles);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            await _roleService.CreateRole();
-            return Ok();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = ListRole.Records)]
+    [Authorize(Policy = PolicyRecorads.Recorads)]
     public class RecipeController : ControllerBase
     {
         private readonly IRecipeService _recipeService;

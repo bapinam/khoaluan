@@ -44,11 +44,30 @@ namespace KhoaLuan.WebAppAdmin
                     options.AccessDeniedPath = "/Home/Index/";
                 });
 
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy(SystemConstants.PolicyRecorads.AddRecorads,
-            //        policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.RecordsManagementsRole.Add));
-            //});
+            services.AddAuthorization(options =>
+              {
+                  //Employee
+
+                  options.AddPolicy(SystemConstants.PolicyEmployee.EditEmployee,
+                      policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.EmployeeRoleClaims.Edit,
+                        SystemConstants.AdminRoleClaims.Admin));
+
+                  options.AddPolicy(SystemConstants.PolicyEmployee.ViewEmployee,
+                      policy => policy.RequireClaim(SystemConstants.CustomClaimTypes.Permission, SystemConstants.EmployeeRoleClaims.View,
+                        SystemConstants.AdminRoleClaims.Admin));
+
+                  // Recorads
+                  options.AddPolicy(SystemConstants.PolicyRecorads.Recorads, policy =>
+                  {
+                      policy.RequireRole(SystemConstants.ListRole.Admin, SystemConstants.ListRole.RecordsManagement);
+                  });
+
+                  // admin
+                  options.AddPolicy(SystemConstants.PolicyRecorads.Admin, policy =>
+                  {
+                      policy.RequireRole(SystemConstants.ListRole.Admin);
+                  });
+              });
 
             ///------
             services.AddTransient<IValidator<MaterialCreate>, MaterialCreateValidator>();

@@ -490,15 +490,14 @@
             success: function (msg) {
                 if (msg.isSuccessed) {
 
+
                     var img = "@Configuration["BaseAddress"]" + msg.resultObj;
-                        $("#ImageAvatar").attr("src", img);
-                        $("#ImageAvatar12").attr("src", img);
+                    $("#ImageAvatar").attr("src", img);
+                    $("#ImageAvatar12").attr("src", img);
 
                 }
-
             },
             error: function (data) {
-                toastr.error('Thay đổi ảnh thất bại');
             }
         });
 

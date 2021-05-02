@@ -71,13 +71,42 @@ namespace KhoaLuan.Service.RoleService
                 await _roleManager.CreateAsync(name);
 
                 await _roleManager
-                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsManagementsRole.View));
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsRoleClaims.View));
                 await _roleManager
-                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsManagementsRole.Add));
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsRoleClaims.Add));
                 await _roleManager
-                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsManagementsRole.Edit));
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsRoleClaims.Edit));
                 await _roleManager
-                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsManagementsRole.Reminder));
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, RecordsRoleClaims.Reminder));
+            }
+
+            // Employee
+            var nameEmployee = await _roleManager.FindByNameAsync(RoleDecentralization.Employee.ToString());
+            if (nameEmployee == null)
+            {
+                nameEmployee = new AppRole(RoleDecentralization.Employee.ToString());
+                nameEmployee.Description = "Vai trò nhân viên";
+
+                await _roleManager.CreateAsync(nameEmployee);
+
+                await _roleManager
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, EmployeeRoleClaims.View));
+                await _roleManager
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, EmployeeRoleClaims.Add));
+                await _roleManager
+                    .AddClaimAsync(name, new Claim(CustomClaimTypes.Permission, EmployeeRoleClaims.Edit));
+            }
+
+            // ADMIN
+            var roleAdmin = await _roleManager.FindByNameAsync(RoleDecentralization.Admin.ToString());
+
+            var claimAdmin = await _roleManager.GetClaimsAsync(roleAdmin).ConfigureAwait(false);
+
+            var count = claimAdmin.Count();
+            if (count < 1)
+            {
+                await _roleManager
+                    .AddClaimAsync(roleAdmin, new Claim(CustomClaimTypes.Permission, AdminRoleClaims.Admin));
             }
         }
 

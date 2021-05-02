@@ -8,6 +8,8 @@ namespace KhoaLuan.Data.Enums
 {
     public enum RoleDecentralization
     {
-        RecordsManagement
+        RecordsManagement,
+        Employee,
+        Admin
     }
 }

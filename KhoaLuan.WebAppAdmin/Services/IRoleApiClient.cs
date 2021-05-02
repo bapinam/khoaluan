@@ -10,8 +10,6 @@ namespace KhoaLuan.WebAppAdmin.Services
 {
     public interface IRoleApiClient
     {
-        Task CreateRole();
-
         Task<List<string>> GetRole(Guid id);
 
         Task<ApiResult<bool>> Assign(AssignVm bundle);

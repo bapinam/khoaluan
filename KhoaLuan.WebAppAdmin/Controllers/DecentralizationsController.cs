@@ -13,7 +13,7 @@ using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    [Authorize(Roles = ListRole.Admin)]
+    [Authorize(Policy = PolicyRecorads.Admin)]
     public class DecentralizationsController : BaseController
     {
         private readonly IUserApiClient _userApiClient;
@@ -40,8 +40,6 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             var data = await _userApiClient.GetUsersPagings(request);
 
             ViewBag.Keyword = keyword;
-
-            await _roleApiClient.CreateRole();
 
             return View(data.ResultObj);
         }

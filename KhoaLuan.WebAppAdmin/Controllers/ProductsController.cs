@@ -13,7 +13,7 @@ using static KhoaLuan.Utilities.Constants.SystemConstants;
 
 namespace KhoaLuan.WebAppAdmin.Controllers
 {
-    [Authorize(Roles = ListRole.Records)]
+    [Authorize(Policy = PolicyRecorads.Recorads)]
     public class ProductsController : BaseController
     {
         private readonly IProductApiClient _productApiClient;

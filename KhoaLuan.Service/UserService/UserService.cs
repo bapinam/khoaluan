@@ -3,6 +3,7 @@ using KhoaLuan.Data.EF;
 using KhoaLuan.Data.Entities;
 using KhoaLuan.Data.Enums;
 using KhoaLuan.Service.Common;
+using KhoaLuan.Service.RoleService;
 using KhoaLuan.Utilities.Constants;
 using KhoaLuan.ViewModels.Common;
 using KhoaLuan.ViewModels.User;
@@ -34,12 +35,14 @@ namespace KhoaLuan.Service.UserService
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IStorageService _storageService;
+        private IRoleService _roleService;
         private const string PRODUCT_CONTENT_FOLDER_NAME = "product-content";
 
         public UserService(EnterpriseDbContext context,
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             RoleManager<AppRole> roleManager,
+            IRoleService roleService,
             IConfiguration config, IMapper mapper,
             IStorageService storageService)
         {
@@ -50,6 +53,7 @@ namespace KhoaLuan.Service.UserService
             _config = config;
             _mapper = mapper;
             _storageService = storageService;
+            _roleService = roleService;
         }
 
         public async Task<ApiResult<string>> Authencate(LoginRequest bundle)
@@ -74,20 +78,24 @@ namespace KhoaLuan.Service.UserService
                 return new ApiErrorResult<string>("Bạn không thể đăng nhập, vì bạn đã nghỉ việc");
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
-
-            //var userRoles = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToArray();
-            //var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
-            //var roleClaims = await GetRoleClaimAsync(roles).ConfigureAwait(false);
-
-            var claims = new[]  // đẩy thông tin về token
-            {
-                new Claim(ClaimTypes.GivenName,user.FirstName),
-                new Claim(ClaimTypes.Role, string.Join(";",roles)),
-                new Claim(ClaimTypes.Name, bundle.UserName),
-                new Claim("Image", user.PathImage!= null ? user.PathImage : "OK"),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            var claims = new List<Claim>{
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("Image", user.PathImage!= null ? user.PathImage : "OK")
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+                var identityRole = await _roleManager.FindByNameAsync(role);
+                var roleClaims = await _roleManager.GetClaimsAsync(identityRole);
+                if (roleClaims != null && roleClaims.Any())
+                {
+                    claims = claims.Concat(await _roleManager.GetClaimsAsync(identityRole)).ToList();
+                }
+            }
 
             // sau khi có claims thì mã khóa claims  bằng Symmetric
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
@@ -100,18 +108,6 @@ namespace KhoaLuan.Service.UserService
                 signingCredentials: creds);
 
             return new ApiSuccessResult<string>(new JwtSecurityTokenHandler().WriteToken(token));
-        }
-
-        private async Task<IList<Claim>> GetRoleClaimAsync(IList<string> data)
-        {
-            IList<Claim> roleClaims;
-
-            foreach (var item in data)
-            {
-                var role = await _roleManager.FindByNameAsync(item);
-                roleClaims = await _roleManager.GetClaimsAsync(role).ConfigureAwait(false);
-            }
-            throw new NotImplementedException();
         }
 
         public async Task<ApiResult<Guid>> Register(RegisterRequest bundle)
@@ -145,6 +141,20 @@ namespace KhoaLuan.Service.UserService
             user.UserName = userName;
             user.JobStatus = JobStatus.NotWorking;
             var result = await _userManager.CreateAsync(user, passWord);
+
+            Role:
+            var role = await _roleManager.FindByNameAsync(RoleDecentralization.Employee.ToString());
+            if (role == null)
+            {
+                await _roleService.CreateRole();
+                goto Role;
+            }
+
+            if (!await _userManager.IsInRoleAsync(user, role.Name))
+            {
+                await _userManager.AddToRoleAsync(user, role.Name);
+            }
+
             if (result.Succeeded)
             {
                 return new ApiSuccessResult<Guid>(user.Id);

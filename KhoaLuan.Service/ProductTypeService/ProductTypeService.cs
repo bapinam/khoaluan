@@ -168,6 +168,7 @@ namespace KhoaLuan.Service.ProductTypeService
 
             _context.ProductTypes.Add(productType);
             await _context.SaveChangesAsync(); // số bản ghi nếu return
+
             return new ApiSuccessResult<int>(productType.Id);
         }
 

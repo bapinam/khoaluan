@@ -1,4 +1,5 @@
 ﻿@using KhoaLuan.Data.Enums;
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
 <style>
     .va:hover {
         box-shadow: #ECECEC 2px 2px;
@@ -11,17 +12,17 @@
 
 <section class="content">
     <!-- Default box -->
-    <div class="card">
+    <div class="card collapsed-box">
         <div class="card-header">
             <h3 class="card-title">Tạo Kế Hoạch Đặt Hàng</h3>
 
             <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                    <i class="fas fa-minus"></i>
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
                     <div class="row">
@@ -53,67 +54,112 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="inputEmail4">Loại Nguyên Vật Liệu</label>
-                        <div id="DeMT">
-                            <select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required>
-                            </select>
+                    <form id="frmTK" method="post">
+                        <div class="form-group">
+                            <label for="inputEmail4">Loại Nguyên Vật Liệu</label>
+                            <div id="DeMT">
+                                <select id="MaterialsTypeLoai" name="MaterialsType" onchange="myFunction()" class="form-control select2bs4" required>
+                                    <option selected>Chọn dữ liệu...</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="TimKiem"
+                                   placeholder="Tìm kiếm mã số hoặc tên sản phẩm" aria-label="Search" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search fa-fw"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <div class="row">
                         <div class="col-12">
-                            <h4>Danh Sách</h4>
+                            <h4>Danh Sách Tìm Kiếm</h4>
+                        </div>
+                        <div class="card-body">
+                            <table id="table2" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã Số</th>
+                                        <th>Tên</th>
+                                        <th>Hình Ảnh</th>
+                                        <th>Số Lượng</th>
+                                        <th class="text-center">Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableAddNVL">
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Mã Số</th>
+                                        <th>Tên</th>
+                                        <th>Hình Ảnh</th>
+                                        <th>Số Lượng</th>
+                                        <th class="text-center">Thao Tác</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
 
                 <!--//////////////////////////////////////////////////////////////////////////////////////////////////-->
                 <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
-                    <h3 class="text-primary"><i class="fas fa-paint-brush"></i>Phiếu Kế Hoạch</h3>
-                    <h5 class="mt-5 text-muted"></h5>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="inputEmail4">Mã Số</label>
-                            <select id="Code" name="Code" class="form-control selectMater" required>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="inputEmail4">Tên</label>
-                            <input type="text" class="form-control" name="Name" id="Name" placeholder="Tên kế hoạch" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputEmail4">Ngày Dự Kiến</label>
-                        <input type="date" class="form-control" name="ExpectedDate" id="Date" placeholder="Tên kế hoạch" required>
-                    </div>
+                    <form id="AddSaveNVL" method="post">
 
-                    <div class="form-group">
-                        <label for="inputAddress">Ghi Chú</label>
-                        <input type="text" class="form-control" name="Note" id="Note" placeholder="Ghi chú">
-                    </div>
+                        <h3 class="text-primary"><i class="fas fa-paint-brush"></i>Phiếu Kế Hoạch</h3>
+                        <h5 class="mt-5 text-muted"></h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mã Số</label>
+                                <select id="Code" name="Code" class="form-control selectMater" required>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Tên</label>
+                                <input type="text" class="form-control" name="Name" id="Name" placeholder="Tên kế hoạch" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail4">Ngày Dự Kiến</label>
+                            <input type="date" class="form-control" name="ExpectedDate" id="Date" placeholder="Tên kế hoạch" required>
+                        </div>
 
-                    <h5 class="mt-5 text-muted">Project files</h5>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Functional-requirements.docx</a>
-                        </li>
-                        <li>
-                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-pdf"></i> UAT.pdf</a>
-                        </li>
-                        <li>
-                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-envelope"></i> Email-from-flatbal.mln</a>
-                        </li>
-                        <li>
-                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-image "></i> Logo.png</a>
-                        </li>
-                        <li>
-                            <a href="" class="btn-link text-secondary"><i class="far fa-fw fa-file-word"></i> Contract-10_12_2014.docx</a>
-                        </li>
-                    </ul>
-                    <div class="text-center mt-5 mb-3">
-                        <a href="#" class="btn btn-sm btn-primary">Add files</a>
-                        <a href="#" class="btn btn-sm btn-warning">Report contact</a>
-                    </div>
+                        <div class="form-group">
+                            <label for="inputAddress">Ghi Chú</label>
+                            <input type="text" class="form-control" name="Note" id="Note" placeholder="Ghi chú">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputAddress">Giao Phiếu</label>
+                            <button type="button" class="form-control" onclick="GiaoViec()"
+                                    data-toggle="modal" data-target="#exampleGiaoViec"
+                                    id="IdResponsible">
+                                <div id="ShowNV"></div>
+                            </button>
+                            @{
+                                var user = User.Identity.Name;
+                            }
+                            <input name="NameCreator" value="@user" type="hidden" />
+                            <input name="IdResponsible" id="idGV" type="hidden" />
+                        </div>
+                        <h5 class="mt-5 text-muted">Đã thêm</h5>
+                        <table id="table3" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tên</th>
+                                    <th style="width:140px;">ĐVT</th>
+                                    <th style="width:100px;">Số Lượng</th>
+                                    <th class="text-center">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableAdd">
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-5 mb-3">
+                            <button class="btn btn-sm btn-primary">Lưu Lại</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -122,6 +168,79 @@
     <!-- /.card -->
 </section>
 
+<!--Modal amount-->
+<div class="modal fade" id="exampleAmount" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nguyên Vật Liệu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idAmount" />
+                <input type="hidden" id="nameAmount" />
+                <input type="hidden" id="amountAmount" />
+                <h5 class="modal-title" id="exampleModalLabel">
+                    <b style="color:red;">Nguyên vật liệu đã vượt mức hàng tồn kho, bạn có muốn đặt hàng?</b>
+                </h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxAmount()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal tìm kiếm nhân viên-->
+<div class="modal fade bd-example-modal-lg" id="exampleGiaoViec" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nguyên Vật Liệu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-group">
+                    <form id="frmTKNV" method="post">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="TimKiemNV"
+                               placeholder="Tìm kiếm mã số, chứng minh thư, tên nhân viên" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <br />
+                    <h5>Danh Sách Nhân Viên</h5>
+                    <table id="tableNhanVien3" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Chứng Minh Thư</th>
+                                <th>Họ</th>
+                                <th>Tên</th>
+                                <th class="text-center">Giao Việc</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableNVIEN">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 
     function addClassFunc1() {
@@ -132,7 +251,8 @@
         id2.classList.remove("va1");
         id3.classList.remove("va1");
         document.getElementById("MaterialsTypeLoai").remove();
-        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType"  onchange="myFunction()" class="form-control select2bs4" required>' +
+            '<option selected>Chọn dữ liệu...</option></select > ';
         $("#DeMT").append(de);
         SetNVL(1);
         $('.selectMater').select2({
@@ -141,6 +261,8 @@
         $('.select2bs4').select2({
             theme: 'bootstrap4'
         });
+        XoaView();
+
     }
     function addClassFunc2() {
         var id1 = document.getElementById('class1');
@@ -151,7 +273,8 @@
         id3.classList.remove("va1");
 
         document.getElementById("MaterialsTypeLoai").remove();
-        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType"  onchange="myFunction()" class="form-control select2bs4" required>' +
+            '<option selected>Chọn dữ liệu...</option></select > ';
         $("#DeMT").append(de);
         SetNVL(2);
         $('.selectMater').select2({
@@ -160,6 +283,8 @@
         $('.select2bs4').select2({
             theme: 'bootstrap4'
         });
+        XoaView();
+
     }
     function addClassFunc3() {
         var id1 = document.getElementById('class1');
@@ -169,7 +294,8 @@
         id2.classList.remove("va1");
         id1.classList.remove("va1");
         document.getElementById("MaterialsTypeLoai").remove();
-        var de = '<select id="MaterialsTypeLoai" name="MaterialsType" class="form-control select2bs4" required></select>';
+        var de = '<select id="MaterialsTypeLoai" name="MaterialsType"  onchange="myFunction()" class="form-control select2bs4" required>' +
+            '<option selected>Chọn dữ liệu...</option></select > ';
         $("#DeMT").append(de);
         SetNVL(3);
         $('.selectMater').select2({
@@ -178,6 +304,8 @@
         $('.select2bs4').select2({
             theme: 'bootstrap4'
         });
+        XoaView();
+
     }
 
     addClassFunc1();
@@ -216,4 +344,261 @@
     window.onload = function (event) {
         addClassFunc1();
     };
+    function myFunction() {
+        var x = document.getElementById("MaterialsTypeLoai").value;
+        $.ajax({
+            type: "GET",
+             url: "@Url.Action("GetMaterials")",
+             data: { id: x },
+            dataType: "json",
+             success: function (data) {
+
+            }
+        });
+    }
+
+    var frmTK = $("#frmTK");
+    frmTK.submit(function (e) {
+        var id = document.getElementById("MaterialsTypeLoai").value;
+        var key = document.getElementById("TimKiem").value;
+
+        if (id == "Chọn dữ liệu...") {
+            toastr.error('Vui lòng chọn loại nguyên vật liệu');
+        }
+        else {
+            XoaView();
+             $.ajax({
+            type: "GET",
+             url: "@Url.Action("GetMaterialsSearch")",
+             data: { id: id, key: key },
+            dataType: "json",
+                 success: function (data) {
+                     var i = 0;
+                 data.forEach(function (item) {
+                     i++;
+                     var hinh = '@Configuration["BaseAddress"]' + item.image;
+                         var str = '<tr>'+
+                             '<td>'+item.code+' </td>'+
+                         ' <td>' + item.name +'</td>' +
+                             ' <td><img src="'+hinh+'"  title="'+item.name+'" style="width: 50px; height: 50px;" /></td>' +
+                             ' <td>' + item.amount + '</td>' +
+                             ' <td class="text-center py-0 align-middle">' +
+                             ' <div class="btn-group btn-group-sm">' +
+                             '   <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"' +
+                             '     onclick="GetView()" title="Xem">' +
+                             '      <i class="fas fa-eye"></i>' +
+                             '  </a>' +
+                             '  <a class="btn btn-primary"' +
+                             '     onclick="GetAdd('+item.id+',\''+item.name+'\','+item.amount+','+item.max+')" title="Thêm">' +
+                             '      <i class="fas fa-plus"></i>' +
+                             '   </a>' +
+                             '</div>' +
+                             ' </td>' +
+                         '</tr >';
+                         $("#tableAddNVL").append(str);
+                 });
+
+                     if (i == 0) {
+                         toastr.warning('Không tìm thấy dữ liệu');
+                     }
+
+            }
+        });
+        }
+        e.preventDefault();
+    });
+
+    function XoaView() {
+        $("#tableAddNVL").remove();
+        $("#table2").append('<tbody id="tableAddNVL"></tbody>');
+    }
+
+    var arrAdd = [];
+    function GetAdd(id, name, amount, max) {
+
+        if (amount >= max && max != 0) {
+            $('#exampleAmount').modal('show');
+            $('#idAmount').val(id);
+            $('#nameAmount').val(name);
+            $('#amountAmount').val(amount);
+        }
+        else {
+            GetValueAdd(id, name, amount);
+        }
+
+    }
+    function GetDelete(id) {
+        var de = "#DeNVL-" + id;
+        $(de).remove();
+        var pos = arrAdd.indexOf(id);
+        arrAdd.splice(pos, 1);
+
+    }
+
+    function ajaxAmount() {
+        $('#exampleAmount').modal('hide');
+        var id = $('#idAmount').val();
+        var name = $('#nameAmount').val();
+        var amount = $('#amountAmount').val();
+        GetValueAdd(id, name, amount);
+    }
+    function GetValueAdd(id, name,amount, max) {
+        var kq = arrAdd.indexOf(id);
+        if (kq < 0) {
+            arrAdd.push(id);
+            var str = '<tr id="DeNVL-' + id + '">' +
+                ' <td><input name="IdMaterials[]" type="hidden" value="'+id+'" />' + name + '</td>' +
+                ' <td>' +
+                '<select id="Se-' + id + '" class="form-control select2bs46" name="Pack[]" required></select> '
+                + '</td>' +
+                ' <td>' +
+                '<input type="number" id="SL-' + id + '" class="form-control"  name="Amount[]" min="1" max="100000000" required />' +
+                '</td>' +
+                ' <td class="text-center py-0 align-middle">' +
+                ' <div class="btn-group btn-group-sm">' +
+                '   <a class="btn btn-danger"' +
+                '     onclick="GetDelete(' + id + ')" title="Xóa">' +
+                '      <i class="fa fa-minus"></i>' +
+                '  </a>' +
+                '</div>' +
+                ' </td>' +
+                '</tr >';
+            $("#tableAdd").append(str);
+            GetListPack(id);
+            $('.select2bs46').select2({ theme: 'bootstrap4' });
+        } else {
+            toastr.error('Dữ liệu đã được thêm rồi');
+        }
+    }
+
+    function GetListPack(id) {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetListPacks","Recipes")",
+            data: { id:id},
+            dataType: "json",
+            success: function (data) {
+
+                data.forEach(function (item) {
+                    var op = '<option  value="' + item.name + '">' + item.name + '</option>';
+                    var str = "#Se-" + id;
+                    $(str).append(op);
+                });
+            }
+        });
+    }
+</script>
+
+<script>
+    var frmAdd = $('#AddSaveNVL');
+    frmAdd.submit(function (e) {
+        var btn = $("#IdResponsible").val();
+        if (btn=="") {
+            toastr.error('Vui lòng chọn người nhận kế hoạch');
+        } else {
+            if (arrAdd.length < 1) {
+            toastr.error('Vui lòng chọn thêm nguyên vật liệu');
+        } else {
+             $.ajax({
+                type: "POST",
+                 url: "@Url.Action("Create")",
+                 data: frmAdd.serialize(),
+                dataType: "json",
+                 success: function (msg) {
+                     toastr.success('Tạo thành công');
+                     arrAdd = [];
+                     $('#AddSaveNVL').trigger("reset");
+                     document.getElementById('ShowNV').innerHTML = "";
+                     $('#tableAdd').remove();
+                     $("#table3").append('<tbody id="tableAddNVL"></tbody>');
+                     DeUpdateCreateCen();
+                     ShowCensorship();
+                },
+                error: function (req, status, error) {
+                    toastr.success('Tạo thất bại');
+                }
+            });
+        }
+        }
+
+        e.preventDefault();
+    });
+</script>
+
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.ProductType";
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#Code').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!--Tìm kiếm nhân viên-->
+<script>
+    var frmNV = $('#frmTKNV');
+    frmNV.submit(function (e) {
+        var keyWord = $('#TimKiemNV').val();
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetEmployee")",
+            data: { key: keyWord },
+            dataType: "json",
+            success: function (data) {
+                if (data.length < 1) {
+                    toastr.warning('Không tìm thấy dữ liệu');
+                }
+                else {
+                    $('#tableNVIEN').remove();
+                    $('#tableNhanVien3').append('<tbody id="tableNVIEN"></tbody>');
+
+                }
+                data.forEach(function (item) {
+                     var str = '<tr>'
+                         + ' <td>'+item.code+'</td>'
+                         + '  <td>'+item.card+'</td>'
+                         + '  <td>' + item.lastName +'</td>'
+                         + '    <td>' + item.firstName +'</td>'
+                         + '    <td class="text-center">'
+                         + '       <a class="btn btn-success btn-sm"'
+                         + '           onclick="GetAddNhanVien(\'' + item.id + '\',\'' + item.code +'\')" title="Thêm">'
+                         + '            <i class="fas fa-plus"></i>'
+                         + '         </a>'
+                         + '       </td>'
+                         + '     </tr >';
+
+                    $('#tableNVIEN').append(str);
+                });
+
+            }
+        });
+        e.preventDefault();
+    });
+
+    //GetAddNhanVien,,ajaxNhanVien
+    function GetAddNhanVien(id,code)
+    {
+        $("#idGV").val(id);
+        $('#IdResponsible').val(id);
+        document.getElementById('ShowNV').innerHTML = code;
+        $('#exampleGiaoViec').modal('hide');
+    }
 </script>

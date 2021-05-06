@@ -1,0 +1,599 @@
+﻿<style>
+    .vnbox {
+        box-shadow: 2px 2px 5px;
+    }
+
+    .my-custom-scrollbar {
+        position: relative;
+        height: 200px;
+        overflow-x: auto;
+    }
+
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+
+    * {
+        margin: 0;
+    }
+
+    #container1 {
+        height: 100%;
+        width: 100%;
+        border: 1px solid green;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #container2 {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        left: 0px;
+        right: -15px;
+        border: 1px solid blue;
+        overflow: auto;
+    }
+</style>
+<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box">
+        <div class="card-header">
+            <h3 class="card-title">Kế Hoạch Đặt Hàng Đang Chờ Duyệt</h3>
+
+            <div class="card-tools">
+                <span title="Chờ Duyệt" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="KiemDuyetPhieu" style="float:left;">0</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none; background-color: #F5F5F5;">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row" id="peP">
+                        <!-- Left col -->
+                        <section class="col-lg-6 connectedSortable" id="leftCol">
+                        </section>
+
+                        <!--Right-->
+                        <section class="col-lg-6 connectedSortable" id="rightCol">
+                        </section>
+
+                        <!-- right col -->
+                    </div>
+                    <!-- /.row (main row) -->
+                </div><!-- /.container-fluid -->
+            </section>
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <!-- /.card -->
+</section>
+<!--Modal price-->
+<div class="modal fade" id="examplePrice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Giá Tiền</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="frmPrice" method="post">
+                <input id="idKHShowC" type="hidden" />
+                <input id="idNVLShowC" type="hidden" />
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="number" min="0" class="form-control rounded-0" placeholder="Nhập giá nguyên vật liệu" required>
+                        <span class="input-group-append">
+                            <button type="button" class="btn btn-info btn-flat">VNĐ</button>
+                        </span>
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" onclick="ajaxPrice()" class="btn btn-primary">Đồng Ý</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Modal supplies-->
+<div class="modal fade  bd-example-modal-lg" id="exampleSupplies" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhà Cung Cấp</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Gợi Ý</h5>
+                    </div>
+                    <table id="table2NCC" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Số Lượt</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAddNCCGY">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Số Lượt</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <br />
+                <form id="frmTKNCC" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" name="keyword"
+                               placeholder="Tìm kiếm mã số hoặc tên nhà cung cấp" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Danh Sách Tìm Kiếm</h5>
+                    </div>
+                    <input id="idKHShowCNCC" type="hidden" />
+                    <input id="idNVLShowCNCC" type="hidden" />
+                    <table id="table34NCC" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAddNCC">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Xóa Kế hoạch vừa tạo-->
+<div class="modal fade" id="exampleDeleteKH" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idKHDeleteC" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn xóa kế hoạch đặt hàng này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteKH()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Sửa Kế hoạch vừa tạo-->
+<div class="modal fade bd-example-modal-lg" id="exampleEditKH" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idKHDeleteC" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn xóa kế hoạch đặt hàng này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteKH()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    document.getElementById("number").onblur = function () {
+        this.value = parseFloat(this.value.replace(/,/g, ""))
+            .toFixed(2)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    }
+    function GetSupplies(idKH, idNVL) {
+        $('#idKHShowCNCC').val(idKH);
+        $('#idNVLShowCNCC').val(idNVL);
+
+    }
+
+    function GetPrice(idKH, idNVL) {
+        $('#idKHShowC').val(idKH);
+        $('#idNVLShowC').val(idNVL);
+    }
+    function isNumber(n) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); }
+
+    var frmPrice = $('#frmPrice');
+    $('#frmPrice').submit(function (e) {
+        var price = $('#number').val();
+        var mystring = price.split(',').join('')
+        mystring = mystring.replace('.00', '');
+        var kq = isNumber(mystring);
+        if (!kq) {
+            toastr.error('Vui lòng nhập số dương');
+        }
+        else {
+            if (mystring < 0) {
+                toastr.error('Vui lòng nhập số dương');
+            } else {
+                var idKHS = $('#idKHShowC').val();
+                var idNVLS = $('#idNVLShowC').val();
+                var t = idKHS + "-" + idNVLS;
+                var pr = "TextPrice-" + t;
+                document.getElementById(pr).innerHTML = price + ' VNĐ';
+                var pi = '#Price-' + t;
+                $(pi).val(mystring);
+                $('#examplePrice').modal('hide');
+            }
+        }
+        e.preventDefault();
+    });
+
+    var frmTKNCC = $('#frmTKNCC');
+    frmTKNCC.submit(function (e) {
+        let form = document.getElementById('frmTKNCC');
+        var name = form.elements['keyword'];
+        var na = name.value;
+
+         $.ajax({
+            type: "GET",
+             url: "@Url.Action("GetListSuppliersPlan")",
+             data: { key: na },
+            dataType: "json",
+             success: function (data) {
+                 DeleteViewSupp();
+                 data.forEach(function (item) {
+                     str = ' <tr>'
+                         +'<td>'+item.code+'</td>'
+                         + '  <td>'+item.name+'</td>'
+                         + ' <td>'+item.address+'</td>'
+                         + '  <td class="text-center">'
+                         + '     <div class="btn-group btn-group-sm">'
+                         + '          <a class="btn btn-primary"'
+                         + '             onclick="GetAddNCC('+item.id+',\''+item.code+'\')" title="Thêm">'
+                         + '              <i class="fas fa-plus"></i>'
+                         + '          </a>'
+                         + '       </div>'
+                         + '     </td>'
+                         + ' </tr>';
+                     $('#tableAddNCC').append(str);
+                 });
+            }
+        });
+        e.preventDefault();
+    });
+
+    function DeleteViewSupp() {
+
+        $('#tableAddNCC').remove();
+        $("#table34NCC").append('<tbody id="tableAddNCC"><tbody>');
+    }
+
+    function GetAddNCC(id, code) {
+       var idKHS= $('#idKHShowCNCC').val();
+        var idNVLS = $('#idNVLShowCNCC').val();
+        var t = idKHS + "-" + idNVLS;
+        var pr = "TextSuppliers-" + t;
+        document.getElementById(pr).innerHTML = code;
+        var su = "#Suppliers-" + t;
+        $(su).val(id);
+        $('#exampleSupplies').modal('hide');
+    }
+
+    ShowCensorship();
+    // show phần kiểm duyệt
+    function ShowCensorship() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetByOrderPlanCensorship")",
+            data: {} ,
+            dataType: "json",
+             success: function (data) {
+                 DeleteViewCensorship();
+                 var i = 0;
+                 data.forEach(function (item) {
+                     var str = stringShowCensorship(item);
+
+                     if (i % 2 == 0) {
+                         $('#leftCol').append(str);
+                     } else {
+                         $('#rightCol').append(str);
+                     }
+                     i++;
+                 });
+
+                 if (i == 0) {
+                         document.getElementById("KiemDuyetPhieu").style.display = "none";
+
+                 }
+            }
+        });
+    }
+    function DeleteViewCensorship() {
+
+        $('#tableAddNCC').remove();
+        $("#table34NCC").append('<tbody id="tableAddNCC"><tbody>');
+    }
+
+    function stringShowCensorship(item) {
+        str = ' <div class="card direct-chat direct-chat-primary table-hover12 vnbox"> '
+            + ' <div class="card-header">'
+            + ' <h3 class="card-title">' + item.code + '</h3>'
+            + '   <div class="card-tools">'
+            + '       <button type="button" class="btn btn-tool" data-card-widget="collapse">'
+            + '            <i class="fas fa-minus"></i>'
+            + '        </button>'
+            + '     </div>'
+            + '  </div>'
+            + '  <!-- /.card-header -->'
+            + '                    <div class="card-body">'
+            + '      <div class="modal-body">'
+            + '             <div class="form-group">'
+            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <span class="form-control" id="TenKHView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.name
+            + '      </span>'
+            + '             </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <span class="form-control" id="TenKHView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.createdDate
+            + '                                     </span>'
+            + '             </div>'
+            + '              <div class="form-group col-md-6">'
+            + '                 <label>Ngày Dự Kiến:</label>'
+            + '                 <span class="form-control" id="NgayDuKienView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.expectedDate
+            + '                                     </span>'
+            + '             </div>'
+            + '         </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                  <label>Người Tạo:</label>'
+            + '                  <span class="form-control" id="NguoiTaoView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeCreator
+            + '                                      </span>'
+            + '             </div>'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Người Nhận:</label>'
+            + '                 <span class="form-control" id="NguoiNhanView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeResponsible
+            + '                                      </span>'
+            + '             </div>'
+            + ' </div>'
+            + '         <div class="form-group">'
+            + '              <label>Ghi Chú:</label>'
+            + '              <span class="form-control" id="GhiChuView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.note
+            + '              </span>'
+            + '          </div>'
+            + '      </div>'
+            + '  </div>'
+            + '   <!--Danh sách nguyên vật liệu-->'
+            + '      <div class="modal-body table-wrapper-scroll-y my-custom-scrollbar">'
+            + ' <table id="KHDHtable" class="table table-bordered ">'
+            + '             <thead>'
+            + '                 <tr>'
+            + '                     <th>Mã Số</th>'
+            + '                     <th>Tên</th>'
+            + '                     <th>Số Lượng</th>'
+            + '                     <th>ĐVT</th>'
+            + '                     <th>Nhà Cung Cấp</th>'
+            + '                      <th>Giá</th>'
+            + '                 </tr>'
+            + ' </thead>'
+            + '              <tbody id="addShowNVL">';
+
+        item.listOrderDetails.forEach(function (i) {
+            str = str + '                 <tr>'
+                + '                      <td> <input type="hidden" name="Materials' + item.id + '[]" value="' + i.idOrderDetail + '" />'
+                + i.codeMaterials + '</td>'
+                + '                     <td>' + i.nameMaterials+'</td>'
+                + '                     <td>'+i.amount+'</td>'
+                + '                     <td>'+i.unit+'</td>'
+                + '                      <td>'
+                + '                          <div class="btn-group btn-group-sm">'
+                + '                              <input type="hidden" id="Suppliers-' + item.id + '-' + i.idOrderDetail + '"'
+                +' value ="0" name = "Suppliers'+item.id+'[]" /> '
+                + '                              <button type="button" class="btn btn-default" id="TextSuppliers-' + item.id + '-' + i.idOrderDetail +'">'
+                + '                              </button>'
+                + '                              <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">'
+                + '                                  <span class="sr-only">Toggle Dropdown</span>'
+                + '                              </button>'
+                + '                              <div class="dropdown-menu" role="menu">'
+                + '                                  <a class="dropdown-item"'
+                + '                                      data-toggle="modal" data-target="#exampleSupplies"'
+                + '                                      onclick="GetSupplies(' + item.id + ',' + i.idOrderDetail +')">Thao Tác</a>'
+                + '                              </div>'
+                + '                          </div>'
+                + '                      </td>'
+                + '                      <td>'
+                + '                          <div class="btn-group btn-group-sm">'
+                + '                              <input type="hidden" id="Price-' + item.id + '-' + i.idOrderDetail + '"'
+                + ' value="0" name="Price' + item.id + '[]" />'
+                + '                             <button type="button" class="btn btn-default" id="TextPrice-' + item.id + '-' + i.idOrderDetail +'">'
+                + i.price
+                + '                                                   </button>'
+                + '                               <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">'
+                + '                                   <span class="sr-only">Toggle Dropdown</span>'
+                + '                              </button>'
+                + '                              <div class="dropdown-menu" role="menu">'
+                + '                                  <a class="dropdown-item"'
+                + '                                     data-toggle="modal" data-target="#examplePrice"'
+                + '                                     onclick="GetPrice(' + item.id + ',' + i.idOrderDetail +')">Thao Tác</a>'
+                + '                              </div>'
+                + '                           </div>'
+                + '                      </td>'
+                + ' </tr>';
+        });
+
+         str = str  +'             </tbody>'
+           +'          </table>'
+           +'      </div>'
+           +'      <div class="text-center mt-5 mb-3">'
+           +'          <input type="hidden" id="IdKHUpdate-'+item.id+'" name="IdOrderPlan" value="'+item.id+'" />'
+             + '         <button class="btn btn-sm btn-success" onclick="GetSaveCen(' + item.id + ',' + item.count + ')">Duyệt</button>'
+             + '         <button class="btn btn-sm btn-primary" onclick="GetSUpdateKH(' + item.id + ',' + item.count + ')">Sửa</button>'
+             + '         <button class="btn btn-sm btn-danger" onclick="GetDeleteKH(' + item.id + ',' + item.count + ')">Xóa</button>'
+             + '      </div>'
+            + '  </div>';
+        document.getElementById("KiemDuyetPhieu").style.display = "block";
+        document.getElementById("KiemDuyetPhieu").innerHTML = item.count;
+        return str;
+    }
+
+    function GetSaveCen(id,count) {
+        var idkhC = "#IdKHUpdate-" + id;
+        var idKH = $(idkhC).val();
+
+        var su = "Suppliers" + id + "[]";
+        var Suppliers = [];
+        var inps = document.getElementsByName(su);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Suppliers.push(inp.value);
+        }
+
+        var sup = "Price" + id + "[]";
+        var Price = [];
+        var inps = document.getElementsByName(sup);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Price.push(inp.value);
+        }
+
+        var ma = "Materials" + id + "[]";
+        var Materials = [];
+        var inps = document.getElementsByName(ma);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Materials.push(inp.value);
+        }
+
+        var bundle =
+        {
+            Id: idKH,
+            IdOrderDetail: Materials,
+            IdSupplier: Suppliers,
+            Price: Price
+        }
+        $.ajax({
+            type: "PUT",
+            url: "@Url.Action("UpdateOrderPlanCensorship")",
+            data: bundle ,
+            dataType: "json",
+            success: function (data) {
+                DeUpdateCreateCen();
+                toastr.success('Duyệt thành công');
+                ShowCensorship();
+            },
+            error: function (req, status, error) {
+                toastr.error('Duyệt thất bại');
+            }
+        });
+
+    }
+
+    function DeUpdateCreateCen() {
+        $('#leftCol').remove();
+        $('#rightCol').remove();
+        str = '<section class="col-lg-6 connectedSortable" id="leftCol">'
+            + '</section>'
+            + ' <section class="col-lg-6 connectedSortable" id="rightCol">'
+            + '</section>';
+        $('#peP').append(str);
+
+    }
+
+    function GetDeleteKH(id, count) {
+        $("#exampleDeleteKH").modal("show");
+        $("#idKHDeleteC").val(id);
+    }
+    function ajaxDeleteKH()
+    {
+        var idKH = $("#idKHDeleteC").val();
+         $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+             data: { id: idKH } ,
+            dataType: "json",
+             success: function (data) {
+                 if (data.isSuccessed) {
+                     toastr.success('Xóa thành công');
+                     DeUpdateCreateCen();
+                     ShowCensorship();
+                     $("#exampleDeleteKH").modal("hide");
+                 } else {
+                     toastr.error('Xóa thất bại');
+                 }
+             },
+             error: function (req, status, error) {
+                 toastr.error('Xóa thất bại');
+             }
+        });
+    }
+</script>
+
+<script>
+    //sửa kế hoạch vừa thêm
+   function GetSUpdateKH(id, count)
+   {
+       $("#exampleEditKH").modal("show");
+    }
+</script>

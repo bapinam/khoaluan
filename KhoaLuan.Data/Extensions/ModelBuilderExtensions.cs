@@ -27,7 +27,7 @@ namespace KhoaLuan.Data.Extensions
             modelBuilder.Entity<AppUser>().HasData(new AppUser
             {
                 Id = adminId,
-                Code = "Admin123456789",
+                Code = "Admin",
                 Card = "0123456789",
                 UserName = "admin",
                 NormalizedUserName = "admin",

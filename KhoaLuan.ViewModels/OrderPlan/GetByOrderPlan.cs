@@ -23,6 +23,7 @@ namespace KhoaLuan.ViewModels.OrderPlan
         public string CodeCreator { get; set; }
         public Guid IdResponsible { get; set; }
         public string CodeResponsible { get; set; }
+        public string NameResponsible { get; set; }
         public string CodeAuthority { get; set; }
         public List<ListOrderDetails> ListOrderDetails { get; set; }
 

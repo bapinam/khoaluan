@@ -117,6 +117,7 @@ namespace KhoaLuan.WebAppAdmin
             services.AddTransient<IProductTypeGroupApiClient, ProductTypeGroupApiClient>();
             services.AddTransient<IProductApiClient, ProductApiClient>();
             services.AddTransient<IOrderPlanApiClient, OrderPlanApiClient>();
+            services.AddTransient<IBillApiClient, BillApiClient>();
 
             // SignalR
             services.AddSignalR();

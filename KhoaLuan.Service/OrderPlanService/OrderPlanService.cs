@@ -33,20 +33,15 @@ namespace KhoaLuan.Service.OrderPlanService
 
             if (!string.IsNullOrEmpty(bundle.Status))
             {
-                string[] arrListStr = bundle.Status.Split(',');
-
-                if (arrListStr.Length != 2)
+                switch (bundle.Status)
                 {
-                    switch (arrListStr[0])
-                    {
-                        case "true":
-                            query = query.Where(c => c.Status == StatusOrderPlan.Accomplished);
-                            break;
+                    case "true":
+                        query = query.Where(c => c.Status == StatusOrderPlan.Accomplished);
+                        break;
 
-                        case "false":
-                            query = query.Where(c => c.Status == StatusOrderPlan.Cancel);
-                            break;
-                    }
+                    case "false":
+                        query = query.Where(c => c.Status == StatusOrderPlan.Cancel);
+                        break;
                 }
             }
 
@@ -71,7 +66,8 @@ namespace KhoaLuan.Service.OrderPlanService
                     Id = i.Id,
                     Code = i.Code,
                     Name = i.Name,
-                    Status = i.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" : "Đã hủy",
+                    Status = i.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
+                         i.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Đang đặt hàng",
                     CreatedDate = i.CreatedDate.ToString("dd-MM-yyyy"),
                     CodeCreator = i.Creator.Code,
                     CodeResponsible = i.Responsible.Code
@@ -170,9 +166,10 @@ namespace KhoaLuan.Service.OrderPlanService
                 CodeCreator = o.Creator.Code,
                 IdResponsible = o.IdResponsible,
                 CodeResponsible = o.Responsible.Code,
+                NameResponsible = o.Responsible.UserName,
                 Count = count,
                 Status = o.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
-                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
+                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Đang đặt hàng",
                 ListOrderDetails = o.OrderDetails.Select(
                   i => new ListOrderDetails()
                   {
@@ -193,23 +190,16 @@ namespace KhoaLuan.Service.OrderPlanService
         public async Task<List<GetByOrderPlan>> GetByOrderPlanApproved(string key)
         {
             var order = _context.OrderPlans;
+            order.Include(x => x.OrderDetails)
+           .ThenInclude(m => m.Material);
+            var cr = order.Include(g => g.Creator);
 
-            if (string.IsNullOrEmpty(key))
-            {
-                order.Include(x => x.OrderDetails)
-               .ThenInclude(m => m.Material).Where(o => o.Censorship == true && o.Status == StatusOrderPlan.Unfinished)
-               .Include(t => t.Responsible).Include(g => g.Creator);
-            }
-            else
-            {
-                order.Include(x => x.OrderDetails)
-              .ThenInclude(m => m.Material).Where(o => o.Censorship == true && o.Status == StatusOrderPlan.Unfinished
-              && (o.Code.Contains(key) || o.Name.Contains(key)))
-              .Include(t => t.Responsible).Include(g => g.Creator);
-            }
-            var re = order.OrderByDescending(x => x.Id);
+            var re = cr.Include(t => t.Responsible).Where(t => t.Responsible.UserName == key);
 
-            var count = await order.CountAsync();
+            re = re.OrderByDescending(x => x.Id);
+            re = re.Where(o => (o.Censorship == true && o.Status == StatusOrderPlan.Unfinished));
+            var count = await re.CountAsync();
+
             var reuslt = await re.Select(o => new GetByOrderPlan()
             {
                 Id = o.Id,
@@ -227,7 +217,7 @@ namespace KhoaLuan.Service.OrderPlanService
                 CodeResponsible = o.Responsible.Code,
                 Count = count,
                 Status = o.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
-                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
+                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Đang đặt hàng",
                 ListOrderDetails = o.OrderDetails.Select(
                   i => new ListOrderDetails()
                   {
@@ -382,6 +372,7 @@ namespace KhoaLuan.Service.OrderPlanService
                 Duration = orderPlan.ExpectedDate.Date >= DateTime.Now.Date ? true : false,
                 Name = orderPlan.Name,
                 Note = orderPlan.Note,
+                NameResponsible = orderPlan.Responsible.UserName,
                 IdResponsible = orderPlan.IdResponsible,
                 CodeResponsible = orderPlan.Responsible.Code
             };
@@ -429,7 +420,7 @@ namespace KhoaLuan.Service.OrderPlanService
                 ExpectedDate = x.ExpectedDate.ToString("dd-MM-yyyy"),
                 Note = x.Note,
                 Status = x.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
-                         x.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
+                         x.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Đang đặt hàng",
                 ListOrderDetails = x.OrderDetails.Select(
                   i => new ListOrderDetails()
                   {

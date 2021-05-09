@@ -113,7 +113,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="inputEmail4">Mã Số</label>
-                                <select id="Code" name="Code" class="form-control selectMater" required>
+                                <select id="CodeChon" name="Code" class="form-control selectMater" required>
                                 </select>
                             </div>
                             <div class="form-group col-md-6">
@@ -242,7 +242,6 @@
     </div>
 </div>
 <script>
-
     function addClassFunc1() {
         var id1 = document.getElementById('class1');
         var id2 = document.getElementById('class2');
@@ -534,17 +533,17 @@
     // Lấy giá trị của mã User
     function GetUser() {
         var typeMVL = "@CodeType.OrderPlan";
-
          $.ajax({
                 type: "GET",
-                 url: "@Url.Action("GetAll","ManageCodes")",
+              url: "@Url.Action("GetAll","ManageCodes")",
+           //  url: "/ManageCodes/GetAll?type=" + typeMVL,
              data: {type: typeMVL} ,
                 dataType: "json",
             success: function (msg) {
                 msg.forEach(function (item) {
                     //Code
                     str = '<option value="' + item.name +'">'+item.name+'</option>';
-                    $('#Code').append(str);
+                    $('#CodeChon').append(str);
                 });
 
                 },

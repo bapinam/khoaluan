@@ -21,7 +21,8 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <select class="select2" multiple="multiple" data-placeholder="Chọn trạng thái..." name="status" style="width: 100%;">
+                                    <select class="form-control" data-placeholder="Chọn trạng thái..." id="poprt" name="status" style="width: 100%;">
+                                        <option selected>Chọn trạng thái...</option>
                                         <option value="true">Đã Hoàn Thành</option>
                                         <option value="false">Đã Hủy</option>
                                     </select>
@@ -178,7 +179,8 @@
                     </span>
                 </div>
                 <div class="card-body">
-                    <label>Danh Sách Nguyên Vật Liệu
+                    <label>
+                        Danh Sách Nguyên Vật Liệu
                     </label>
                     <table id="tableShowViewKH12" class="table table-bordered table-striped table-hover">
                         <thead>
@@ -194,20 +196,17 @@
                         <tbody id="ShowViewKH12">
                         </tbody>
                     </table>
-                </div>
-                </div>
-                <!---->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <label style="float:right; margin-top: 20px;" id="TongTien"></label>
                 </div>
             </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
     </div>
 </div>
 <script>
-    //Initialize Select2 Elements
-    $('.select2bs456').select2({
-        theme: 'bootstrap4'
-    });
 
     function GetViewKH(id) {
         $("#ShowViewKH12").remove();
@@ -228,17 +227,24 @@
                         document.getElementById("nguoitaoViewKH").innerHTML = msg.resultObj.codeCreator;
                         document.getElementById("nguoinhanViewKH").innerHTML = msg.resultObj.codeResponsible;
                         document.getElementById("nguoiduyetViewKH").innerHTML = msg.resultObj.codeAuthority;
+
+                        var giaTien = 0;
                         msg.resultObj.listOrderDetails.forEach(function (item) {
+                            var pricexxx = item.price.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
+                            giaTien = giaTien + item.price;
                           var  str = '<tr>'
                               + '  <td>' + item.codeMaterials+'</td>'
                               + '  <td>' + item.nameMaterials+'</td>'
                               + ' <td>' + item.amount+'</td>'
                               + ' <td>' + item.unit+'</td>'
                               + ' <td>' + item.codeSuppliers +'</td>'
-                              + ' <td>' + item.price +'</td>'
+                              + ' <td>' + pricexxx +'</td>'
                               + '</tr>';
                             $("#ShowViewKH12").append(str);
                         });
+                       var tongTien = giaTien.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
+                        document.getElementById("TongTien").innerHTML = "Tổng tiền chi trả (tham khảo):&nbsp;&nbsp; "+ tongTien;
+
                     }
 
                 },

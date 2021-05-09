@@ -219,6 +219,9 @@
                      var resSet = "NguoiNhanView" + id;
                      var dateSet = "NgayDuKienView" + id
 
+                     var nvduyet = "#NVDuyet-" + id;
+                     $(nvduyet).val(msg.resultObj.nameResponsible);
+
                      document.getElementById(nameSet).innerHTML = msg.resultObj.name;
                      document.getElementById(noteSet).innerHTML = msg.resultObj.note;
                      document.getElementById(resSet).innerHTML = msg.resultObj.codeResponsible;

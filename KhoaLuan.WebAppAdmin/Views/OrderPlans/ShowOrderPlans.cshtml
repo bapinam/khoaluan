@@ -306,7 +306,7 @@
     function DeleteViewSupp() {
 
         $('#tableAddNCC').remove();
-        $("#table34NCC").append('<tbody id="tableAUserd★ IdentityNCC"><tbody>');
+        $("#table34NCC").append('<tbody id="tableAddNCC"><tbody>');
     }
 
     function GetAddNCC(id, code) {
@@ -483,8 +483,9 @@
            +'          </table>'
            +'      </div>'
            +'      <div class="text-center mt-5 mb-3">'
-           +'          <input type="hidden" id="IdKHUpdate-'+item.id+'" name="IdOrderPlan" value="'+item.id+'" />'
-             + '         <button class="btn btn-sm btn-success" onclick="GetSaveCen(' + item.id + ',' + item.count + ')">Duyệt</button>'
+             + '          <input type="hidden" id="IdKHUpdate-' + item.id + '" name="IdOrderPlan" value="' + item.id + '" />'
+             + '          <input type="hidden" id="NVDuyet-' + item.id + '" name="IdOrderPlan" value="' + item.nameResponsible + '" />'
+             + '         <button class="btn btn-sm btn-success" onclick="GetSaveCen(' + item.id + ',' + item.count + ',\'' + item.nameResponsible+'\')">Duyệt</button>'
              + '         <button class="btn btn-sm btn-primary" onclick="GetSUpdateKH(' + item.id + ',' + item.count + ')">Sửa</button>'
              + '         <button class="btn btn-sm btn-danger" onclick="GetDeleteKH(' + item.id + ',' + item.count + ')">Xóa</button>'
              + '         <button class="btn btn-sm btn-info" onclick="GetThemNVL(' + item.id + ',' + item.count + ')">Thêm</button>'
@@ -496,9 +497,10 @@
         document.getElementById("KiemDuyetPhieu").innerHTML = item.count;
         return str;
     }
-    function GetSaveCen(id, count) {
+
+    function GetSaveCen(id, count,name) {
         $("#deleteHoiDuyet").remove();
-        var bt = '<button type="submit" onclick="ajaxHoiDuyet(' + id + ')" class="btn btn-primary"' +
+        var bt = '<button type="submit" onclick="ajaxHoiDuyet(' + id + ',\''+name+'\')" class="btn btn-primary"' +
             'id="deleteHoiDuyet" > Đồng Ý</button > ';
         $("#DuyetModal").append(bt);
         $("#exampleHoiDuyet").modal("show");
@@ -543,10 +545,11 @@
         });
     }
 
-    function ajaxHoiDuyet(id) {
+    function ajaxHoiDuyet(id,name) {
         var idkhC = "#IdKHUpdate-" + id;
         var idKH = $(idkhC).val();
-
+        var nvduyet = "#NVDuyet-" + id;
+        var namenv = $(nvduyet).val();
         var su = "Suppliers" + id + "[]";
         var Suppliers = [];
         var inps = document.getElementsByName(su);
@@ -596,6 +599,15 @@
                     toastr.success('Duyệt thành công');
                     ShowCensorship();
                     $("#exampleHoiDuyet").modal("hide");
+
+                    // gửi singralR đến người nhận
+                    var user = namenv;
+                    var message = namenv;
+
+                          connection.invoke("SendMessage", user, message).catch(function (err) {
+                                return console.error(err.toString());
+                          });
+                          event.preventDefault();
                 },
                 error: function (req, status, error) {
                     toastr.error('Duyệt thất bại');
@@ -619,7 +631,7 @@
             <div class="modal-body">
                 <input type="hidden" id="idDelete" />
                 <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn duyệt kế hoạch đã chọn?</h5>
-                <br/><small>Gợi ý: Bạn có thể thêm nhà cung cấp và giá để tham khảo.</small>
+                <br /><small>Gợi ý: Bạn có thể thêm nhà cung cấp và giá để tham khảo.</small>
             </div>
             <!---->
             <div class="modal-footer" id="DuyetModal">

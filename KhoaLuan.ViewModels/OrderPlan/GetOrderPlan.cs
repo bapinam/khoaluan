@@ -17,5 +17,6 @@ namespace KhoaLuan.ViewModels.OrderPlan
         public string Note { get; set; }
         public Guid IdResponsible { get; set; }
         public string CodeResponsible { get; set; }
+        public string NameResponsible { get; set; }
     }
 }

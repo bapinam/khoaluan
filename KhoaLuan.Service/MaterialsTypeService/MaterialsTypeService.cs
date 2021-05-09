@@ -45,7 +45,8 @@ namespace KhoaLuan.Service.MaterialsTypeService
             return new ApiSuccessResult<GetByIdListMaterialsType>(result);
         }
 
-        public async Task<ApiResult<PagedResult<MaterialsTypeViewModel>>> GetUsersPaging(GetMaterialsTypePagingRequest bundle)
+        public async Task<ApiResult<PagedResult<MaterialsTypeViewModel>>>
+            GetUsersPaging(GetMaterialsTypePagingRequest bundle)
         {
             IQueryable<MaterialsType> query = _context.MaterialsTypes;
 

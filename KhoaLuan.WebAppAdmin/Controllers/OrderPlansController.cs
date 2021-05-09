@@ -21,9 +21,20 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             _orderPlanApiClient = orderPlanApiClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string keyword, string status, int pageIndex = 1, int pageSize = 5)
         {
-            return View();
+            var request = new GetOrderPlanPagingRequest()
+            {
+                Keyword = keyword,
+                Status = status,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+            var data = await _orderPlanApiClient.GetOrderPlanPaging(request);
+
+            ViewBag.Keyword = keyword;
+
+            return View(data.ResultObj);
         }
 
         [HttpGet]
@@ -68,6 +79,14 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return Ok(result);
         }
 
+        //duyệt
+        [HttpGet]
+        public async Task<IActionResult> GetByOrderPlanApproved(string key)
+        {
+            var result = await _orderPlanApiClient.GetByOrderPlanApproved(key);
+            return Ok(result);
+        }
+
         [HttpPut]
         public async Task<IActionResult> UpdateOrderPlanCensorship(UpdateOrderPlanCensorship bundle)
         {
@@ -79,6 +98,27 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         public async Task<IActionResult> Delete(long id)
         {
             var result = await _orderPlanApiClient.Delete(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrderPlan(long id)
+        {
+            var result = await _orderPlanApiClient.GetOrderPlan(id);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateOrderPlan bundle)
+        {
+            var result = await _orderPlanApiClient.Update(bundle);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetByIdOrderPlan(long id)
+        {
+            var result = await _orderPlanApiClient.GetByIdOrderPlan(id);
             return Ok(result);
         }
     }

@@ -60,7 +60,8 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
-        public async Task<ApiResult<PagedResult<MaterialsTypeViewModel>>> GetUsersPaging(GetMaterialsTypePagingRequest bundle)
+        public async Task<ApiResult<PagedResult<MaterialsTypeViewModel>>>
+            GetUsersPaging(GetMaterialsTypePagingRequest bundle)
         {
             var url = $"/api/MaterialsType/paging?pageIndex=" +
                 $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}";

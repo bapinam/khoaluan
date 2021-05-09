@@ -1,38 +1,251 @@
-﻿<section class="content">
+﻿@using KhoaLuan.ViewModels.Common;
+@using KhoaLuan.Data.Enums;
+@model PagedResult<KhoaLuan.ViewModels.OrderPlan.OrderPlanVm>
+<section class="content">
     <!-- Default box -->
     <div class="card collapsed-box">
         <div class="card-header">
-            <h3 class="card-title">Kế Hoạch Đặt Hàng Đã Hoàn Thành</h3>
+            <h3 class="card-title">Danh Sách Kế Hoạch Hoàn Thành</h3>
 
             <div class="card-tools">
-                <span title="Chờ Duyệt" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="KiemDuyetPhieu">0</span>
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
-        <div class="card-body" style="display: none; background-color: #F5F5F5;">
-            <section class="content">
-                <div class="container-fluid">
-                    <!-- Small boxes (Stat box) -->
-                    <!-- /.row -->
-                    <!-- Main row -->
-                    <div class="row" id="peP">
-                        <!-- Left col -->
-                        <section class="col-lg-6 connectedSortable" id="leftCol">
-                        </section>
+        <form asp-action="Index" method="get">
 
-                        <!--Right-->
-                        <section class="col-lg-6 connectedSortable" id="rightCol">
-                        </section>
-
-                        <!-- right col -->
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <select class="select2" multiple="multiple" data-placeholder="Chọn trạng thái..." name="status" style="width: 100%;">
+                                        <option value="true">Đã Hoàn Thành</option>
+                                        <option value="false">Đã Hủy</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-8">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="search" class="form-control" name="keyword"
+                                               placeholder="Nhập mã số hoặc tên kế hoạch">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-default">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
-            </section>
+                </div>
+            </div>
+        </form>
+
+        <div class="card-body">
+            <table id="example2" class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã Số</th>
+                        <th>Tên</th>
+                        <th>Ngày Tạo</th>
+                        <th>Người Tạo</th>
+                        <th>Người Nhận</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.Items)
+                    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeCreator)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeResponsible)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td class="text-center py-0 align-middle">
+                <div class="btn-group btn-group-sm">
+                    <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"
+                       onclick="GetViewKH('@item.Id')" title="Xem">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Mã Số</th>
+                        <th>Tên</th>
+                        <th>Ngày Tạo</th>
+                        <th>Người Tạo</th>
+                        <th>Người Nhận</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            @await Component.InvokeAsync("Pager", Model)
         </div>
     </div>
     <!-- /.card-body -->
     <!-- /.card -->
 </section>
+<!--Modal xem kế hoạch-->
+<div class="modal fade bd-example-modal-lg" id="exampleView" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Mã Số:</label>
+                        <span class="form-control" id="codeViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Tên Kế Hoạch:</label>
+                        <span class="form-control" id="nameViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Ngày Khởi Tạo:</label>
+                        <span class="form-control" id="createDateViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Ngày Dự Kiến:</label>
+                        <span class="form-control" id="dateDKViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Người Tạo:</label>
+                        <span class="form-control" id="nguoitaoViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Người Nhận:</label>
+                        <span class="form-control" id="nguoinhanViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Người Duyệt:</label>
+                        <span class="form-control" id="nguoiduyetViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Trạng Thái:</label>
+                        <span class="form-control" id="trangthaiViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ghi Chú:</label>
+                    <span class="form-control" id="ghichuViewKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                    </span>
+                </div>
+                <div class="card-body">
+                    <label>Danh Sách Nguyên Vật Liệu
+                    </label>
+                    <table id="tableShowViewKH12" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Số Lượng</th>
+                                <th>ĐVT</th>
+                                <th>Nhà Cung Cấp</th>
+                                <th>Giá</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ShowViewKH12">
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+    </div>
+</div>
+<script>
+    //Initialize Select2 Elements
+    $('.select2bs456').select2({
+        theme: 'bootstrap4'
+    });
+
+    function GetViewKH(id) {
+        $("#ShowViewKH12").remove();
+        $("#tableShowViewKH12").append('<tbody id="ShowViewKH12"></tbody>');
+
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetByIdOrderPlan")",
+            data: {id:id},
+                success: function (msg) {
+                    if (msg.isSuccessed) {
+                        document.getElementById("codeViewKH").innerHTML = msg.resultObj.code ;
+                        document.getElementById("nameViewKH").innerHTML = msg.resultObj.name;
+                        document.getElementById("ghichuViewKH").innerHTML = msg.resultObj.note;
+                        document.getElementById("trangthaiViewKH").innerHTML = msg.resultObj.status;
+                        document.getElementById("createDateViewKH").innerHTML = msg.resultObj.createdDate;
+                        document.getElementById("dateDKViewKH").innerHTML = msg.resultObj.expectedDate;
+                        document.getElementById("nguoitaoViewKH").innerHTML = msg.resultObj.codeCreator;
+                        document.getElementById("nguoinhanViewKH").innerHTML = msg.resultObj.codeResponsible;
+                        document.getElementById("nguoiduyetViewKH").innerHTML = msg.resultObj.codeAuthority;
+                        msg.resultObj.listOrderDetails.forEach(function (item) {
+                          var  str = '<tr>'
+                              + '  <td>' + item.codeMaterials+'</td>'
+                              + '  <td>' + item.nameMaterials+'</td>'
+                              + ' <td>' + item.amount+'</td>'
+                              + ' <td>' + item.unit+'</td>'
+                              + ' <td>' + item.codeSuppliers +'</td>'
+                              + ' <td>' + item.price +'</td>'
+                              + '</tr>';
+                            $("#ShowViewKH12").append(str);
+                        });
+                    }
+
+                },
+                error: function (data) {
+
+                }
+            });
+
+    }
+</script>

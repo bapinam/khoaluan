@@ -23,7 +23,7 @@ namespace KhoaLuan.Data.Entities
         public List<ProcessPlan> ProcessPlanResponsibles { get; set; }
         public List<OrderPlan> OrderPlanCreators { get; set; }
         public List<OrderPlan> OrderPlanResponsible { get; set; }
-
+        public List<OrderPlan> OrderPlanAuthority { get; set; }
         public List<Bill> Bills { get; set; }
     }
 }

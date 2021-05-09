@@ -12,5 +12,6 @@ namespace KhoaLuan.ViewModels.OrderPlan
         public long[] IdOrderDetail { get; set; }
         public int[] IdSupplier { get; set; }
         public string[] Price { get; set; }
+        public string Authority { get; set; }
     }
 }

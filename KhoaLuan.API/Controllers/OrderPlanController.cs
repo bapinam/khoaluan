@@ -70,6 +70,13 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("approved")]
+        public async Task<IActionResult> GetByOrderPlanApproved(string key)
+        {
+            var result = await _orderPlanService.GetByOrderPlanApproved(key);
+            return Ok(result);
+        }
+
         [HttpPut("update-censorship")]
         public async Task<IActionResult> UpdateOrderPlanCensorship(UpdateOrderPlanCensorship bundle)
         {
@@ -81,6 +88,41 @@ namespace KhoaLuan.API.Controllers
         public async Task<IActionResult> Delete(long id)
         {
             var result = await _orderPlanService.Delete(id);
+            return Ok(result);
+        }
+
+        [HttpGet("get-order-plan/{id}")]
+        public async Task<IActionResult> GetOrderPlan(long id)
+        {
+            var result = await _orderPlanService.GetOrderPlan(id);
+            return Ok(result);
+        }
+
+        [HttpGet("view-order-plan/{id}")]
+        public async Task<IActionResult> GetByIdOrderPlan(long id)
+        {
+            var result = await _orderPlanService.GetByIdOrderPlan(id);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateOrderPlan bundle)
+        {
+            var resultId = await _orderPlanService.Update(bundle);
+
+            if (resultId.IsSuccessed)
+            {
+                var result = await _orderPlanService.GetOrderPlan(resultId.ResultObj);
+                return Ok(result);
+            }
+
+            return BadRequest(resultId);
+        }
+
+        [HttpGet("paging")]
+        public async Task<IActionResult> GetAllPaging([FromQuery] GetOrderPlanPagingRequest request)
+        {
+            var result = await _orderPlanService.GetOrderPlanPaging(request);
             return Ok(result);
         }
     }

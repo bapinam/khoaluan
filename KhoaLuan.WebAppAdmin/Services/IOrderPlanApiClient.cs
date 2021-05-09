@@ -10,6 +10,8 @@ namespace KhoaLuan.WebAppAdmin.Services
 {
     public interface IOrderPlanApiClient
     {
+        Task<ApiResult<PagedResult<OrderPlanVm>>> GetOrderPlanPaging(GetOrderPlanPagingRequest bundle);
+
         Task<List<GetMaterialsTypePlan>> GetMaterialsType(GroupType group);
 
         Task<List<GetMaterialsPlan>> GetMaterialsSearch(int id, string key);
@@ -22,8 +24,16 @@ namespace KhoaLuan.WebAppAdmin.Services
 
         Task<List<GetByOrderPlan>> GetByOrderPlanCensorship();
 
+        Task<List<GetByOrderPlan>> GetByOrderPlanApproved(string key);
+
         Task<ApiResult<bool>> UpdateOrderPlanCensorship(UpdateOrderPlanCensorship bundle);
 
         Task<ApiResult<bool>> Delete(long id);
+
+        Task<ApiResult<GetOrderPlan>> GetOrderPlan(long id);
+
+        Task<ApiResult<GetByOrderPlan>> GetByIdOrderPlan(long id);
+
+        Task<ApiResult<GetOrderPlan>> Update(UpdateOrderPlan bundle);
     }
 }

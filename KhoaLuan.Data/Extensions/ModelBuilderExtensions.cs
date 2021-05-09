@@ -171,7 +171,7 @@ namespace KhoaLuan.Data.Extensions
                   Name = "Đặt hàng bột gạo và cam",
                   CreatedDate = DateTime.Now,
                   ExpectedDate = DateTime.Now,
-                  Status = true,
+                  Status = StatusOrderPlan.Accomplished,
                   Censorship = true,
                   IdResponsible = adminId,
                   IdCreator = adminId

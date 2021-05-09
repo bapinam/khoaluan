@@ -34,6 +34,11 @@
         border: 1px solid blue;
         overflow: auto;
     }
+
+    .he:hover > .hy {
+        background-color: #EC870E;
+        color: aliceblue;
+    }
 </style>
 <section class="content">
     <!-- Default box -->
@@ -213,30 +218,10 @@
     </div>
 </div>
 
-
 <!--Modal Sửa Kế hoạch vừa tạo-->
-<div class="modal fade bd-example-modal-lg" id="exampleEditKH" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <!---->
-            <input id="idKHDeleteC" type="hidden" />
-            <div class="modal-body">
-                <h4>Bạn có muốn xóa kế hoạch đặt hàng này?</h4>
-            </div>
-            <!---->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                <button type="submit" onclick="ajaxDeleteKH()" class="btn btn-primary">Đồng Ý</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+@await Html.PartialAsync("UpdateOrderPlan")
+
 <script>
 
     document.getElementById("number").onblur = function () {
@@ -321,7 +306,7 @@
     function DeleteViewSupp() {
 
         $('#tableAddNCC').remove();
-        $("#table34NCC").append('<tbody id="tableAddNCC"><tbody>');
+        $("#table34NCC").append('<tbody id="tableAUserd★ IdentityNCC"><tbody>');
     }
 
     function GetAddNCC(id, code) {
@@ -371,9 +356,20 @@
     }
 
     function stringShowCensorship(item) {
-        str = ' <div class="card direct-chat direct-chat-primary table-hover12 vnbox"> '
-            + ' <div class="card-header">'
-            + ' <h3 class="card-title">' + item.code + '</h3>'
+
+       var str = ' <div class="card direct-chat direct-chat-primary table-hover12 vnbox he" id="topShow'+item.id+'"> ';
+
+        if (!item.duration) {
+            str = str + '<div class="ribbon-wrapper" id="DeRibbon-'+item.id+'"> '
+                + ' <div class="ribbon bg-danger"> '
+                + '     Hết Hạn '
+                + '</div> '
+                + ' </div> ';
+        }
+
+        str = str + ' <div class="card-header hy">'
+             +'<input id="DurationShow-'+item.id+'" value="'+item.duration+'" type="hidden" />'
+            + ' <h3 class="card-title hy">' + item.code + '</h3>'
             + '   <div class="card-tools">'
             + '       <button type="button" class="btn btn-tool" data-card-widget="collapse">'
             + '            <i class="fas fa-minus"></i>'
@@ -385,20 +381,20 @@
             + '      <div class="modal-body">'
             + '             <div class="form-group">'
             + '                 <label>Ngày Khởi Tạo:</label>'
-            + '                 <span class="form-control" id="TenKHView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '                 <span class="form-control" id="TenKHView'+item.id+'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.name
             + '      </span>'
             + '             </div>'
             + '         <div class="form-row">'
             + '             <div class="form-group col-md-6">'
             + '                 <label>Ngày Khởi Tạo:</label>'
-            + '                 <span class="form-control" id="TenKHView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '                 <span class="form-control" id="DateKHView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.createdDate
             + '                                     </span>'
             + '             </div>'
             + '              <div class="form-group col-md-6">'
             + '                 <label>Ngày Dự Kiến:</label>'
-            + '                 <span class="form-control" id="NgayDuKienView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '                 <span class="form-control" id="NgayDuKienView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.expectedDate
             + '                                     </span>'
             + '             </div>'
@@ -406,20 +402,20 @@
             + '         <div class="form-row">'
             + '             <div class="form-group col-md-6">'
             + '                  <label>Người Tạo:</label>'
-            + '                  <span class="form-control" id="NguoiTaoView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '                  <span class="form-control" id="NguoiTaoView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.codeCreator
             + '                                      </span>'
             + '             </div>'
             + '             <div class="form-group col-md-6">'
             + '                 <label>Người Nhận:</label>'
-            + '                 <span class="form-control" id="NguoiNhanView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '                 <span class="form-control" id="NguoiNhanView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.codeResponsible
             + '                                      </span>'
             + '             </div>'
             + ' </div>'
             + '         <div class="form-group">'
             + '              <label>Ghi Chú:</label>'
-            + '              <span class="form-control" id="GhiChuView" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + '              <span class="form-control" id="GhiChuView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.note
             + '              </span>'
             + '          </div>'
@@ -491,63 +487,21 @@
              + '         <button class="btn btn-sm btn-success" onclick="GetSaveCen(' + item.id + ',' + item.count + ')">Duyệt</button>'
              + '         <button class="btn btn-sm btn-primary" onclick="GetSUpdateKH(' + item.id + ',' + item.count + ')">Sửa</button>'
              + '         <button class="btn btn-sm btn-danger" onclick="GetDeleteKH(' + item.id + ',' + item.count + ')">Xóa</button>'
+             + '         <button class="btn btn-sm btn-info" onclick="GetThemNVL(' + item.id + ',' + item.count + ')">Thêm</button>'
+
              + '      </div>'
             + '  </div>';
+
         document.getElementById("KiemDuyetPhieu").style.display = "block";
         document.getElementById("KiemDuyetPhieu").innerHTML = item.count;
         return str;
     }
-
-    function GetSaveCen(id,count) {
-        var idkhC = "#IdKHUpdate-" + id;
-        var idKH = $(idkhC).val();
-
-        var su = "Suppliers" + id + "[]";
-        var Suppliers = [];
-        var inps = document.getElementsByName(su);
-        for (var i = 0; i < inps.length; i++) {
-            var inp = inps[i];
-            Suppliers.push(inp.value);
-        }
-
-        var sup = "Price" + id + "[]";
-        var Price = [];
-        var inps = document.getElementsByName(sup);
-        for (var i = 0; i < inps.length; i++) {
-            var inp = inps[i];
-            Price.push(inp.value);
-        }
-
-        var ma = "Materials" + id + "[]";
-        var Materials = [];
-        var inps = document.getElementsByName(ma);
-        for (var i = 0; i < inps.length; i++) {
-            var inp = inps[i];
-            Materials.push(inp.value);
-        }
-
-        var bundle =
-        {
-            Id: idKH,
-            IdOrderDetail: Materials,
-            IdSupplier: Suppliers,
-            Price: Price
-        }
-        $.ajax({
-            type: "PUT",
-            url: "@Url.Action("UpdateOrderPlanCensorship")",
-            data: bundle ,
-            dataType: "json",
-            success: function (data) {
-                DeUpdateCreateCen();
-                toastr.success('Duyệt thành công');
-                ShowCensorship();
-            },
-            error: function (req, status, error) {
-                toastr.error('Duyệt thất bại');
-            }
-        });
-
+    function GetSaveCen(id, count) {
+        $("#deleteHoiDuyet").remove();
+        var bt = '<button type="submit" onclick="ajaxHoiDuyet(' + id + ')" class="btn btn-primary"' +
+            'id="deleteHoiDuyet" > Đồng Ý</button > ';
+        $("#DuyetModal").append(bt);
+        $("#exampleHoiDuyet").modal("show");
     }
 
     function DeUpdateCreateCen() {
@@ -588,12 +542,89 @@
              }
         });
     }
-</script>
 
-<script>
-    //sửa kế hoạch vừa thêm
-   function GetSUpdateKH(id, count)
-   {
-       $("#exampleEditKH").modal("show");
+    function ajaxHoiDuyet(id) {
+        var idkhC = "#IdKHUpdate-" + id;
+        var idKH = $(idkhC).val();
+
+        var su = "Suppliers" + id + "[]";
+        var Suppliers = [];
+        var inps = document.getElementsByName(su);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Suppliers.push(inp.value);
+        }
+
+        var sup = "Price" + id + "[]";
+        var Price = [];
+        var inps = document.getElementsByName(sup);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Price.push(inp.value);
+        }
+
+        var ma = "Materials" + id + "[]";
+        var Materials = [];
+        var inps = document.getElementsByName(ma);
+        for (var i = 0; i < inps.length; i++) {
+            var inp = inps[i];
+            Materials.push(inp.value);
+        }
+
+        var authority = "@User.Identity.Name";
+        var bundle =
+        {
+            Id: idKH,
+            IdOrderDetail: Materials,
+            IdSupplier: Suppliers,
+            Price: Price,
+            Authority: authority
+        }
+        var du = "#DurationShow-" + idKH;
+        var duTF = $(du).val();
+        if (duTF == "false") {
+            toastr.error('Không thể duyệt vì kế hoạch đã hết hạn. Vui lòng xóa hoặc cập nhật lại ngày');
+
+        } else {
+            $.ajax({
+                type: "PUT",
+                url: "@Url.Action("UpdateOrderPlanCensorship")",
+                data: bundle,
+                dataType: "json",
+                success: function (data) {
+                    DeUpdateCreateCen();
+                    toastr.success('Duyệt thành công');
+                    ShowCensorship();
+                    $("#exampleHoiDuyet").modal("hide");
+                },
+                error: function (req, status, error) {
+                    toastr.error('Duyệt thất bại');
+                }
+            });
+        }
     }
 </script>
+
+<!--Modal hỏi duyệt-->
+<div class="modal fade" id="exampleHoiDuyet" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Duyệt Kế Hoạch</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDelete" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn duyệt kế hoạch đã chọn?</h5>
+                <br/><small>Gợi ý: Bạn có thể thêm nhà cung cấp và giá để tham khảo.</small>
+            </div>
+            <!---->
+            <div class="modal-footer" id="DuyetModal">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

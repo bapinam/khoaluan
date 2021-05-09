@@ -46,6 +46,20 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
+        public async Task<ApiResult<GetByOrderPlan>> GetByIdOrderPlan(long id)
+        {
+            var url = $"/api/OrderPlan/view-order-plan/" + $"{id}";
+            var result = await GetIdAsync<GetByOrderPlan>(url);
+            return result;
+        }
+
+        public async Task<List<GetByOrderPlan>> GetByOrderPlanApproved(string key)
+        {
+            var url = $"/api/OrderPlan/approved?key={key}";
+            var result = await GetAll<GetByOrderPlan>(url);
+            return result; throw new NotImplementedException();
+        }
+
         public async Task<List<GetByOrderPlan>> GetByOrderPlanCensorship()
         {
             var url = $"/api/OrderPlan/censorship";
@@ -78,6 +92,30 @@ namespace KhoaLuan.WebAppAdmin.Services
         {
             var url = $"/api/OrderPlan/materials-type?group=" + $"{group}";
             var result = await GetAll<GetMaterialsTypePlan>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<GetOrderPlan>> GetOrderPlan(long id)
+        {
+            var url = $"/api/OrderPlan/get-order-plan/" + $"{id}";
+            var result = await GetIdAsync<GetOrderPlan>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<PagedResult<OrderPlanVm>>> GetOrderPlanPaging(GetOrderPlanPagingRequest bundle)
+        {
+            var url = $"/api/OrderPlan/paging?pageIndex=" +
+               $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}&status={bundle.Status}";
+            var result = await GetListAsync<OrderPlanVm>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<GetOrderPlan>> Update(UpdateOrderPlan bundle)
+        {
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"/api/OrderPlan/";
+            var result = await Update<GetOrderPlan>(url, httpContent);
             return result;
         }
 

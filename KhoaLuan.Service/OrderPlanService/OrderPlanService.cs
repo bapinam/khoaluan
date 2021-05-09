@@ -27,6 +27,67 @@ namespace KhoaLuan.Service.OrderPlanService
             _userManager = userManager;
         }
 
+        public async Task<ApiResult<PagedResult<OrderPlanVm>>> GetOrderPlanPaging(GetOrderPlanPagingRequest bundle)
+        {
+            IQueryable<OrderPlan> query = _context.OrderPlans;
+
+            if (!string.IsNullOrEmpty(bundle.Status))
+            {
+                string[] arrListStr = bundle.Status.Split(',');
+
+                if (arrListStr.Length != 2)
+                {
+                    switch (arrListStr[0])
+                    {
+                        case "true":
+                            query = query.Where(c => c.Status == StatusOrderPlan.Accomplished);
+                            break;
+
+                        case "false":
+                            query = query.Where(c => c.Status == StatusOrderPlan.Cancel);
+                            break;
+                    }
+                }
+            }
+
+            query = query.Where(c => c.Status != StatusOrderPlan.Unfinished);
+
+            if (!string.IsNullOrEmpty(bundle.Keyword))
+            {
+                query = query.Where(c => c.Name.Contains(bundle.Keyword) || c.Code.Contains(bundle.Keyword));
+            }
+
+            //3. Paging
+            int totalRow = await query.CountAsync();
+
+            query = query.OrderByDescending(c => c.Id);
+
+            query = query.Include(x => x.Creator).Include(l => l.Responsible);
+
+            var data = await query.Skip((bundle.PageIndex - 1) * bundle.PageSize)
+                .Take(bundle.PageSize)
+                .Select(i => new OrderPlanVm()
+                {
+                    Id = i.Id,
+                    Code = i.Code,
+                    Name = i.Name,
+                    Status = i.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" : "Đã hủy",
+                    CreatedDate = i.CreatedDate.ToString("dd-MM-yyyy"),
+                    CodeCreator = i.Creator.Code,
+                    CodeResponsible = i.Responsible.Code
+                }).ToListAsync();
+
+            //4. Select and projection
+            var pagedResult = new PagedResult<OrderPlanVm>()
+            {
+                TotalRecords = totalRow,
+                PageIndex = bundle.PageIndex,
+                PageSize = bundle.PageSize,
+                Items = data
+            };
+            return new ApiSuccessResult<PagedResult<OrderPlanVm>>(pagedResult);
+        }
+
         public async Task<ApiResult<bool>> Create(CreateOrderPlan bundle)
         {
             var order = _context.OrderPlans.Include(x => x.OrderDetails);
@@ -101,16 +162,72 @@ namespace KhoaLuan.Service.OrderPlanService
                 Name = o.Name,
                 Order = o.Order,
                 Censorship = o.Censorship,
-                Status = o.Status,
                 CreatedDate = o.CreatedDate.ToString("dd-MM-yyyy"),
                 ExpectedDate = o.ExpectedDate.ToString("dd-MM-yyyy"),
-                Duration = o.ExpectedDate > DateTime.Now ? false : true,
-                Note = o.Note,
+                Duration = o.ExpectedDate.Date >= DateTime.Now.Date ? true : false,
+                Note = o.Note == null ? "" : o.Note,
                 IdCreator = o.IdCreator,
                 CodeCreator = o.Creator.Code,
                 IdResponsible = o.IdResponsible,
                 CodeResponsible = o.Responsible.Code,
                 Count = count,
+                Status = o.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
+                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
+                ListOrderDetails = o.OrderDetails.Select(
+                  i => new ListOrderDetails()
+                  {
+                      IdOrderDetail = i.Id,
+                      CodeMaterials = i.Material.Code,
+                      Amount = i.Amount,
+                      Unit = i.Unit,
+                      CodeSuppliers = i.IdSupplier == null ? "" : i.Supplier.Code,
+                      Price = (decimal)(i.Price == null ? 0 : i.Price),
+                      NameMaterials = i.Material.Name
+                  }).ToList()
+            }).ToListAsync();
+
+            return new List<GetByOrderPlan>(reuslt);
+        }
+
+        // đã duyệt
+        public async Task<List<GetByOrderPlan>> GetByOrderPlanApproved(string key)
+        {
+            var order = _context.OrderPlans;
+
+            if (string.IsNullOrEmpty(key))
+            {
+                order.Include(x => x.OrderDetails)
+               .ThenInclude(m => m.Material).Where(o => o.Censorship == true && o.Status == StatusOrderPlan.Unfinished)
+               .Include(t => t.Responsible).Include(g => g.Creator);
+            }
+            else
+            {
+                order.Include(x => x.OrderDetails)
+              .ThenInclude(m => m.Material).Where(o => o.Censorship == true && o.Status == StatusOrderPlan.Unfinished
+              && (o.Code.Contains(key) || o.Name.Contains(key)))
+              .Include(t => t.Responsible).Include(g => g.Creator);
+            }
+            var re = order.OrderByDescending(x => x.Id);
+
+            var count = await order.CountAsync();
+            var reuslt = await re.Select(o => new GetByOrderPlan()
+            {
+                Id = o.Id,
+                Code = o.Code,
+                Name = o.Name,
+                Order = o.Order,
+                Censorship = o.Censorship,
+                CreatedDate = o.CreatedDate.ToString("dd-MM-yyyy"),
+                ExpectedDate = o.ExpectedDate.ToString("dd-MM-yyyy"),
+                Duration = o.ExpectedDate.Date >= DateTime.Now.Date ? true : false,
+                Note = o.Note == null ? "" : o.Note,
+                IdCreator = o.IdCreator,
+                CodeCreator = o.Creator.Code,
+                IdResponsible = o.IdResponsible,
+                CodeResponsible = o.Responsible.Code,
+                Count = count,
+                Status = o.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
+                         o.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
                 ListOrderDetails = o.OrderDetails.Select(
                   i => new ListOrderDetails()
                   {
@@ -226,6 +343,10 @@ namespace KhoaLuan.Service.OrderPlanService
                 }
             }
             order.OrderDetails = orderDetail;
+            var authority = await _userManager.FindByNameAsync(bundle.Authority);
+
+            order.IdAuthority = authority.Id;
+
             _context.OrderPlans.Update(order);
             await _context.SaveChangesAsync();
 
@@ -244,6 +365,85 @@ namespace KhoaLuan.Service.OrderPlanService
             _context.OrderPlans.Remove(order);
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<GetOrderPlan>> GetOrderPlan(long id)
+        {
+            var orderPlan = await _context.OrderPlans
+                .Include(x => x.Responsible)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            var result = new GetOrderPlan()
+            {
+                Id = orderPlan.Id,
+                Code = orderPlan.Code,
+                DateMan = orderPlan.ExpectedDate.ToString("yyyy-MM-dd"),
+                ExpectedDate = orderPlan.ExpectedDate.ToString("dd-MM-yyyy"),
+                Duration = orderPlan.ExpectedDate.Date >= DateTime.Now.Date ? true : false,
+                Name = orderPlan.Name,
+                Note = orderPlan.Note,
+                IdResponsible = orderPlan.IdResponsible,
+                CodeResponsible = orderPlan.Responsible.Code
+            };
+
+            return new ApiSuccessResult<GetOrderPlan>(result);
+        }
+
+        public async Task<ApiResult<long>> Update(UpdateOrderPlan bundle)
+        {
+            var order = await _context.OrderPlans.FindAsync(bundle.Id);
+
+            order.Name = bundle.Name;
+            order.Note = bundle.Note;
+            order.IdResponsible = bundle.IdResponsible;
+            order.ExpectedDate = bundle.ExpectedDate;
+
+            _context.OrderPlans.Update(order);
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<long>(order.Id);
+        }
+
+        public async Task<ApiResult<GetByOrderPlan>> GetByIdOrderPlan(long id)
+        {
+            var order = _context.OrderPlans
+                .Include(x => x.OrderDetails).ThenInclude(x => x.Material)
+                .Where(x => x.Id == id);
+
+            var re = order.Include(r => r.Responsible);
+            var au = re.Include(a => a.Authority);
+            var cr = au.Include(c => c.Creator);
+            if (order == null)
+            {
+                return new ApiErrorResult<GetByOrderPlan>("Kế hoạch không tồn tại");
+            }
+
+            var result = await cr.Select(x => new GetByOrderPlan()
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Name = x.Name,
+                CodeAuthority = x.Authority.Code,
+                CodeCreator = x.Creator.Code,
+                CodeResponsible = x.Responsible.Code,
+                CreatedDate = x.CreatedDate.ToString("dd-MM-yyyy"),
+                ExpectedDate = x.ExpectedDate.ToString("dd-MM-yyyy"),
+                Note = x.Note,
+                Status = x.Status == StatusOrderPlan.Accomplished ? "Đã hoàn thành" :
+                         x.Status == StatusOrderPlan.Cancel ? "Đã hủy" : "Chưa đặt hàng",
+                ListOrderDetails = x.OrderDetails.Select(
+                  i => new ListOrderDetails()
+                  {
+                      IdOrderDetail = i.Id,
+                      CodeMaterials = i.Material.Code,
+                      Amount = i.Amount,
+                      Unit = i.Unit,
+                      CodeSuppliers = i.IdSupplier == null ? "" : i.Supplier.Code,
+                      Price = (decimal)(i.Price == null ? 0 : i.Price),
+                      NameMaterials = i.Material.Name
+                  }).ToList()
+            }).FirstOrDefaultAsync();
+
+            return new ApiSuccessResult<GetByOrderPlan>(result);
         }
     }
 }

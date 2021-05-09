@@ -343,6 +343,9 @@
 <script>
     window.onload = function (event) {
         addClassFunc1();
+        $('.selectMater').select2({
+            theme: 'bootstrap4'
+        });
     };
     function myFunction() {
         var x = document.getElementById("MaterialsTypeLoai").value;
@@ -510,12 +513,12 @@
                      $('#AddSaveNVL').trigger("reset");
                      document.getElementById('ShowNV').innerHTML = "";
                      $('#tableAdd').remove();
-                     $("#table3").append('<tbody id="tableAddNVL"></tbody>');
+                     $("#table3").append('<tbody id="tableAdd"></tbody>');
                      DeUpdateCreateCen();
                      ShowCensorship();
                 },
                 error: function (req, status, error) {
-                    toastr.success('Tạo thất bại');
+                    toastr.error('Tạo thất bại');
                 }
             });
         }
@@ -530,7 +533,7 @@
      GetUser();
     // Lấy giá trị của mã User
     function GetUser() {
-        var typeMVL = "@CodeType.ProductType";
+        var typeMVL = "@CodeType.OrderPlan";
 
          $.ajax({
                 type: "GET",

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalR.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,6 +118,8 @@ namespace KhoaLuan.WebAppAdmin
             services.AddTransient<IProductApiClient, ProductApiClient>();
             services.AddTransient<IOrderPlanApiClient, OrderPlanApiClient>();
 
+            // SignalR
+            services.AddSignalR();
             //---
             IMvcBuilder builder = services.AddRazorPages();
             var environment = Environment.GetEnvironmentVariable(SystemConstants.Environment);
@@ -158,6 +161,7 @@ namespace KhoaLuan.WebAppAdmin
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Welcome}/{id?}");
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
         }
     }

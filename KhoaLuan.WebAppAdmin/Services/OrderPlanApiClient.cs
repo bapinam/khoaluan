@@ -57,7 +57,7 @@ namespace KhoaLuan.WebAppAdmin.Services
         {
             var url = $"/api/OrderPlan/approved?key={key}";
             var result = await GetAll<GetByOrderPlan>(url);
-            return result; throw new NotImplementedException();
+            return result;
         }
 
         public async Task<List<GetByOrderPlan>> GetByOrderPlanCensorship()

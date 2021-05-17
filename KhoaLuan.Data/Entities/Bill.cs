@@ -15,6 +15,8 @@ namespace KhoaLuan.Data.Entities
         public int? Tax { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public decimal AmountPaid { get; set; }
+        public decimal TotalMoney { get; set; }
+        public string ConvertNumbers { get; set; }
         public string Images { get; set; }
 
         public int IdSupplier { get; set; }

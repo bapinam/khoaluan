@@ -124,7 +124,7 @@ namespace KhoaLuan.Service.OrderPlanService
 
             var str = code.Name + location;
 
-            var checkCode = await _context.ProductTypes.AnyAsync(x => x.Code == str);
+            var checkCode = await _context.OrderPlans.AnyAsync(x => x.Code == str);
             if (checkCode)
             {
                 goto Location;

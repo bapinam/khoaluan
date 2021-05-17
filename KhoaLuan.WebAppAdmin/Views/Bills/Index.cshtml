@@ -1,2 +1,733 @@
-﻿@{ ViewData["Title"] = "Hóa Đơn";
+﻿@using KhoaLuan.Data.Enums;
+@{ ViewData["Title"] = "Hóa Đơn";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6" style="margin-bottom:8px; ">
+                <h1>Hóa Đơn</h1>
+            </div>
+            <div class="col-sm-6">
+                <div class="float-sm-right" style="margin-bottom:5px;">
+                    <button type="button" onclick="window.location.href='/Bills/Index'" class="btn btn-dark">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+<style>
+    .checkbutton {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="TaoHoaDon">
+        <div class="card-header">
+            <h3 class="card-title">Tạo Hóa Đơn</h3>
+
+            <div class="card-tools">
+                <span title="Chờ Tạo Hóa Đơn" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="KiemDuyetPhieu" style="float:left;">0</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none;">
+            <form id="frmTaoHD" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="keywordTHD"
+                               placeholder="Nhập mã số hoặc tên kế hoạch" required>
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <form>
+                <section class="content">
+                    <div class="container-fluid">
+                        <table id="example1create" class="table table-bordered table-striped table-hover table-responsive-xl tableTHD">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <button type="submit" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top"
+                                                title="Gộp Kế Hoạch">
+                                            <i class="fas fa-compress"></i>
+                                        </button>
+                                    </th>
+                                    <th>Mã Số</th>
+                                    <th>Tên Kế Hoạch</th>
+                                    <th>Người Nhận</th>
+                                    <th>Ngày Khởi Tạo</th>
+                                    <th>Trải Qua</th>
+                                    <th class="text-center">Nhập Hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addTRCreate">
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center">
+                                        <button type="submit" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top"
+                                                title="Gộp Kế Hoạch">
+                                            <i class="fas fa-compress"></i>
+                                        </button>
+                                    </th>
+                                    <th>Mã Số</th>
+                                    <th>Tên Kế Hoạch</th>
+                                    <th>Người Nhận</th>
+                                    <th>Ngày Khởi Tạo</th>
+                                    <th>Trải Qua</th>
+                                    <th class="text-center">Nhập Hàng</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </section>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!--Hóa Đơn Chưa Thanh Toán-->
+@await Html.PartialAsync("UnpaidBill")
+
+<!--Hóa Đơn Đã Thanh Toán-->
+@await Html.PartialAsync("PaidView")
+
+<script>
+
+    var frmTaoHD = $("#frmTaoHD");
+    frmTaoHD.submit(function (e) {
+
+        var keyTHD = $("#keywordTHD").val();
+        DeleteTHD();
+        GetByOrderPlanBills(keyTHD);
+        e.preventDefault();
+    });
+
+    function DeleteTHD() {
+        $("#addTR").remove();
+        $(".tableTHD").append('<tbody id="addTR" ></tbody>');
+
+    }
+
+    GetByOrderPlanBills("");
+    document.getElementById("TaoHoaDon").style.display = "block";
+    function GetByOrderPlanBills(key) {
+        $.ajax({
+                type: "GET",
+            url: "@Url.Action("GetByOrderPlanBills")",
+            data: {key: key},
+                dataType: "json",
+                success: function (msg) {
+                    var count = 0;
+                    msg.forEach(function (item) {
+                        count++;
+                        if (item.count < 1) {
+                            document.getElementById("TaoHoaDon").style.display = "none";
+                        } else {
+                            document.getElementById("TaoHoaDon").style.display = "block";
+                            document.getElementById("KiemDuyetPhieu").innerHTML = item.count;
+
+                        }
+                        var str = ' <tr id="Order-' + item.id + '">'
+                            + ' <td class="text-center">'
+                            + '<div class="icheck-primary">'
+                            + '       <input type="checkbox" name="CombinedBills[]" value="'+item.id+'" class="checkbutton">'
+                            + '           </div>'
+                            + '       </td>'
+                            + ' <td>' + item.code + '</td>'
+                            + ' <td>'+item.name+'</td>'
+                            + ' <td>' + item.codeResponsible +'</td>'
+                            + ' <td>' + item.createdDate + '</td>'
+                            + ' <td>' + item.distance + ' Ngày</td>'
+                            +'  <td class="text-center">'
+                            +'<div class="btn-group btn-group-sm">'
+                            +'          <a class="btn btn-primary" data-toggle="modal" data-target="#exampleCreate"'
+                            + '              onclick="SetBills(' + item.id +')" title="Nhập Hàng">'
+                            +'               <i class="fas fa-cart-plus"></i>'
+                            +'           </a>'
+                            +'           <a class="btn btn-success" data-toggle="modal" data-target="#exampleEdit"'
+                            + '               onclick="SplitBills(' + item.id +')" title="Tách Kế Hoạch">'
+                            +'                <i class="fas fa-scissors"></i>'
+                            +'            </a>'
+                            +'            <a class="btn btn-danger" data-toggle="modal" data-target="#exampleEdit"'
+                            + '               onclick="CancelBills(' + item.id +')" title="Hủy Kế Hoạch">'
+                            +'               <i class="fas fa-ban"></i>'
+                            +'            </a>'
+                            +'        </div>'
+                            +'    </td>'
+                            +' </tr >';
+
+                        $("#addTRCreate").append(str);
+
+                    });
+                    if (count < 1) {
+                        document.getElementById("TaoHoaDon").style.display = "none";
+                        var row = '<tr>'
+                            + '<td colspan="6" class="text-center">Chưa có dữ liệu</td>'
+                            + '</tr > ';
+                        $("#addTRCreate").append(row);
+                    }
+
+               },
+                error: function (req, status, error) {
+                }
+            });
+    }
+</script>
+<!--Nhập hàng-->
+<style>
+    #exampleCreate {
+        overflow-y: scroll
+    }
+</style>
+<!--Modal Nhập hàng-->
+<div class="modal fade  bd-example-modal-lg" id="exampleCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tạo Hóa Đơn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="CreateHoaDonBill" method="post">
+
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mã Lưu Trữ</label>
+                            <select id="CodeChon" name="StorageCode" class="form-control" required>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Số Hóa Đơn</label>
+                            <input type="text" class="form-control" name="CodeBill" id="SoHoaDon" onkeyup="checkSHD()" placeholder="Số hóa đơn" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Nhà Cung Cấp</label>
+                            <button type="button" class="form-control" onclick="GetNhaCungCap()"
+                                    data-toggle="modal" data-target="#exampleNhaCungCap">
+                                <div id="NameNhaCungCap"></div>
+                            </button>
+                            <input id="IdSupliers" name="IdSupliers" type="hidden" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Ngày Mua Hàng</label>
+                            <input type="date" class="form-control" name="PurchaseDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Thuế Suất GTGT (%)</label>
+                            <input type="text" class="form-control" onkeyup="checkThue()" id="Thue" name="Tax" placeholder="Thuế suất GTGT">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Số Tiền Đã Thanh Toán (VNĐ)</label>
+                            <input type="text" class="form-control" id="AmountPaidShow" onkeyup="checkAmoutPaid()" value="0" placeholder="Số tiền đã thanh toán" required>
+                            <input type="hidden" class="form-control" name="AmountPaid" id="AmountPaid" value="0" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Danh Sách Nguyên Vật Liệu</h5>
+                        </div>
+                        <input name="NameCreator" type="hidden" value="@User.Identity.Name" />
+                        <input id="IdOrderPlan" name="IdOrderPlan" type="hidden" />
+                        <table id="table34NCC" class="table table-bordered table-striped table-hover table-responsive-xl">
+                            <thead>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Tên</th>
+                                    <th>ĐVT</th>
+                                    <th>Số Lượng</th>
+                                    <th>Đơn Giá (VNĐ)</th>
+                                    <th>Giảm Giá (%)</th>
+                                    <th>Thành Tiền (VNĐ)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableAddNVL">
+                                <tr>
+                                    <td>hihi</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="0" value="0" name="Amount[]" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="0" value="0" name="Price[]" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="100" value="0" name="Discount[]" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+
+            <!---->
+        </div>
+    </div>
+</div>
+<!--Modal supplies-->
+<div class="modal fade  bd-example-modal-lg" id="exampleNhaCungCap" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhà Cung Cấp</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <form id="frmTKNCCBill" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="keyword"
+                               placeholder="Tìm kiếm mã số hoặc tên nhà cung cấp" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Danh Sách Tìm Kiếm</h5>
+                    </div>
+                    <table id="table34NCCBill" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAddNCCBill">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var arrItem = [];
+    function SetBills(id) {
+       DeleteTableBill();
+        $("#IdOrderPlan").val(id);
+            $.ajax({
+                type: "GET",
+            url: "@Url.Action("GetByIdOrderPlanBills")",
+            data: {id:id},
+                dataType: "json",
+                success: function (msg) {
+                    arrItem = [];
+                    msg.forEach(function (item) {
+                        arrItem.push(item.idMaterials);
+                        var max = item.amount - item.enterAmount;
+
+
+
+                        if (max != 0) {
+                            var str = '<tr>'
+                                + '<td>'
+                                + '<input value="' + item.idOrderDetail + '" type="hidden"  name="IdOrderDetail[]" />'
+                                + '<input value="' + item.idMaterials + '" type="hidden"  name="IdMaterials[]" />'
+                                + item.name + ' </td>'
+                                + ' <td>' + item.code + '</td>'
+                                + ' <td>'
+                                + '<input value="' + item.unit + '" type="hidden"  name="Unit[]" />'
+                                + item.unit + '</td>'
+                                + ' <td>'
+                                + '      <input class="form-control" type="hidden" value="' + item.amount + '"  name="Amount[]" />'
+                                + '    <input class="form-control" type="number" min="0" max="' + max + '" id="SoLuongShow-' + id + '-' + item.idMaterials + '"'
+                                + 'onchange="SoLuong(' + id + ',' + item.idMaterials + ')" value="0" name="EnterAmount[]" />'
+                                + '<small>Tối đa: ' + max + '</small> '
+                                + '  </td>'
+                                + '  <td>'
+                                + '      <input class="form-control" type="text" id="numberPrice' + id + '-' + item.idMaterials + '" onkeyup="price(' + id + ',' + item.idMaterials + ')"  min="0" value="0" required />'
+                                + '      <input class="form-control" type="hidden" id="numberPriceShow' + id + '-' + item.idMaterials + '"  min="0" value="0"  name="Price[]" />'
+                                + '   </td>'
+                                + '  <td>'
+                                + '       <input class="form-control" type="number" min="0" max="100" value="0" name="Discount[]"'
+                                + 'onchange="GiamGia(' + id + ',' + item.idMaterials + ')" id="GiamGiaShow-' + id + '-' + item.idMaterials + '" required />'
+                                + '   </td>'
+                                + ' <td id="ThanhTien-' + id + '-' + item.idMaterials + '">0'
+                                + '  </td>'
+                                + ' </tr>';
+                            $("#tableAddNVL").append(str);
+                        }
+
+                    });
+
+                    var str12 = '<tr>'
+                        + '<td colspan="5" class="text-center"><b>Cộng Tiền:  </b></td>'
+                        + '<td colspan="2" class="text-center" id="showTongTien">0</td>'
+                        + '      </tr >';
+                    $("#tableAddNVL").append(str12);
+
+                    var tienthue = '<tr>'
+                        + '<td colspan="5" class="text-center"><b>Tiền Thuế GTGT:  </b></td>'
+                        + '<td colspan="2" class="text-center" id="showTienThue">0</td>'
+                        + '      </tr >';
+                    $("#tableAddNVL").append(tienthue);
+
+                    var str1234 = '<tr>'
+                        + '<td colspan="5" class="text-center"><b>Tổng Tiền Thanh Toán:  </b></td>'
+                        + '<td colspan="2" class="text-center" id="showTongTienTT">0</td>'
+                        + '      </tr >';
+                    $("#tableAddNVL").append(str1234);
+
+               },
+                error: function (req, status, error) {
+                }
+            });
+    }
+
+    function DeleteTableBill() {
+        $("#tableAddNVL").remove();
+        $("#table34NCC").append('<tbody id="tableAddNVL"></tbody>');
+    }
+
+    function isNumber(n) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); }
+
+    function price(id, idmater) {
+        var txt = "numberPrice" + id + "-" + idmater;
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "numberPriceShow" + id + "-" + idmater;
+        document.getElementById(pr).value = mystring;
+
+        SoLuong(id, idmater);
+    }
+
+    function checkThue() {
+        var mystring = document.getElementById("Thue").value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById("Thue").value = "";
+            document.getElementById("showTienThue").innerHTML = 0;
+            mystring = 0;
+
+        }
+
+            var tong = document.getElementById("showTongTien").innerText;
+            var tongTien = tong.split('.').join('')
+            tongTien = tongTien.replace('.00', '');
+            var tien = tongTien.substring(0, tongTien.length - 1);
+
+            if (tien === "") {
+                tien = 0;
+            }
+                var tongThue = parseInt(tien) * parseInt(mystring) / 100;
+                var tthue = tongThue;
+                tthue = tthue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                document.getElementById("showTienThue").innerHTML = tthue;
+
+
+                var tongTT = parseInt(tien) + parseInt(tongThue);
+                tongTT = tongTT.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                document.getElementById("showTongTienTT").innerHTML = tongTT;
+            
+        
+
+        
+       
+    }
+    function checkSHD() {
+        var mystring = document.getElementById("SoHoaDon").value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById("SoHoaDon").value = "";
+        }
+    }
+
+    function checkAmoutPaid() {
+        var txt = "AmountPaidShow";
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "AmountPaid";
+        document.getElementById(pr).value = mystring;
+    }
+</script>
+<!--Nhà Cung Cấp-->
+<script>
+    function GetNhaCungCap() {
+        $("#exampleCreate").modal("hide");
+    }
+    var frmTKNCCBill = $("#frmTKNCCBill");
+    frmTKNCCBill.submit(function (e) {
+        var key = $("#keyword").val();
+          $.ajax({
+                type: "GET",
+              url: "@Url.Action("GetAllSuppliers")",
+              data: {key:key},
+                dataType: "json",
+                success: function (msg) {
+                    DeleteViewSupp();
+                    var i = 0;
+                    msg.forEach(function (item) {
+
+                       var str = ' <tr>'
+                            + '<td>' + item.code + '</td>'
+                            + '  <td>' + item.name + '</td>'
+                           + ' <td>' + item.address + '</td>'
+                            + '  <td class="text-center">'
+                            + '     <div class="btn-group btn-group-sm">'
+                            + '          <a class="btn btn-primary"'
+                           + '             onclick="GetAddNCCBill(' + item.id + ',\'' + item.code + '\')" title="Thêm">'
+                            + '              <i class="fas fa-plus"></i>'
+                            + '          </a>'
+                            + '       </div>'
+                            + '     </td>'
+                            + ' </tr>';
+                        $("#tableAddNCCBill").append(str); i++;
+
+                    });
+                    if (i == 0) {
+                        toastr.warning('Không tìm thấy kết quả');
+                    }
+
+               },
+                error: function (req, status, error) {
+                }
+            });
+        e.preventDefault();
+    });
+
+    function DeleteViewSupp() {
+
+        $('#tableAddNCCBill').remove();
+        $("#table34NCCBill").append('<tbody id="tableAddNCCBill"><tbody>');
+    }
+
+    function GetAddNCCBill(id, code) {
+        document.getElementById("NameNhaCungCap").innerHTML = code;
+        $("#IdSupliers").val(id);
+        $("#exampleNhaCungCap").modal("hide");
+        $("#exampleCreate").modal("show");
+
+    }
+</script>
+
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.Bill";
+         $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+             dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#CodeChon').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!--Khởi tạo hóa đơn-->
+<script>
+    var CreateHoaDonBill = $("#CreateHoaDonBill");
+    CreateHoaDonBill.submit(function (e) {
+        var idSuppliers = $("#IdSupliers").val();
+        if (idSuppliers <= 0) {
+            toastr.error('Vui lòng chọn nhà cung cấp');
+        } else {
+            var thue = $("#Thue").val();
+
+            if (thue < 0 || thue > 100) {
+                toastr.error('Vui lòng nhập thuế trong khoảng từ 0 - 100');
+            } else {
+                            $.ajax({
+             type: "POST",
+              url: "@Url.Action("Create")",
+              data: CreateHoaDonBill.serialize() ,
+             dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    toastr.success('Tạo thành công');
+                    $("#exampleCreate").modal("hide");
+                    $("#exampleViewBill").modal("show");
+                    SetViewHD(msg);
+                    GetAllUnpaidBill("");
+                    if (msg.resultObj.paymentStatus == "Đã thanh toán") {
+                        var str = ' <tr id="BillPaid-' + msg.resultObj.id + '">'
+                            + ' <td>' + msg.resultObj.storageCode + '</td>'
+                            + ' <td>' + msg.resultObj.codeBill + '</td>'
+                            + ' <td>' + msg.resultObj.codePlan + '</td>'
+                            + ' <td>' + msg.resultObj.createdDate + '</td>'
+                            + ' <td>' + msg.resultObj.codeCreator + '</td>'
+                            + '  <td class="text-center">'
+                            + '<div class="btn-group btn-group-sm">'
+                            + ' <a class="btn btn-primary" data-toggle="modal" data-target="#exampleViewBill"'
+                            + '   onclick="GetViewHD(' + msg.resultObj.id + ')" title="Xem">'
+                            + '    <i class="fas fa-eye"></i>'
+                            + ' </a>'
+                            + ' <a class="btn btn-success" data-toggle="modal" data-target="#exampleEditBill"'
+                            + '     onclick="EditBills(' + msg.resultObj.id + ')" title="Sửa">'
+                            + '     <i class="fas fa-pencil-alt"></i>'
+                            + '  </a>'
+                            + '  <a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteBill"'
+                            + '     onclick="DeleteBills(' + msg.resultObj.id + ', 1)" title="Xóa">'
+                            + '     <i class="fas fa-trash"></i>'
+                            + '  </a>'
+                            + ' </div>'
+                            + '    </td>'
+                            + ' </tr >';
+                        $("#addTRDaTT").prepend(str);
+                        var deO = "#Order-" + msg.resultObj.idPlan;
+                        $(deO).remove();
+                    }
+                    else {
+                        $("#DuLieuUnpaid").remove();
+                    }
+
+                } else {
+                    toastr.error('Tạo thất bại');
+
+                }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Tạo thất bại');
+                }
+            });
+
+            }
+        }
+
+        e.preventDefault();
+    });
+</script>
+
+<!-- Thành Tiền-->
+<script>
+    function SoLuong(id, idMaterials) {
+        var sl = "#SoLuongShow-" + id + "-" + idMaterials;
+        var gg = "#GiamGiaShow-" + id + "-" + idMaterials;
+        var price = "#numberPriceShow" + id + "-" + idMaterials;
+        var thanhTien = "ThanhTien-" + id + "-" + idMaterials;
+        var soLuong = $(sl).val();
+        var giamGia = $(gg).val();
+        var giaTien = $(price).val();
+        if (soLuong === "") {
+            soLuong = 0;
+        }
+
+        if (giamGia === "") {
+            giamGia = 0;
+        }
+
+        if (giaTien === "") {
+            giaTien = 0;
+        }
+        var kq;
+        if (giamGia == 0) {
+            kq = soLuong * giaTien;
+        } else {
+            var tongTien = soLuong * giaTien;
+
+            var phamTram = tongTien * giamGia / 100;
+            kq = tongTien - phamTram;
+        }
+
+        document.getElementById(thanhTien).innerHTML = kq;
+
+        var thue = $("#Thue").val();
+
+        if (thue === "") {
+            thue = 0;
+        }
+
+        var tong = 0;
+        arrItem.forEach(function myFunction(item) {
+            var thanhTienTong = "ThanhTien-" + id + "-" + item;
+            txt = document.getElementById(thanhTienTong).innerText;
+            tong += parseInt(txt);
+        });
+        var tongGoc = tong;
+        tong = tong.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("showTongTien").innerHTML = tong;
+
+        var tongThue = parseInt(tongGoc) * parseInt(thue) / 100;
+        var tthue = tongThue;
+        tthue = tthue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("showTienThue").innerHTML = tthue
+            ;
+
+        var tongTT = parseInt(tongGoc) + parseInt(tongThue);
+
+        tongTT = tongTT.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("showTongTienTT").innerHTML = tongTT;
+
+    }
+
+    function GiamGia(id, idMaterials) {
+        SoLuong(id, idMaterials);
+    }
+</script>

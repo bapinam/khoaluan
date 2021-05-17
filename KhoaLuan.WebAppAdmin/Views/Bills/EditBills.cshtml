@@ -1,0 +1,570 @@
+﻿@using KhoaLuan.Data.Enums;
+<style>
+    #exampleEditBill {
+        overflow-y: scroll
+    }
+</style>
+<div class="modal fade  bd-example-modal-lg" id="exampleEditBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sửa Hóa Đơn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="EditHoaDonBill" method="post">
+                <input id="HoaDonEdit" name="IdBill" type="hidden" />
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mã Lưu Trữ</label>
+                            <input id="CodeLuuTru" name="StorageCode" class="form-control" disabled />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Số Hóa Đơn</label>
+                            <input type="text" class="form-control" name="CodeBill" id="SoHoaDonEdit" onkeyup="checkSHDEdit()" placeholder="Số hóa đơn" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Nhà Cung Cấp</label>
+                            <button type="button" class="form-control" onclick="GetNhaCungCapEdit()"
+                                    data-toggle="modal" data-target="#exampleNhaCungCapEdit">
+                                <div id="NameNhaCungCapEdit"></div>
+                            </button>
+                            <input id="IdSupliersEdit" name="IdSupliers" type="hidden" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Ngày Mua Hàng</label>
+                            <input type="date" class="form-control" name="PurchaseDate" id="DateEdit" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Thuế Suất GTGT (%)</label>
+                            <input type="text" class="form-control" onkeyup="checkThueEdit()" id="ThueEdit" name="Tax" placeholder="Thuế suất GTGT">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Số Tiền Đã Thanh Toán (VNĐ)</label>
+                            <input type="text" class="form-control" id="AmountPaidShowEdit" onkeyup="checkAmoutPaidEdit()" value="0" placeholder="Số tiền đã thanh toán" required>
+                            <input type="hidden" class="form-control" name="AmountPaid" id="AmountPaidEdit" value="0" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Danh Sách Nguyên Vật Liệu</h5>
+                        </div>
+                        <table id="table34NCCEdit" class="table table-bordered table-striped table-hover table-responsive-xl">
+                            <thead>
+                                <tr>
+                                    <th>Mã Số</th>
+                                    <th>Tên</th>
+                                    <th>ĐVT</th>
+                                    <th>Số Lượng</th>
+                                    <th>Đơn Giá (VNĐ)</th>
+                                    <th>Giảm Giá (%)</th>
+                                    <th>Thành Tiền (VNĐ)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableAddNVLEdit">
+                                <tr>
+                                    <td>hihi</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="0" value="0" name="Amount[]" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="0" value="0" name="Price[]" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" min="0" max="100" value="0" name="Discount[]" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+
+            <!---->
+        </div>
+    </div>
+</div>
+
+<script>
+    function EditBills(id) {
+        $("#HoaDonEdit").val(id);
+        GetViewEditHD(id);
+    }
+     function GetViewEditHD(id) {
+                  $.ajax({
+                type: "GET",
+              url: "@Url.Action("GetBillById")",
+              data: {id:id},
+                dataType: "json",
+                success: function (msg) {
+                    SetViewEditHD(msg);
+               },
+                error: function (req, status, error) {
+                }
+            });
+
+    }
+
+    function checkAmoutPaidEdit() {
+        var txt = "AmountPaidShowEdit";
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "AmountPaidEdit";
+        document.getElementById(pr).value = mystring;
+    }
+
+    function formatCash(str) {
+        return str.split('').reverse().reduce((prev, next, index) => {
+            return ((index % 3) ? next : (next + ',')) + prev
+        })
+    }
+    var arrItemEdit = [];
+    function SetViewEditHD(msg) {
+        //CodeLuuTru,SoHoaDonEdit,NameNhaCungCapEdit,IdSupliersEdit,DateEdit,ThueEdit,AmountPaidShowEdit,AmountPaid
+        var maLT = document.getElementById("CodeLuuTru");
+        var soHD = document.getElementById("SoHoaDonEdit");
+        var nhaCC = document.getElementById("NameNhaCungCapEdit");
+        var thue = document.getElementById("ThueEdit");
+
+       // var sotienDTT = document.getElementById("SoTienDTT");
+
+        maLT.value = msg.resultObj.storageCode;
+        soHD.value = msg.resultObj.codeBill;
+        nhaCC.innerHTML = msg.resultObj.codeSupplier;
+        thue.value = msg.resultObj.tax;
+
+        $("#DateEdit").val(msg.resultObj.purchaseDateDefault);
+        $("#IdSupliersEdit").val(msg.resultObj.idSupplier);
+        $("#AmountPaidEdit").val(msg.resultObj.amountPaid);
+
+        var txt = "AmountPaidShowEdit";
+
+        var vlMoeny = formatCash(msg.resultObj.amountPaid.toString());
+        document.getElementById(txt).value = vlMoeny;
+
+       DeleteTableShowNVLEdit();
+        var thanhTien = 0;
+        arrItemEdit = [];
+        msg.resultObj.listBillDetails.forEach(function (item) {
+            if (item.amount != 0) {
+                arrItemEdit.push(item.idMaterials);
+                var nhapSL = item.amount;
+                var max = item.amountOrder - item.enterAmountOrder;
+                if (max!= 0) {
+                    nhapSL += max;
+                }
+
+                var priceEdit = formatCash(item.price.toString());
+                var str = '<tr>'
+                    + '<td> <input type="hidden" name="IdMaterials[]" value="' + item.idMaterials+'" />'
+                    + item.codeMaterials + '</td>'
+                    + '<td> ' + item.nameMaterials + '</td>'
+                    + '<td> ' + item.unit + '</td>'
+                    + '<td> '
+                    + '      <input class="form-control" type="number" value="' + item.amount + '"  name="EnterAmount[]"'
+                    + 'min="0" max="' + nhapSL + '" id="SoLuongShowEdit-' + msg.resultObj.id  + '-' + item.idMaterials + '"'
+                    + 'onchange="SoLuongEdit(' + msg.resultObj.id  + ',' + item.idMaterials + ')" />'
+                    +'<small> Tối đa: ' + nhapSL + '</small> '
+                    + '</td>'
+                    + '<td>'
+                    + '  <input class="form-control" type="text" id="numberPriceEdit' + msg.resultObj.id + '-' + item.idMaterials + '"'
+                    +'onkeyup = "priceEdit(' + msg.resultObj.id + ',' + item.idMaterials + ')"  min = "0" value = "' + priceEdit+'" required /> '
+                    + '  <input class="form-control" type="hidden" id="numberPriceShowEdit' + msg.resultObj.id + '-' + item.idMaterials + '"  min="0" value="'+item.price+'"  name="Price[]" /> '
+                    + '</td > '
+                    + '<td> '
+                    + '       <input class="form-control" type="number" min="0" max="100" value="' + item.discount+'" name="Discount[]"'
+                    + 'onchange="GiamGiaEdit(' + msg.resultObj.id + ',' + item.idMaterials + ')" id="GiamGiaShowEdit-' + msg.resultObj.id + '-' + item.idMaterials + '" required />'
+                    + '</td>'
+                    + '<td id="ThanhTienEdit-' + msg.resultObj.id + '-' + item.idMaterials + '">' + item.totalPrice + '</td>'
+                    + '      </tr >';
+                $("#tableAddNVLEdit").append(str);
+                thanhTien = thanhTien + item.totalPrice;
+            }
+
+        });
+
+        msg.resultObj.listBillDetailNotIds.forEach(function (item) {
+            var max = item.amountOrder - item.enterAmountOrder;
+            if (max != 0) {
+                arrItemEdit.push(item.idMaterials);
+                var str = '<tr>'
+                    + '<td> <input type="hidden" name="IdMaterialsCreate[]" value="' + item.idMaterials + '" />'
+                    + item.codeMaterials + '</td>'
+                    + '<td> ' + item.nameMaterials + '</td>'
+                    + '<td> <input type="hidden" name="UnitCreate[]" value="' + item.unit + '" />'
+                    + item.unit + '</td>'
+                    + '<td> '
+                    + '      <input class="form-control" type="number" value="0"  name="EnterAmountCreate[]"'
+                    + 'min="0" max="' + max + '" id="SoLuongShowEdit-' + msg.resultObj.id + '-' + item.idMaterials + '"'
+                    + 'onchange="SoLuongEdit(' + msg.resultObj.id + ',' + item.idMaterials + ')" />'
+                    + '<small> Tối đa: ' + max + '</small> '
+                    + '</td>'
+                    + '<td>'
+                    + '  <input class="form-control" type="text" id="numberPriceEdit' + msg.resultObj.id + '-' + item.idMaterials + '"'
+                    + 'onkeyup = "priceEdit(' + msg.resultObj.id + ',' + item.idMaterials + ')"  min = "0" value = "0" required /> '
+                    + '  <input class="form-control" type="hidden" id="numberPriceShowEdit' + msg.resultObj.id + '-' + item.idMaterials + '"  min="0" value="0"  name="PriceCreate[]" /> '
+                    + '</td > '
+                    + '<td> '
+                    + '       <input class="form-control" type="number" min="0" max="100" value="0" name="DiscountCreate[]"'
+                    + 'onchange="GiamGiaEdit(' + msg.resultObj.id + ',' + item.idMaterials + ')" id="GiamGiaShowEdit-' + msg.resultObj.id + '-' + item.idMaterials + '" required />'
+                    + '</td>'
+                    + '<td id="ThanhTienEdit-' + msg.resultObj.id + '-' + item.idMaterials + '">0</td>'
+                    + '      </tr >';
+                $("#tableAddNVLEdit").append(str);
+            }
+
+        });
+
+        var congTien = msg.resultObj.totalMoney;
+        congTien = congTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        thanhTienTT = thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        var str12CT = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Cộng Tiền:  </b></td>'
+            + '<td colspan="2" class="text-center" id="TongTienEdit"> ' + thanhTienTT + '</td>'
+            + '      </tr >';
+        $("#tableAddNVLEdit").append(str12CT);
+
+        var thuett = thanhTien * msg.resultObj.tax / 100;
+        var thuettShow = thuett.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
+        var str12Thue = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Tiền Thuế GTGT:  </b></td>'
+            + '<td colspan="2" class="text-center" id="TongTienThueEdit"> ' + thuettShow + '</td>'
+            + '      </tr >';
+        $("#tableAddNVLEdit").append(str12Thue);
+
+        var str12TT = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Tổng Tiền Thanh Toán:  </b></td>'
+            + '<td colspan="2" class="text-center" id="TongTienTTEdit"> ' + congTien + '</td>'
+            + '      </tr >';
+        $("#tableAddNVLEdit").append(str12TT);
+
+    }
+
+    function DeleteTableShowNVLEdit() {
+        $("#tableAddNVLEdit").remove();
+        $("#table34NCCEdit").append('<tbody id="tableAddNVLEdit"></tbody>');
+    }
+</script>
+
+<script>
+    function priceEdit(id, idmater) {
+        var txt = "numberPriceEdit" + id + "-" + idmater;
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "numberPriceShowEdit" + id + "-" + idmater;
+        document.getElementById(pr).value = mystring;
+
+        SoLuongEdit(id, idmater);
+
+    }
+
+    function checkSHDEdit() {
+        var mystring = document.getElementById("SoHoaDonEdit").value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById("SoHoaDonEdit").value = "";
+        }
+    }
+
+    function checkAmoutPaidEdit() {
+        var txt = "AmountPaidShowEdit";
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "AmountPaidEdit";
+        document.getElementById(pr).value = mystring;
+
+    }
+
+    function checkThueEdit() {
+        var mystring = document.getElementById("ThueEdit").value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById("ThueEdit").value = "";
+            document.getElementById("TongTienThueEdit").innerHTML = 0;
+            mystring = 0;
+        }
+
+        var tong = document.getElementById("TongTienEdit").innerText;
+        var tongTien = tong.split('.').join('')
+        tongTien = tongTien.replace('.00', '');
+        var tien = tongTien.substring(0, tongTien.length - 1);
+
+        if (tien === "") {
+            tien = 0;
+        }
+        var tongThue = parseInt(tien) * parseInt(mystring) / 100;
+        var tthue = tongThue;
+        tthue = tthue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("TongTienThueEdit").innerHTML = tthue;
+
+        var tongTT = parseInt(tien) + parseInt(tongThue);
+        tongTT = tongTT.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("TongTienTTEdit").innerHTML = tongTT;
+
+    }
+
+    function SoLuongEdit(id, idMaterials) {
+        var sl = "#SoLuongShowEdit-" + id + "-" + idMaterials;
+        var gg = "#GiamGiaShowEdit-" + id + "-" + idMaterials;
+        var price = "#numberPriceShowEdit" + id + "-" + idMaterials;
+        var thanhTien = "ThanhTienEdit-" + id + "-" + idMaterials;
+        var soLuong = $(sl).val();
+        var giamGia = $(gg).val();
+        var giaTien = $(price).val();
+        if (soLuong === "") {
+            soLuong = 0;
+        }
+
+        if (giamGia === "") {
+            giamGia = 0;
+        }
+
+        if (giaTien === "") {
+            giaTien = 0;
+        }
+        var kq;
+        if (giamGia == 0) {
+            kq = soLuong * giaTien;
+        } else {
+            var tongTien = soLuong * giaTien;
+
+            var phamTram = tongTien * giamGia / 100;
+            kq = tongTien - phamTram;
+        }
+
+        document.getElementById(thanhTien).innerHTML = kq;
+
+        var thue = $("#ThueEdit").val();
+
+        if (thue === "") {
+            thue = 0;
+        }
+
+        var tong = 0;
+        var lon = 0;
+
+        arrItemEdit.forEach(function myFunction(item) {
+            var thanhTienTong = "ThanhTienEdit-" + id + "-" + item;
+            txt = document.getElementById(thanhTienTong).innerText;
+            tong += parseInt(txt);
+        });
+        var tongGoc = tong;
+        tong = tong.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("TongTienEdit").innerHTML = tong;
+
+        var tongThue = parseInt(tongGoc) * parseInt(thue) / 100;
+        var tthue = tongThue;
+        tthue = tthue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("TongTienThueEdit").innerHTML = tthue;
+
+        var tongTT = parseInt(tongGoc) + parseInt(tongThue);
+
+        tongTT = tongTT.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        document.getElementById("TongTienTTEdit").innerHTML = tongTT;
+
+    }
+
+    function GiamGiaEdit(id, idMaterials) {
+        SoLuongEdit(id, idMaterials);
+    }
+</script>
+
+<!--Modal supplies-->
+<div class="modal fade  bd-example-modal-lg" id="exampleNhaCungCapEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nhà Cung Cấp</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <form id="frmTKNCCBillEdit" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="keyEdit"
+                               placeholder="Tìm kiếm mã số hoặc tên nhà cung cấp" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Danh Sách Tìm Kiếm</h5>
+                    </div>
+                    <table id="table34NCCBillEdit" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAddNCCBillEdit">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>Địa Chỉ</th>
+                                <th class="text-center">Thêm</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Cập nhật-->
+<script>
+    var EditHoaDonBill = $("#EditHoaDonBill");
+    EditHoaDonBill.submit(function (e) {
+            $.ajax({
+                type: "PUT",
+              url: "@Url.Action("Update")",
+               data: EditHoaDonBill.serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    var up = "CodeBill-" + msg.resultObj.id;
+                    document.getElementById(up).innerHTML = msg.resultObj.codeBill;
+                    toastr.success('Cập nhật thành công');
+                    $("#exampleEditBill").modal("hide");
+                    if (msg.resultObj.statusOrder) {
+                        var de = "#BillPaid-" + msg.resultObj.id;
+                        $(de).remove();
+                        $("#addTRCreate").remove();
+                        $("#example1create").append('<tbody id="addTRCreate"></tbody>');
+                        GetByOrderPlanBills("");
+                    }
+
+                    if (msg.resultObj.paymentStatus) {
+                        var de = "#BillPaid-" + msg.resultObj.id;
+                        $(de).remove();
+                        DeleteChuaTT();
+                        GetAllUnpaidBill("");
+                    }
+
+               },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại');
+                }
+            });
+
+        e.preventDefault();
+    });
+</script>
+<!--Nhà cung cấp-->
+<!--Nhà Cung Cấp-->
+<script>
+    function GetNhaCungCapEdit() {
+        $("#exampleEditBill").modal("hide");
+    }
+    var frmTKNCCBillEdit = $("#frmTKNCCBillEdit");
+    frmTKNCCBillEdit.submit(function (e) {
+        var key = $("#keyEdit").val();
+          $.ajax({
+                type: "GET",
+              url: "@Url.Action("GetAllSuppliers")",
+              data: {key:key},
+                dataType: "json",
+                success: function (msg) {
+                    DeleteViewSuppEdit();
+                    var i = 0;
+                    msg.forEach(function (item) {
+
+                       var str = ' <tr>'
+                            + '<td>' + item.code + '</td>'
+                            + '  <td>' + item.name + '</td>'
+                           + ' <td>' + item.address + '</td>'
+                            + '  <td class="text-center">'
+                            + '     <div class="btn-group btn-group-sm">'
+                            + '          <a class="btn btn-primary"'
+                           + '             onclick="GetAddNCCBillEdit(' + item.id + ',\'' + item.code + '\')" title="Thêm">'
+                            + '              <i class="fas fa-plus"></i>'
+                            + '          </a>'
+                            + '       </div>'
+                            + '     </td>'
+                            + ' </tr>';
+                        $("#tableAddNCCBillEdit").append(str); i++;
+
+                    });
+                    if (i == 0) {
+                        toastr.warning('Không tìm thấy kết quả');
+                    }
+
+               },
+                error: function (req, status, error) {
+                }
+            });
+        e.preventDefault();
+    });
+
+    function DeleteViewSuppEdit() {
+
+        $('#tableAddNCCBillEdit').remove();
+        $("#table34NCCBillEdit").append('<tbody id="tableAddNCCBillEdit"><tbody>');
+    }
+
+    function GetAddNCCBillEdit(id, code) {
+        document.getElementById("NameNhaCungCapEdit").innerHTML = code;
+        $("#IdSupliersEdit").val(id);
+        $("#exampleNhaCungCapEdit").modal("hide");
+        $("#exampleEditBill").modal("show");
+
+    }
+</script>

@@ -17,6 +17,7 @@ namespace KhoaLuan.Data.Enums
         OrderPlan,
         ProcessPlan,
         Recipe,
-        Supplier
+        Supplier,
+        Bill
     }
 }

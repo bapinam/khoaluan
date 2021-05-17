@@ -1,0 +1,343 @@
+﻿@using KhoaLuan.ViewModels.Common;
+@model PagedResult<KhoaLuan.ViewModels.Bill.GetAllPaymentStautsBill>
+<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="HoaDonDaTT">
+        <div class="card-header">
+            <h3 class="card-title">Hóa Đơn Đã Thanh Toán</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="keyword" value="@ViewBag.Keyword"
+                               placeholder="Nhập mã lưu trữ, số hóa đơn hoặc mã kế hoạch">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <section class="content">
+                <div class="container-fluid">
+                    <table id="example2" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Lưu Trữ</th>
+                                <th>Số Hóa Đơn</th>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Ngày Tạo</th>
+                                <th>Người Tạo</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addTRDaTT">
+
+                            @foreach (var item in Model.Items)
+                            {
+                <tr id="BillPaid-@Html.DisplayFor(modelItem => item.Id)">
+                    <td id="StorageCode-@Html.DisplayFor(modelItem => item.Id)">
+                        @Html.DisplayFor(modelItem => item.StorageCode)
+                    </td>
+                    <td id="CodeBill-@Html.DisplayFor(modelItem => item.Id)">
+                        @Html.DisplayFor(modelItem => item.CodeBill)
+                    </td>
+                    <td id="CodePlan-@Html.DisplayFor(modelItem => item.Id)">
+                        @Html.DisplayFor(modelItem => item.CodePlan)
+                    </td>
+                    <td id="CreatedDate-@Html.DisplayFor(modelItem => item.Id)">
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    <td id="CodeCreator-@Html.DisplayFor(modelItem => item.Id)">
+                        @Html.DisplayFor(modelItem => item.CodeCreator)
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-primary" data-toggle="modal" data-target="#exampleViewBill"
+                               onclick="GetViewHD(@item.Id)" title="Xem">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn btn-success" data-toggle="modal" data-target="#exampleEditBill"
+                               onclick="EditBills(@item.Id)" title="Sửa">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteBill"
+                               onclick="DeleteBills(@item.Id,1)" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Lưu Trữ</th>
+                                <th>Số Hóa Đơn</th>
+                                <th>Tên Hóa Đơn</th>
+                                <th>Ngày Tạo</th>
+                                <th>Người Tạo</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    @await Component.InvokeAsync("Pager", Model)
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+<style>
+    #exampleViewBill {
+        overflow-y: scroll
+    }
+</style>
+<!--Show hóa đơn-->
+<div class="modal fade  bd-example-modal-lg" id="exampleViewBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="ribbon-wrapper" id="DaTraRib">
+            <div class="ribbon ribbon-lg bg-success">
+                Đã Trả
+            </div>
+        </div>
+        <div class="ribbon-wrapper" id="ChuaTraRib">
+            <div class="ribbon ribbon-lg bg-danger">
+                Chưa Trả
+            </div>
+        </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Hóa Đơn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Mã Lưu Trữ</label>
+                        <span class="form-control" id="MaLT" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Số Hóa Đơn</label>
+                        <span class="form-control" id="SoHD" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Mã Kế Hoạch</label>
+                        <span class="form-control" id="maKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Nhà Cung Cấp</label>
+                        <span class="form-control" id="NhaCC" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Người Tạo</label>
+                        <span class="form-control" id="nguoiTao" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Ngày Tạo</label>
+                        <span class="form-control" id="ngayTao" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Ngày Mua Hàng</label>
+                        <span class="form-control" id="NgayMH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Thuế Suất GTGT (%)</label>
+                        <span class="form-control" id="ThueSuatGTGT" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Trạng Thái Thanh Toán</label>
+                        <span class="form-control" id="trangThaiTT" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Số Tiền Đã Thanh Toán (VNĐ)</label>
+                        <span class="form-control" id="SoTienDTT" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Danh Sách Nguyên Vật Liệu</h5>
+                    </div>
+                    <table id="tableshowNVLHD" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>ĐVT</th>
+                                <th>Số Lượng</th>
+                                <th>Đơn Giá (VNĐ)</th>
+                                <th>Giảm Giá (%)</th>
+                                <th>Thành Tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableshoNVLHDbody">
+                            <tr>
+                                <td>hihi</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+
+            <!---->
+        </div>
+    </div>
+</div>
+
+<!--Sửa Hóa Đơn-->
+@await Html.PartialAsync("EditBills")
+
+<!--idShow-->
+<script>
+    //MaLT,SoHD,NhaCC,NgayMH,ThueSuatGTGT.SoTienDTT,nguoiTao,ngayTao, maKH, trangthaiTT
+
+    function GetViewHD(id) {
+                  $.ajax({
+                type: "GET",
+              url: "@Url.Action("GetBillById")",
+              data: {id:id},
+                dataType: "json",
+                success: function (msg) {
+                    SetViewHD(msg);
+               },
+                error: function (req, status, error) {
+                }
+            });
+
+    }
+
+    function SetViewHD(msg) {
+        var maLT = document.getElementById("MaLT");
+        var soHD = document.getElementById("SoHD");
+        var nhaCC = document.getElementById("NhaCC");
+        var ngayMH = document.getElementById("NgayMH");
+        var thue = document.getElementById("ThueSuatGTGT");
+        var sotienDTT = document.getElementById("SoTienDTT");
+        var ngayTao = document.getElementById("ngayTao");
+        var maKH = document.getElementById("maKH");
+        var trangthaiTT = document.getElementById("trangThaiTT");
+        var nguoiTao = document.getElementById("nguoiTao");
+
+        maLT.innerHTML = msg.resultObj.storageCode;
+        soHD.innerHTML = msg.resultObj.codeBill;
+        nhaCC.innerHTML = msg.resultObj.codeSupplier;
+        ngayMH.innerHTML = msg.resultObj.purchaseDate;
+        thue.innerHTML = msg.resultObj.tax;
+
+
+         var tongTT = msg.resultObj.amountPaid.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
+        sotienDTT.innerHTML = tongTT;
+
+        ngayTao.innerHTML = msg.resultObj.createdDate;
+        nguoiTao.innerHTML = msg.resultObj.codeCreator;
+        maKH.innerHTML = msg.resultObj.codePlan;
+        trangthaiTT.innerHTML = msg.resultObj.paymentStatus;
+
+        DeleteTableShowNVL();
+
+        if (msg.resultObj.paymentStatus == "Đã thanh toán") {
+            document.getElementById("DaTraRib").style.display = "block";
+            document.getElementById("ChuaTraRib").style.display = "none";
+        }
+        else {
+            document.getElementById("ChuaTraRib").style.display = "block";
+            document.getElementById("DaTraRib").style.display = "none";
+        }
+
+
+        var thanhTien = 0;
+        msg.resultObj.listBillDetails.forEach(function (item) {
+            if (item.amount != 0) {
+                var str = '<tr>'
+                    + '<td> ' + item.codeMaterials + '</td>'
+                    + '<td> ' + item.nameMaterials + '</td>'
+                    + '<td> ' + item.unit + '</td>'
+                    + '<td> ' + item.amount + '</td>'
+                    + '<td> ' + item.price + '</td>'
+                    + '<td> ' + item.discount + '</td>'
+                    + '<td>' + item.totalPrice + '</td>'
+                    + '      </tr >';
+                $("#tableshoNVLHDbody").append(str);
+            }
+            thanhTien = thanhTien + item.totalPrice;
+        });
+
+        var congTien = msg.resultObj.totalMoney;
+        congTien = congTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        thanhTienTT = thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        var str12CT = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Cộng Tiền:  </b></td>'
+            + '<td colspan="2" class="text-center"> ' + thanhTienTT  + '</td>'
+            + '      </tr >';
+        $("#tableshoNVLHDbody").append(str12CT);
+
+
+        var thuett = thanhTien * msg.resultObj.tax / 100;
+        var  thuettShow = thuett.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
+        var str12Thue = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Tiền Thuế GTGT:  </b></td>'
+            + '<td colspan="2" class="text-center"> ' + thuettShow+ '</td>'
+            + '      </tr >';
+        $("#tableshoNVLHDbody").append(str12Thue);
+
+        var str12TT = '<tr>'
+            + '<td colspan="5" class="text-center"><b>Tổng Tiền Thanh Toán:  </b></td>'
+            + '<td colspan="2" class="text-center"> ' + congTien + '</td>'
+            + '      </tr >';
+        $("#tableshoNVLHDbody").append(str12TT);
+
+        var str12TT = '<tr>'
+            + '<td colspan="2" class="text-center"><b>Số Tiền Viết Bằng Chữ:  </b></td>'
+            + '<td colspan="5" class="text-center"> ' + msg.resultObj.convertNumbers + '</td>'
+            + '      </tr >';
+        $("#tableshoNVLHDbody").append(str12TT);
+
+    }
+    function DeleteTableShowNVL() {
+        $("#tableshoNVLHDbody").remove();
+        $("#tableshowNVLHD").append('<tbody id="tableshoNVLHDbody"></tbody>');
+    }
+</script>

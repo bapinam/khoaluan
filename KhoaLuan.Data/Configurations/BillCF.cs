@@ -22,6 +22,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.Now);
             builder.Property(x => x.PurchaseDate).IsRequired().HasDefaultValue(DateTime.Now);
             builder.Property(x => x.AmountPaid).IsRequired().HasDefaultValue(0);
+            builder.Property(x => x.TotalMoney).HasDefaultValue(0);
             builder.Property(x => x.PaymentStatus).IsRequired().HasDefaultValue(PaymentStatus.Unpaid);
 
             builder.HasOne(x => x.Supplier).WithMany(x => x.Bills).HasForeignKey(x => x.IdSupplier);

@@ -8,6 +8,7 @@ namespace KhoaLuan.Data.Entities
     {
         public long Id { get; set; }
         public int Amount { get; set; }
+        public int EnterAmount { get; set; }
         public string Unit { get; set; }
         public decimal? Price { get; set; }
         public bool Status { get; set; }

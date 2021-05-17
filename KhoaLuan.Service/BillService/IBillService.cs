@@ -3,11 +3,12 @@ using KhoaLuan.ViewModels.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace KhoaLuan.WebAppAdmin.Services
+namespace KhoaLuan.Service.BillService
 {
-    public interface IBillApiClient
+    public interface IBillService
     {
         Task<List<GetByOrderPlanBills>> GetByOrderPlanBills(string key);
 
@@ -21,7 +22,7 @@ namespace KhoaLuan.WebAppAdmin.Services
 
         Task<ApiResult<GetBillById>> GetBillById(long id);
 
-        Task<ApiResult<GetBillById>> Create(CreateBill bundle);
+        Task<ApiResult<long>> Create(CreateBill bundle);
 
         Task<ApiResult<ReturnUpdate>> Update(UpdateBill bundle);
 

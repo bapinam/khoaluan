@@ -10,6 +10,7 @@ namespace KhoaLuan.Data.Entities
         public string Unit { get; set; }
         public int Amount { get; set; }
         public decimal Price { get; set; }
+        public decimal TotalPrice { get; set; }
         public int? Discount { get; set; }
 
         public int IdMaterials { get; set; }

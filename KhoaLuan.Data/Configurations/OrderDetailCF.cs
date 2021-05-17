@@ -22,6 +22,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Price).HasDefaultValue(null);
             builder.Property(x => x.Status).HasDefaultValue(false);
             builder.Property(x => x.Note).HasMaxLength(250);
+            builder.Property(x => x.EnterAmount).HasDefaultValue(0);
             builder.Property(x => x.IdSupplier).HasDefaultValue(null);
             builder.HasOne(x => x.OrderPlan).WithMany(x => x.OrderDetails).HasForeignKey(x => x.IdOrderPlan);
             builder.HasOne(x => x.Material).WithMany(x => x.OrderDetails).HasForeignKey(x => x.IdMaterials);

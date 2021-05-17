@@ -1,0 +1,335 @@
+﻿@using KhoaLuan.Data.Enums;
+<div class="card direct-chat direct-chat-primary table-hover12">
+    <div class="card-header">
+        <h3 class="card-title">Hóa Đơn</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="modal-body">
+            <form id="FormBill" method="post">
+                <div class="form-row">
+                    <input type="hidden" id="TypeBill" name="TypeCode" value="@CodeType.Bill" />
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameBill"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeBill()" required>
+                    </div>
+                    <span class="text-danger" id="showNameBill">
+                        Tên mã đã tồn tại
+                    </span>
+                    <div class="form-group col-md-6">
+                        <button type="submit" id="btnthemBill" class="btn btn-primary">Thêm Vào</button>
+                    </div>
+                    <small>Tên mã + số tự tăng: CODE1</small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-body">
+            <table id="Billtable" class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Tên Mã</th>
+                        <th class="text-center">Ưu Tiên</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="addBill">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--Modal xóa-->
+<div class="modal fade" id="exampleDeleteBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDeleteBill" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xóa dữ liệu đã chọn?</h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteBill()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Sửa-->
+<div class="modal fade" id="exampleEditBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idEditBill" />
+                <input type="hidden" id="TypeCodeBill" value="@CodeType.Bill" />
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NameBillEdit"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodeBillEdit()" required>
+                        <span class="text-danger" id="erroGroupBill">
+                            Tên đã tồn tại
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <select class="form-control" name="Top" id="TopEditBill">
+                            <option value="true">Bật</option>
+                            <option value="false">Tắt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxSaveBill()" id="btnEditBill" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Sản Phẩm-->
+<script>
+    //kiểm tra tên
+    document.getElementById('showNameBill').style.display = "none";
+    function iCodeBill()
+    {
+        var nameBill = $('#NameBill').val().trim();
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameBill} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('showNameBill').style.display = "none";
+                    document.getElementById('btnthemBill').style.display = "block";
+                } else {
+                    document.getElementById('showNameBill').style.display = "block";
+                    document.getElementById('btnthemBill').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('showNameBill').style.display = "block";
+                    document.getElementById('btnthemBill').style.display = "none";
+
+                }
+            });
+    }
+
+    document.getElementById('erroGroupBill').style.display = "none";
+    document.getElementById('btnEditBill').style.display = "block";
+
+    function iCodeBillEdit()
+    {
+        var nameBill1 = $('#NameBillEdit').val().trim();
+        var id = $('#idEditBill').val().trim();
+        $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: nameBill1, id: id} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('erroGroupBill').style.display = "none";
+                    document.getElementById('btnEditBill').style.display = "block";
+                } else {
+                    document.getElementById('erroGroupBill').style.display = "block";
+                    document.getElementById('btnEditBill').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('erroGroupBill').style.display = "block";
+                 document.getElementById('btnEditBill').style.display = "none";
+
+                }
+            });
+    }
+    //
+   GetBill();
+    // Lấy giá trị của mã Bill
+    function GetBill() {
+        var typeMVL = $("#TypeBill").val();
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+
+                    var str = '<tr id="Bill-' + item.id +'">' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' +
+                        '<select class="form-control select2bs4" >';
+
+                    if (item.top) {
+                        str = str + '      <option  value="true">Bật</option>' ;
+                    } else {
+                        str = str + '      <option  value="false">Tắt</option>';
+                    }
+
+                    str = str + ' </select>' +
+                        '</td>' +
+                        '<td class="text-center py-0 align-middle">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEditBill"' +
+                        '   onclick="GetEditBill(' + item.id + ', \'' + item.name + '\',' + item.top +')" title="Sửa">' +
+                        '   <i class="fas fa-pencil-alt"></i>' +
+                        '</a>' +
+                        '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteBill"' +
+                        '   onclick="GetDeleteBill(' + item.id + ')" title="Xóa">' +
+                        '    <i class="fas fa-trash"></i>' +
+                        ' </a>' +
+                        '</div>' +
+                        ' </td>' +
+                        ' </tr >';
+                    $('#addBill').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+    }
+
+    // Thêm : btnthemBill,NameBill
+    var formBill = $('#FormBill');
+    formBill.submit(function (e) {
+        var nameBill = $('#NameBill').val().trim();
+        if (nameBill.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
+        } else {
+            if (nameBill.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formBill.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
+
+                        $('#addBill').remove();
+                        $('#Billtable').append('<tbody id="addBill"></tbody>');
+                        GetBill();
+
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
+
+                    }
+                });
+            }
+        }
+        e.preventDefault();
+    });
+
+    // xóa
+    function GetDeleteBill(id) {
+        $("#idDeleteBill").val(id);
+    }
+
+    function ajaxDeleteBill() {
+        var id = $("#idDeleteBill").val();
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id:id},
+                dataType: "json",
+            success: function (msg) {
+                 if (msg.isSuccessed) {
+                     $('#exampleDeleteBill').modal("hide")
+                     toastr.success('Xóa thành công')
+                     var de = "#Bill-" + id;
+                     $(de).remove();
+                 } else {
+                     toastr.error('Xóa thất bại')
+                 }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại')
+
+                }
+            });
+    }
+
+    // CẬP nhật
+    function GetEditBill(id, name, top) {
+        document.getElementById('erroGroupBill').style.display = "none";
+        document.getElementById('btnEditBill').style.display = "block";
+        $("#idEditBill").val(id);
+        $("#NameBillEdit").val(name);
+        if (top) {
+            $("#TopEditBill").val("true");
+        } else {
+            $("#TopEditBill").val("false");
+        }
+    }
+
+    function ajaxSaveBill() {
+        var id = $("#idEditBill").val();
+        var name = $("#NameBillEdit").val();
+        var top = $("#TopEditBill").val();
+        var type = $("#TypeCodeBill").val();
+        if (name.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
+        } else {
+            if (name.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
+                    type: "PUT",
+                    url: "@Url.Action("Update")",
+                    data: data,
+                    dataType: "json",
+                    success: function (msg) {
+                        $('#exampleEditBill').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addBill').remove();
+                        $('#Billtable').append('<tbody id="addBill"></tbody>');
+                        GetBill();
+
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
+
+                    }
+                });
+            }
+        }
+    }
+</script>

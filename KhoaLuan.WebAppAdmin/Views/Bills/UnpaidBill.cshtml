@@ -1,0 +1,329 @@
+﻿<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="HoaDonChuaThanhToan">
+        <div class="card-header">
+            <h3 class="card-title">Hóa Đơn Chưa Thanh Toán</h3>
+
+            <div class="card-tools">
+                <span title="Hóa Đơn Chưa Thanh Toán" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="SoHDCTT" style="float:left;">0</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none;">
+            <form id="frmChuaTT" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="keywordChuaTT"
+                               placeholder="Nhập mã lưu trữ hoặc số hóa đơn">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <section class="content">
+                <div class="container-fluid">
+                    <table id="example112" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        <thead>
+                            <tr>
+                                <th>Mã Lưu Trữ</th>
+                                <th>Số Hóa Đơn</th>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Ngày Tạo</th>
+                                <th>Người Tạo</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addTRHDCTT">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Lưu Trữ</th>
+                                <th>Số Hóa Đơn</th>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Ngày Tạo</th>
+                                <th>Người Tạo</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!--Show hóa đơn-->
+<script>
+
+    var frmChuaTT = $("#frmChuaTT");
+    frmChuaTT.submit(function (e) {
+
+        var keyTHD = $("#keywordChuaTT").val();
+        DeleteChuaTT();
+        GetAllUnpaidBill(keyTHD);
+        e.preventDefault();
+    });
+
+    function DeleteChuaTT() {
+        $("#addTRHDCTT").remove();
+        $("#example112").append('<tbody id="addTRHDCTT" ></tbody>');
+
+    }
+
+    GetAllUnpaidBill("");
+    document.getElementById("SoHDCTT").style.display = "block";
+    function GetAllUnpaidBill(key) {
+        $.ajax({
+                type: "GET",
+            url: "@Url.Action("GetAllUnpaidBill")",
+            data: {key: key},
+                dataType: "json",
+            success: function (msg) {
+                var countt = 0;
+                msg.forEach(function (item) {
+                    countt++;
+                        if (item.count < 1) {
+                            document.getElementById("SoHDCTT").style.display = "none";
+                        } else {
+                            document.getElementById("SoHDCTT").style.display = "block";
+                            document.getElementById("SoHDCTT").innerHTML = item.count;
+
+                    }
+                        var str = ' <tr id="BillUnpaid-' + item.id + '">'
+                            + ' <td>' + item.storageCode + '</td>'
+                            + ' <td>' + item.codeBill+'</td>'
+                            + ' <td>' + item.createdDate +'</td>'
+                            + ' <td>' + item.codePlan + '</td>'
+                            + ' <td>' + item.codeCreator + '</td>'
+                            +'  <td class="text-center">'
+                            +'<div class="btn-group btn-group-sm">'
+                            +'          <a class="btn btn-primary" data-toggle="modal" data-target="#exampleViewBill"'
+                            + '              onclick="GetViewHD(' + item.id +')" title="Xem Hóa Đơn">'
+                            +'               <i class="fas fa-eye"></i>'
+                            +'           </a>'
+                            +'           <a class="btn btn-success" data-toggle="modal" data-target="#exampleEditMoeny"'
+                            + '               onclick="UpdateUnpaid(' + item.id + ',' + item.paymentMoeny + ',' + item.totalMoney +')" title="Cập Nhật Thanh Toán">'
+                            +'                <i class="fas fa-money"></i>'
+                            + '            </a>'
+                            +'<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeleteBill"'
+                            + 'onclick = "DeleteBills(' + item.id +',0)" title = "Xóa" >'
+                            +'<i class="fas fa-trash"></i>'
+                            +'   </a>'
+                            +'        </div>'
+                            +'    </td>'
+                            +' </tr >';
+
+                        $("#addTRHDCTT").append(str);
+
+                    });
+                GetDeleteViewOrderCTT();
+
+                if (countt < 1) {
+                    document.getElementById("SoHDCTT").style.display = "none";
+                    var row = '<tr id="DuLieuUnpaid">'
+                        +'<td colspan="6" class="text-center">Chưa có dữ liệu</td>'
+                        + '</tr > ';
+                    $("#addTRHDCTT").append(row);
+
+                }
+
+               },
+                error: function (req, status, error) {
+                }
+            });
+    }
+
+    function GetDeleteViewOrderCTT() {
+        $("#deleTRHDCTT").remove();
+    }
+</script>
+
+<!--cập nhật tiền Hóa Đơn-->
+<div class="modal fade" id="exampleEditMoeny" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Hóa Đơn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+
+            <div class="modal-body">
+                <input type="hidden" name="Id" id="IdUpdateMoneyHD" />
+                <div class="form-group">
+                    <label>Tổng Số Tiền Cần Thanh Toán</label>
+                    <input class="form-control" id="paymentMoenyCTT" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Số Tiền Đã Thanh Toán (cũ)</label>
+                    <input class="form-control" id="paymentMoeny" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Số Tiền Đã Thanh Toán (mới)</label>
+                    <input class="form-control" type="text" id="moenyNewShow" onkeyup="priceUpdateTT()"
+                           placeholder="Vui lòng nhập giá tiền" required>
+                    <input class="form-control" type="hidden" id="moenyNew">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="UpdateTienHoaDon()">Lưu Lại</button>
+            </div>
+
+            <!---->
+        </div>
+    </div>
+</div>
+<!--xóa Hóa Đơn-->
+<div class="modal fade" id="exampleDeleteBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xóa Hóa Đơn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+
+            <div class="modal-body">
+                <input type="hidden" name="Id" id="IdDeleteHD" />
+                <input type="hidden" id="LoaiDelete" />
+                <p>Bạn có muốn xóa hóa đơn đã chọn?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-danger" onclick="DeleteHoaDon()">Đồng Ý</button>
+            </div>
+
+            <!---->
+        </div>
+    </div>
+</div>
+
+<script>
+    function DeleteBills(id,loai) {
+        $("#IdDeleteHD").val(id);
+        $("#LoaiDelete").val(loai);
+    }
+
+    function DeleteHoaDon() {
+        var id = $("#IdDeleteHD").val();
+        var loai = $("#LoaiDelete").val();
+
+                $.ajax({
+                type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id: id},
+           dataType: "json",
+           success: function (msg) {
+               if (msg.isSuccessed) {
+                   toastr.success('Xóa thành công');
+                   $("#exampleDeleteBill").modal("hide");
+                   var de = "";
+                   if (loai == 0) {
+                       de = "#BillUnpaid-" + id;
+                       $("#DuLieuUnpaid").remove();
+                   }
+                   else {
+                       de = "#BillPaid-" + id;
+
+                   }
+                   $(de).remove();
+                   $("#addTRCreate").remove();
+                   $("#example1create").append('<tbody id="addTRCreate"></tbody>');
+                   GetByOrderPlanBills("");
+
+               } else {
+                   toastr.error('Xóa thất bại');
+
+               }
+            },
+                    error: function (req, status, error) {
+                        toastr.error('Xóa thất bại');
+
+                }
+            });
+
+    }
+</script>
+
+<!--Cập nhật thanh toán tiền-->
+<script>
+    function UpdateUnpaid(id, paymentMoeny, paymentMoenyCTT) {
+        var frmoeny = formatCashUpdate(paymentMoeny.toString()) + "  VNĐ";
+        $("#IdUpdateMoneyHD").val(id);
+        $("#paymentMoeny").val(frmoeny);
+
+        var frmoenyCTT = formatCashUpdate(paymentMoenyCTT.toString()) + "  VNĐ";
+        $("#paymentMoenyCTT").val(frmoenyCTT);
+    }
+
+    function UpdateTienHoaDon() {
+        var id =  $("#IdUpdateMoneyHD").val();
+        var paymentMoeny = $("#moenyNew").val();
+        var bundle =
+        {
+            Id: id,
+            Money: paymentMoeny
+        };
+
+                        $.ajax({
+                type: "PUT",
+            url: "@Url.Action("UpdateUnpaid")",
+            data: bundle,
+           dataType: "json",
+           success: function (msg) {
+               if (msg.isSuccessed) {
+                   toastr.success('Cập nhật thành công');
+                   $("#exampleEditMoeny").modal("hide");
+                   location.reload();
+
+
+               } else {
+                   toastr.error('Cập nhật thất bại');
+
+               }
+            },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
+
+                }
+            });
+
+    }
+
+    function priceUpdateTT(){
+        var txt = "moenyNewShow";
+        document.getElementById(txt).onblur = function () {
+            this.value = parseFloat(this.value.replace(/,/g, ""))
+                .toFixed(2)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var mystring = document.getElementById(txt).value;
+        var kq = isNumber(mystring);
+        if (!kq) {
+            document.getElementById(txt).value = 0;
+        }
+
+        var pr = "moenyNew";
+        document.getElementById(pr).value = mystring;
+
+    }
+
+    function formatCashUpdate(str) {
+        return str.split('').reverse().reduce((prev, next, index) => {
+            return ((index % 3) ? next : (next + ',')) + prev
+        })
+    }
+</script>

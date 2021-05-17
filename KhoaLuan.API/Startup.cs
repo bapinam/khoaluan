@@ -43,7 +43,7 @@ using KhoaLuan.ViewModels.Material;
 using KhoaLuan.Service.RecipeService;
 using KhoaLuan.Service.ManageCodeService;
 using KhoaLuan.Service.OrderPlanService;
-using KhoaLuan.Service.Bill;
+using KhoaLuan.Service.BillService;
 
 namespace KhoaLuan.API
 {

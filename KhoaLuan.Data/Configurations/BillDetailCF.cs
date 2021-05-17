@@ -18,6 +18,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Unit).IsRequired();
             builder.Property(x => x.Amount).IsRequired().HasDefaultValue(1);
             builder.Property(x => x.Discount).HasDefaultValue(0);
+            builder.Property(x => x.TotalPrice).HasDefaultValue(0);
 
             builder.HasOne(x => x.Material).WithMany(x => x.BillDetails).HasForeignKey(x => x.IdMaterials);
             builder.HasOne(x => x.Bill).WithMany(x => x.BillDetails).HasForeignKey(x => x.IdBill);

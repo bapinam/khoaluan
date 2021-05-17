@@ -282,12 +282,14 @@ namespace KhoaLuan.Service.BillService
                 bill = _context.Bills.Include(x => x.BillDetails).Include(s => s.OrderPlan)
                     .Where(b => (b.StorageCode.Contains(bundle.Keyword) ||
                     b.CodeBill.Contains(bundle.Keyword) || b.OrderPlan.Code.Contains(bundle.Keyword))
-                    && b.PaymentStatus == PaymentStatus.Paid);
+                    && b.PaymentStatus == PaymentStatus.Paid &&
+                                            b.OrderPlan.Status == StatusOrderPlan.Accomplished);
             }
             else
             {
                 bill = _context.Bills.Include(x => x.BillDetails)
-                                    .Where(b => b.PaymentStatus == PaymentStatus.Paid);
+                                    .Where(b => b.PaymentStatus == PaymentStatus.Paid &&
+                                            b.OrderPlan.Status == StatusOrderPlan.Accomplished);
             }
 
             bill = bill.Include(x => x.OrderPlan);

@@ -145,7 +145,7 @@ namespace KhoaLuan.Service.OrderPlanService
         public async Task<List<GetByOrderPlan>> GetByOrderPlanCensorship()
         {
             var order = _context.OrderPlans.Include(x => x.OrderDetails)
-                .ThenInclude(m => m.Material).Where(o => o.Censorship == false);
+                .ThenInclude(m => m.Material).Where(o => o.Censorship == false );
 
             order = order.Include(t => t.Responsible);
             var re = order.Include(g => g.Creator).OrderByDescending(x => x.Id);

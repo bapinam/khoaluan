@@ -205,11 +205,11 @@ namespace KhoaLuan.Service.RecipeService
             return new List<GetListMaterials>(result);
         }
 
-        public async Task<List<GetListPacks>> GetListPacks(int id)
+        public async Task<List<GetListPacksProduct>> GetListPacks(int id)
         {
             var packs = _context.Packs.Where(x => x.IdMaterials == id);
 
-            var result = await packs.Select(x => new GetListPacks()
+            var result = await packs.Select(x => new GetListPacksProduct()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -217,7 +217,7 @@ namespace KhoaLuan.Service.RecipeService
             }
             ).ToListAsync();
 
-            return new List<GetListPacks>(result);
+            return new List<GetListPacksProduct>(result);
         }
 
         public async Task<ApiResult<GetCreateRecipe>> Create(CreateRecipe bundle)

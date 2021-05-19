@@ -1,0 +1,312 @@
+﻿<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="NhiemVuBox">
+        <div class="card-header">
+            <h3 class="card-title">Nhiệm Vụ</h3>
+
+            <div class="card-tools">
+                <span title="Nhiệm Vụ" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="NhiemVu" style="float:left;">0</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body" style="background-color: #F5F5F5;">
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row" id="pePNV">
+                        <section class="col-lg-6 connectedSortable" id="leftColNV">
+                        </section>
+
+                        <section class="col-lg-6 connectedSortable" id="rightColNV">
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById("NhiemVuBox").style.display = "none";
+    document.getElementById("NhiemVu").style.display = "none";
+
+    var x = "@User.Identity.Name";
+    GetMisonProcessPlan(x);
+    function GetMisonProcessPlan(x) {
+        $.ajax({
+            type: "GET",
+             url: "@Url.Action("GetByProcessPlanApproved")",
+             data: { key: x },
+            dataType: "json",
+            success: function (data) {
+                DeMisonProcessPlan();
+                var i = 0;
+                data.forEach(function (item) {
+                    if (item.count > 0) {
+                        document.getElementById("NhiemVuBox").style.display = "block";
+                        document.getElementById("NhiemVu").style.display = "block";
+                        document.getElementById("NhiemVu").innerHTML = item.count;
+
+                        var str = stringShowMisonOrder(item);
+                        if (i % 2 == 0) {
+                            $('#leftColNV').append(str);
+                        } else {
+                            $('#rightColNV').append(str);
+                        }
+                        i++;
+                    } else {
+                        document.getElementById("NhiemVuBox").style.display = "none";
+                        document.getElementById("NhiemVu").style.display = "none";
+                    }
+
+                });
+
+            }
+        });
+    }
+
+    function stringShowMisonOrder(item) {
+
+        var str = ' <div class="card direct-chat direct-chat-primary table-hover12 vnbox he" id="topShowIn' + item.id + '"> ';
+
+        str = str + ' <div class="card-header hy">'
+            + ' <h3 class="card-title hy">' + item.code + '</h3>'
+            + '   <div class="card-tools">'
+            + '       <button type="button" class="btn btn-tool" data-card-widget="collapse">'
+            + '            <i class="fas fa-minus"></i>'
+            + '        </button>'
+            + '     </div>'
+            + '  </div>'
+            + '  <!-- /.card-header -->'
+            + '                    <div class="card-body">'
+            + '      <div class="modal-body">'
+            + '             <div class="form-group">'
+            + '                 <label>Tên Kế Hoạch:</label>'
+            + '                 <span class="form-control"  style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.name
+            + '      </span>'
+            + '             </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <span class="form-control" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.createdDate
+            + '                                     </span>'
+            + '             </div>'
+            + '              <div class="form-group col-md-6">'
+            + '                 <label>Ngày Dự Kiến:</label>'
+            + '                 <span class="form-control"  style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.expectedDate
+            + '                                     </span>'
+            + '             </div>'
+            + '         </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                  <label>Người Tạo:</label>'
+            + '                  <span class="form-control"  style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeCreator
+            + '                                      </span>'
+            + '             </div>'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Người Nhận:</label>'
+            + '                 <span class="form-control" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeResponsible
+            + '                                      </span>'
+            + '             </div>'
+            + ' </div>'
+            + '         <div class="form-group">'
+            + '              <label>Ghi Chú:</label>'
+            + '              <span class="form-control" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.note
+            + '              </span>'
+            + '          </div>'
+            + '      </div>'
+            + '  </div>'
+            + '   <!--Danh sách nguyên vật liệu-->'
+            + '      <div class="modal-body table-wrapper-scroll-y my-custom-scrollbar">'
+            + ' <table class="table table-bordered ">'
+            + '             <thead>'
+            + '                 <tr>'
+            + '                     <th>Mã Số</th>'
+            + '                     <th>Số Lượng</th>'
+            + '                     <th>ĐVT</th>'
+            + '                     <th class="text-center py-0 align-middle">Công Thức</th>'
+            + '                 </tr>'
+            + ' </thead>'
+            + '              <tbody>';
+
+        item.listProcessingDetails.forEach(function (i) {
+
+            str = str + '                 <tr>'
+                + '                      <td>'
+                + i.codeRecipe + '</td>'
+                + '                     <td>' + i.amount + '</td>'
+                + '                     <td>' + i.unit + '</td>'
+                + '                      <td class="text-center py-0 align-middle">'
+                + '         <button class="btn btn-sm btn-success" onclick="GetShowRecipes(' + item.id + ',' + i.idRecipe + ','+i.amount+')">'
+            +'      <i class="fas fa-eye"></i>'
+                +'</button > '
+                + '                      </td>'
+                + ' </tr>';
+        });
+
+        str = str + '             </tbody>'
+            + '          </table>'
+            + '      </div>'
+            + '      <div class="text-center mt-5 mb-3">'
+            + '          <input type="hidden" id="IdKHMesion-' + item.id + '" name="IdProcessPlan" value="' + item.id + '" />'
+            + '         <button class="btn btn-sm btn-success" onclick="GetSaveMesion(' + item.id + ')">In Đơn Hàng</button>'
+
+            + '      </div>'
+            + '  </div>';
+
+        return str;
+    }
+
+    function DeMisonProcessPlan() {
+        $('#leftColNV').remove();
+        $('#rightColNV').remove();
+        str = '<section class="col-lg-6 connectedSortable" id="leftColNV">'
+            + '</section>'
+            + ' <section class="col-lg-6 connectedSortable" id="rightColNV">'
+            + '</section>';
+        $('#pePNV').append(str);
+
+    }
+
+    function GetShowRecipes(idKH, idRecipe, sl) {
+        $("#addTRNVL").remove();
+        $("#example2456").append('<tbody id="addTRNVL"></tbody>');
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetMaterialsByRecipes")",
+            dataType: "json",
+            data: { idRecipe: idRecipe},
+            success: function (data) {
+                data.forEach(function (item) {
+                    var total = item.amount * sl;
+                   var str = '<tr>'
+                        + ' <td>'+item.code+'</td>'
+                        + ' <td>' + item.name +'</td>'
+                        + ' <td>' + item.unit + '</td>'
+                        + ' <td>' + item.amount + '</td>'
+                        + ' <td>' +total +'</td>'
+                        + '</tr>';
+                    $("#addTRNVL").append(str);
+
+                });
+
+            }
+        });
+        $("#exampleRecipesGiao").modal("show");
+
+    }
+
+</script>
+<style>
+    #exampleRecipesGiao {
+        overflow-y: scroll
+    }
+</style>
+<!--Modal show recipes-->
+<div class="modal fade bd-example-modal-lg" id="exampleRecipesGiao" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Công Thức Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div id="ShowCT7">
+                <div class="modal-body">
+                    <label>Danh Sách Nguyên Vật Liệu</label>
+                    <table id="example2456" class="table table-bordered table-striped table-hover ">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Tên</th>
+                                <th>ĐVT</th>
+                                <th>Số Lượng</th>
+                                <th>Tổng Số Lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addTRNVL">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="InCT()">In Công Thức</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Gửi singalR realtime-->
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
+<script>
+    "use strict";
+
+    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+    connection.on("ReceiveMessage", function (user, message) {
+        var name = "@User.Identity.Name";
+        if (user == name) {
+            GetMisonProcessPlan(user);
+        }
+    });
+
+    // khởi động
+    connection.start().then(function () {
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+</script>
+
+<!--In đơn hàng-->
+<script>
+    function GetSaveMesion(id) {
+        var inDH = "topShowIn" + id;
+        //Get the HTML of div
+        var divElements = document.getElementById(inDH).innerHTML;
+        //Get the HTML of whole page
+        var oldPage = document.body.innerHTML;
+        //Reset the page's HTML with div's HTML only
+        document.body.innerHTML =
+            "<html><head><title></title></head><body>" +
+            divElements + "</body>";
+        //Print Page
+        window.print();
+        //Restore orignal HTML
+        document.body.innerHTML = oldPage;
+    }
+</script>
+
+<!--In CT-->
+<script>
+    function InCT() {
+        var inDH = "ShowCT7";
+        //Get the HTML of div
+        var divElements = document.getElementById(inDH).innerHTML;
+        //Get the HTML of whole page
+        var oldPage = document.body.innerHTML;
+        //Reset the page's HTML with div's HTML only
+        document.body.innerHTML =
+            "<html><head><title></title></head><body>" +
+            divElements + "</body>";
+        //Print Page
+        window.print();
+        //Restore orignal HTML
+        document.body.innerHTML = oldPage;
+        setTimeout(function () {
+            location.reload();
+        }, 1000);
+    }
+    
+</script>

@@ -10,7 +10,7 @@ namespace KhoaLuan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BillController : Controller
+    public class BillController : ControllerBase
     {
         private readonly IBillService _billService;
 

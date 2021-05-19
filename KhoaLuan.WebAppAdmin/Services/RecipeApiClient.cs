@@ -66,10 +66,10 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
-        public async Task<List<GetListPacks>> GetListPacks(int id)
+        public async Task<List<GetListPacksProduct>> GetListPacks(int id)
         {
             var url = $"/api/recipe/packs/" + $"{id}";
-            var result = await GetAll<GetListPacks>(url);
+            var result = await GetAll<GetListPacksProduct>(url);
             return result;
         }
 

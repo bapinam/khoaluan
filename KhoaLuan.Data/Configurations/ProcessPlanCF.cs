@@ -20,12 +20,13 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.Now);
             builder.Property(x => x.ExpectedDate).IsRequired().HasDefaultValue(DateTime.Now);
-            builder.Property(x => x.Status).HasDefaultValue(false);
+            builder.Property(x => x.Status).HasDefaultValue(StatusProcessPlan.Processing);
             builder.Property(x => x.Censorship).HasDefaultValue(false);
             builder.Property(x => x.Note).HasMaxLength(250);
 
             builder.HasOne(x => x.Creator).WithMany(x => x.ProcessPlanCreators).HasForeignKey(x => x.IdCreator);
             builder.HasOne(x => x.Responsible).WithMany(x => x.ProcessPlanResponsibles).HasForeignKey(x => x.IdResponsible);
+            builder.HasOne(x => x.Authority).WithMany(x => x.ProcessPlanAuthority).HasForeignKey(x => x.IdAuthority);
         }
     }
 }

@@ -3,11 +3,12 @@ using KhoaLuan.ViewModels.ProcessPlan;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace KhoaLuan.WebAppAdmin.Services
+namespace KhoaLuan.Service.ProcessPlanService
 {
-    public interface IProcessPlanApiClient
+    public interface IProcessPlanService
     {
         Task<List<GetAllProductGroup>> GetAllProductGroup();
 
@@ -27,7 +28,7 @@ namespace KhoaLuan.WebAppAdmin.Services
 
         Task<ApiResult<GetProcessPlanById>> GetProcessPlanById(long id);
 
-        Task<ApiResult<GetProcessPlanById>> Update(UpdatePlan bundle);
+        Task<ApiResult<long>> Update(UpdatePlan bundle);
 
         Task<ApiResult<bool>> Delete(long id);
 

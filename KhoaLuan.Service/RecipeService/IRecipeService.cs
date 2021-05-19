@@ -22,7 +22,7 @@ namespace KhoaLuan.Service.RecipeService
 
         Task<List<GetListMaterials>> GetListMaterials(ListBundleMaterials bundle);
 
-        Task<List<GetListPacks>> GetListPacks(int id);
+        Task<List<GetListPacksProduct>> GetListPacks(int id);
 
         Task<ApiResult<GetCreateRecipe>> Create(CreateRecipe bundle);
 

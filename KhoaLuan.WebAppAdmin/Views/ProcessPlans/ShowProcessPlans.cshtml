@@ -1,0 +1,369 @@
+﻿<style>
+    .vnbox {
+        box-shadow: 2px 2px 5px;
+    }
+
+    .my-custom-scrollbar {
+        position: relative;
+        height: 200px;
+        overflow-x: auto;
+    }
+
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+
+    * {
+        margin: 0;
+    }
+
+    #container1 {
+        height: 100%;
+        width: 100%;
+        border: 1px solid green;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #container2 {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        left: 0px;
+        right: -15px;
+        border: 1px solid blue;
+        overflow: auto;
+    }
+
+    .he:hover > .hy {
+        background-color: #EC870E;
+        color: aliceblue;
+    }
+</style>
+<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box">
+        <div class="card-header">
+            <h3 class="card-title">Kế Hoạch Chế Biến Đang Chờ Duyệt</h3>
+
+            <div class="card-tools">
+                <span title="Chờ Duyệt" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="KiemDuyetPhieu" style="float:left;">0</span>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none; background-color: #F5F5F5;">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <!-- /.row -->
+                    <!-- Main row -->
+                    <div class="row" id="peP">
+                        <!-- Left col -->
+                        <section class="col-lg-6 connectedSortable" id="leftCol">
+                        </section>
+
+                        <!--Right-->
+                        <section class="col-lg-6 connectedSortable" id="rightCol">
+                        </section>
+
+                        <!-- right col -->
+                    </div>
+                    <!-- /.row (main row) -->
+                </div><!-- /.container-fluid -->
+            </section>
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <!-- /.card -->
+</section>
+
+<script>
+       ShowCensorship();
+    // show phần kiểm duyệt
+    function ShowCensorship() {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetByProcessPlanCensorship")",
+            data: {} ,
+            dataType: "json",
+             success: function (data) {
+                 var i = 0;
+                 var count = 0;
+                 data.forEach(function (item) {
+                     var str = stringShowCensorship(item);
+                     //var str = "12";
+                     if (i % 2 == 0) {
+                         $('#leftCol').append(str);
+                     } else {
+                         $('#rightCol').append(str);
+                     }
+                     i++;
+                     count = item.count;
+                 });
+
+                 if (i == 0) {
+                     document.getElementById("KiemDuyetPhieu").style.display = "none";
+
+                 } else {
+                     document.getElementById("KiemDuyetPhieu").style.display = "block";
+                     document.getElementById("KiemDuyetPhieu").innerHTML = count;
+                 }
+            }
+        });
+    }
+
+    function DeUpdateCreateCen() {
+        $('#leftCol').remove();
+        $('#rightCol').remove();
+        str = '<section class="col-lg-6 connectedSortable" id="leftCol">'
+            + '</section>'
+            + ' <section class="col-lg-6 connectedSortable" id="rightCol">'
+            + '</section>';
+        $('#peP').append(str);
+
+    }
+    function stringShowCensorship(item) {
+        var str = ' <div class="card direct-chat direct-chat-primary table-hover12 vnbox he" id="topShow' + item.id + '"> ';
+
+        if (!item.duration) {
+            str = str + '<div class="ribbon-wrapper" id="DeRibbon-'+item.id+'"> '
+                + ' <div class="ribbon bg-danger"> '
+                + '     Hết Hạn '
+                + '</div> '
+                + ' </div> ';
+        }
+
+        str = str + ' <div class="card-header hy">'
+            + '<input id="DurationShow-' + item.id + '" value="' + item.duration + '" type="hidden" />'
+           + ' <h3 class="card-title hy">' + item.code + '</h3>'
+           + '   <div class="card-tools">'
+           + '       <button type="button" class="btn btn-tool" data-card-widget="collapse">'
+           + '            <i class="fas fa-minus"></i>'
+           + '        </button>'
+           + '     </div>'
+           + '  </div>'
+            + '  <!-- /.card-header -->'
+           + '                    <div class="card-body">'
+           + '      <div class="modal-body">'
+            + '             <div class="form-group">'
+            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <span class="form-control" id="TenKHView'+item.id+'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.name
+            + '      </span>'
+            + '             </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <span class="form-control" id="DateKHView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.createdDate
+            + '                                     </span>'
+            + '             </div>'
+            + '              <div class="form-group col-md-6">'
+            + '                 <label>Ngày Dự Kiến:</label>'
+            + '                 <span class="form-control" id="NgayDuKienView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.expectedDate
+            + '                                     </span>'
+            + '             </div>'
+            + '         </div>'
+            + '         <div class="form-row">'
+            + '             <div class="form-group col-md-6">'
+            + '                  <label>Người Tạo:</label>'
+            + '                  <span class="form-control" id="NguoiTaoView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeCreator
+            + '                                      </span>'
+            + '             </div>'
+            + '             <div class="form-group col-md-6">'
+            + '                 <label>Người Nhận:</label>'
+            + '                 <span class="form-control" id="NguoiNhanView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.codeResponsible
+            + '                                      </span>'
+            + '             </div>'
+            + ' </div>'
+            + '         <div class="form-group">'
+            + '              <label>Ghi Chú:</label>'
+            + '              <span class="form-control" id="GhiChuView' + item.id +'" style="border:none; border-bottom:1px solid #EEEEEE;">'
+            + item.note
+            + '              </span>'
+            + '          </div>'
+           + '      </div>'
+           + '  </div>'
+            + '   <!--Danh sách nguyên vật liệu-->'
+           + '      <div class="modal-body table-wrapper-scroll-y my-custom-scrollbar">'
+            + ' <table id="KHDHtable" class="table table-bordered ">'
+            + '             <thead>'
+            + '                 <tr>'
+            + '                     <th>Mã Số</th>'
+            + '                     <th>Số Lượng</th>'
+            + '                     <th>ĐVT</th>'
+            + '                      <th class="text-center py-0 align-middle">Xem</th>'
+            + '                 </tr>'
+            + ' </thead>'
+            + '              <tbody id="addShowNVL">';
+
+        item.listProcessingDetails.forEach(function (i) {
+            str = str + '                 <tr>'
+                + '<td>' + i.codeRecipe+'</td>'
+                + '<td>' + i.amount+'</td>'
+                + '<td>' + i.unit+'</td>'
+                + '<td class="text-center py-0 align-middle">'
+                + '         <button class="btn btn-sm btn-success" onclick="GetShowRecipes(' + item.id + ',' + i.idRecipe + ',' + i.amount + ')">'
+                + '      <i class="fas fa-eye"></i>'
+                + '</button > '
+                + '</td>'
+
+                + ' </tr>';
+        });
+
+        str = str  +'             </tbody>'
+         +'          </table>'
+          +'      </div>'
+           +'      <div class="text-center mt-5 mb-3">'
+             + '          <input type="hidden" id="IdKHUpdate-' + item.id + '" name="IdOrderPlan" value="' + item.id + '" />'
+             + '          <input type="hidden" id="NVDuyet-' + item.id + '" name="IdOrderPlan" value="' + item.nameResponsible + '" />'
+             + '         <button class="btn btn-sm btn-success" onclick="GetSaveCen(' + item.id + ',' + item.count + ',\'' + item.nameResponsible+'\')">Duyệt</button>'
+             + '         <button class="btn btn-sm btn-primary" onclick="GetSUpdateKH(' + item.id + ',' + item.count + ')">Sửa</button>'
+             + '         <button class="btn btn-sm btn-danger" onclick="GetDeleteKH(' + item.id + ',' + item.count + ')">Xóa</button>'
+       //    //  + '         <button class="btn btn-sm btn-info" onclick="GetThemNVL(' + item.id + ',' + item.count + ')">Thêm</button>'
+             + '      </div>'
+           + '  </div>';
+
+        return str;
+    }
+</script>
+<!--Modal Sửa Kế hoạch vừa tạo-->
+
+@await Html.PartialAsync("UpdateProcessPlan")
+
+<!--Modal Xóa Kế hoạch vừa tạo-->
+<div class="modal fade" id="exampleDeleteKH" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idKHDeleteC" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn xóa kế hoạch đặt hàng này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeleteKH()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+     function GetDeleteKH(id, count) {
+        $("#exampleDeleteKH").modal("show");
+        $("#idKHDeleteC").val(id);
+    }
+    function ajaxDeleteKH()
+    {
+        var idKH = $("#idKHDeleteC").val();
+         $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+             data: { id: idKH } ,
+            dataType: "json",
+             success: function (data) {
+                 if (data.isSuccessed) {
+                     toastr.success('Xóa thành công');
+                     DeUpdateCreateCen();
+                     ShowCensorship();
+                     $("#exampleDeleteKH").modal("hide");
+                 } else {
+                     toastr.error('Xóa thất bại');
+                 }
+             },
+             error: function (req, status, error) {
+                 toastr.error('Xóa thất bại');
+             }
+        });
+    }
+</script>
+
+<!--Duyệt đơn hàng-->
+<script>
+    function GetSaveCen(id, count, name) {
+        $("#deleteHoiDuyet").remove();
+        var bt = '<button type="submit" onclick="ajaxHoiDuyet(' + id + ',\'' + name + '\')" class="btn btn-primary"' +
+            'id="deleteHoiDuyet" > Đồng Ý</button > ';
+        $("#DuyetModal").append(bt);
+        $("#exampleHoiDuyet").modal("show");
+    }
+ function ajaxHoiDuyet(id,name) {
+        var idkhC = "#IdKHUpdate-" + id;
+        var idKH = $(idkhC).val();
+
+        var authority = "@User.Identity.Name";
+        var bundle =
+        {
+            Id: idKH,
+            Authority: authority
+        }
+        var du = "#DurationShow-" + idKH;
+        var duTF = $(du).val();
+        if (duTF == "false") {
+            toastr.error('Không thể duyệt vì kế hoạch đã hết hạn. Vui lòng xóa hoặc cập nhật lại ngày');
+
+        } else {
+            var nvduyet = "#NVDuyet-" + id;
+            var namenv = $(nvduyet).val();
+            $.ajax({
+                type: "PUT",
+                url: "@Url.Action("UpdateProcessPlanCensorship")",
+                data: bundle,
+                dataType: "json",
+                success: function (data) {
+                    DeUpdateCreateCen();
+                    toastr.success('Duyệt thành công');
+                    ShowCensorship();
+                    $("#exampleHoiDuyet").modal("hide");
+
+                    // gửi singralR đến người nhận
+                    var user = namenv;
+                    var message = namenv;
+
+                          connection.invoke("SendMessage", user, message).catch(function (err) {
+                                return console.error(err.toString());
+                          });
+                          event.preventDefault();
+                },
+                error: function (req, status, error) {
+                    toastr.error('Duyệt thất bại');
+                }
+            });
+        }
+    }
+</script>
+
+<!--Modal hỏi duyệt-->
+<div class="modal fade" id="exampleHoiDuyet" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Duyệt Kế Hoạch</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDelete" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn duyệt kế hoạch đã chọn?</h5>
+            </div>
+            <!---->
+            <div class="modal-footer" id="DuyetModal">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

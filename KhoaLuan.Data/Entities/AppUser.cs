@@ -19,6 +19,7 @@ namespace KhoaLuan.Data.Entities
         public string PathImage { get; set; }
         public JobStatus JobStatus { get; set; }
 
+        public List<ProcessPlan> ProcessPlanAuthority { get; set; }
         public List<ProcessPlan> ProcessPlanCreators { get; set; }
         public List<ProcessPlan> ProcessPlanResponsibles { get; set; }
         public List<OrderPlan> OrderPlanCreators { get; set; }

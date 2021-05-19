@@ -1,9 +1,5 @@
-﻿@using KhoaLuan.ViewModels.Common;
-@using KhoaLuan.Data.Enums;
-
-@{ ViewData["Title"] = "Kế Hoạch Chế Biến";
+﻿@{ ViewData["Title"] = "Kế Hoạch Chế Biến";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
-
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -12,47 +8,21 @@
             </div>
             <div class="col-sm-6">
                 <div class="float-sm-right" style="margin-bottom:5px;">
-                    <div class="cold-md-6" style="float:right; ">
-                        <button type="button" onclick="window.location.href='/ProcessPlans/Index'" class="btn btn-dark">
-                            <i class="fa fa-refresh"></i>
-                        </button>
-                    </div>
+                    <button type="button" onclick="window.location.href='/ProcessPlans/Index'" class="btn btn-dark">
+                        <i class="fa fa-refresh"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div><!-- /.container-fluid -->
 </section>
+<!--Giao việc-->
+@await Html.PartialAsync("MissionProcessPlan")
+<!--Tạo kế hoạch chế biến-->
+@await Html.PartialAsync("CreateProcessPlans")
 
-<!-- Main content -->
-<section class="content" id="main">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Danh Sách</h3>
-                        <div class="col-md-5" style="float:right;">
-                            <form asp-action="Index" method="get">
-                                <div class="form-group">
-                                    <div class="cold-md-6" style="float:right; ">
-                                        <button type="submit" class="btn btn-primary">Tìm</button>
-                                        <button type="button" onclick="window.location.href='/ProcessPlans/Index'" class="btn btn-dark">Reset</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+<!--Show kế hoạch chế biến chờ duyệt-->
+@await Html.PartialAsync("ShowProcessPlans")
 
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-            </div>
-            <!-- /.col -->
-        </div>
-        <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
-</section>
+<!--Show kế hoạch chế biến chờ duyệt-->
+@await Html.PartialAsync("ProcessPlanAccomplished")

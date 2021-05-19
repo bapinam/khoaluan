@@ -1,0 +1,643 @@
+﻿@using KhoaLuan.Data.Enums;
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
+<style>
+    .va:hover {
+        box-shadow: #ECECEC 2px 2px;
+    }
+
+    .va1 {
+        box-shadow: #BBBBBB 2px 2px;
+    }
+</style>
+
+<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box">
+        <div class="card-header">
+            <h3 class="card-title">Tạo Kế Hoạch Chế Biến</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+                    <form id="frmTK" method="post">
+                        <div class="form-group">
+                            <label for="inputEmail4">Nhóm Sản Phẩm</label>
+                            <div id="DeMT">
+                                <select id="ProductGroup" name="ProductGroup" onchange="myFunction()" class="form-control select2bs4" required>
+                                    <option selected>Chọn dữ liệu...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail4">Loại Sản Phẩm</label>
+                            <div id="DeMTType">
+                                <select id="ProductType" name="ProductType" class="form-control select2bs4" required>
+                                    <option selected>Chọn dữ liệu...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="TimKiem"
+                                   placeholder="Tìm kiếm mã số hoặc tên sản phẩm" aria-label="Search" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search fa-fw"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>Danh Sách Tìm Kiếm</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="bodyIdTable">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--//////////////////////////////////////////////////////////////////////////////////////////////////-->
+                <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                    <form id="AddSaveSP" method="post">
+
+                        <h3 class="text-primary"><i class="fas fa-paint-brush"></i>Phiếu Kế Hoạch</h3>
+                        <h5 class="mt-5 text-muted"></h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Mã Số</label>
+                                <select id="CodeChon" name="Code" class="form-control selectMater" required>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Tên</label>
+                                <input type="text" class="form-control" name="Name" id="Name" placeholder="Tên kế hoạch" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail4">Ngày Dự Kiến</label>
+                            <input type="date" class="form-control" name="ExpectedDate" id="Date" placeholder="Tên kế hoạch" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputAddress">Ghi Chú</label>
+                            <input type="text" class="form-control" name="Note" id="Note" placeholder="Ghi chú">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputAddress">Giao Phiếu</label>
+                            <button type="button" class="form-control" onclick="GiaoViec()"
+                                    data-toggle="modal" data-target="#exampleGiaoViec"
+                                    id="IdResponsible">
+                                <div id="ShowNV"></div>
+                            </button>
+                            @{
+                                var user = User.Identity.Name;
+                            }
+                            <input name="NameCreator" value="@user" type="hidden" />
+                            <input name="IdResponsible" id="idGV" type="hidden" />
+                        </div>
+                        <h5 class="mt-5 text-muted">Đã thêm</h5>
+                        <table id="table3ty" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tên Công Thức</th>
+                                    <th style="width:100px;">ĐVT</th>
+                                    <th style="width:100px;">Số Lượng</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableAddru">
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-5 mb-3">
+                            <button class="btn btn-sm btn-primary">Lưu Lại</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+</section>
+<!--Modal tìm kiếm nhân viên-->
+<div class="modal fade bd-example-modal-lg" id="exampleGiaoViec" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Nguyên Vật Liệu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-group">
+                    <form id="frmTKNV" method="post">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="TimKiemNV"
+                               placeholder="Tìm kiếm mã số, chứng minh thư, tên nhân viên" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <br />
+                    <h5>Danh Sách Nhân Viên</h5>
+                    <table id="tableNhanVien3" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Chứng Minh Thư</th>
+                                <th>Họ</th>
+                                <th>Tên</th>
+                                <th class="text-center">Giao Việc</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableNVIEN">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Lấy mã code-->
+<script>
+     GetUser();
+    // Lấy giá trị của mã User
+    function GetUser() {
+        var typeMVL = "@CodeType.ProcessPlan";
+         $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAll","ManageCodes")",
+          //   url: "/ManageCodes/GetAll?type=" + typeMVL,
+             data: {type: typeMVL} ,
+             dataType: "json",
+          //   cache: false,
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#CodeChon').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!-- Lấy nhóm sản phẩm-->
+<script>
+     GetProductGroup();
+    // Lấy giá trị của mã User
+    function GetProductGroup() {
+         $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAllProductGroup")",
+             dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.id +'">'+item.name+'</option>';
+                    $('#ProductGroup').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!-- Lấy loại sản phẩm-->
+<script>
+    GetProductGroup();
+    // Lấy giá trị của mã User
+    function GetProductGroup() {
+         $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAll","ManageCodes")",
+          //   url: "/ManageCodes/GetAll?type=" + typeMVL,
+             data: {type: typeMVL} ,
+             dataType: "json",
+          //   cache: false,
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#CodeChon').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+</script>
+
+<!--Show nhóm sản phẩm lấy loại-->
+<script>
+    function myFunction() {
+        DeleteGetAllProductType();
+        var id = $('#ProductGroup').val();
+          $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAllProductType")",
+              data: { id: id},
+             dataType: "json",
+              success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.id +'">'+item.name+'</option>';
+                    $('#ProductType').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+    function DeleteGetAllProductType() {
+        $("#ProductType option").remove();
+        var str = '<option selected>Chọn dữ liệu...</option>';
+        $("#ProductType").append(str);
+    }
+
+    // tìm kiếm
+    var frmTK = $("#frmTK");
+    frmTK.submit(function (e) {
+        var idGroup = $('#ProductGroup').val();
+        var idType = $('#ProductType').val();
+        var key = $('#TimKiem').val();
+        if (idGroup == "Chọn dữ liệu...") {
+            toastr.error('Vui lòng chọn nhóm sản phẩm')
+
+        } else {
+            if (idType == "Chọn dữ liệu...") {
+                toastr.error('Vui lòng chọn loại sản phẩm')
+
+            } else {
+                 $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAllProductRecipes")",
+              data: { id: idType, key: key},
+             dataType: "json",
+                     success: function (msg) {
+                         var i = 0;
+                  msg.forEach(function (item) {
+                      i++;
+                      var str = '<table id="table2" class="table table-bordered table-striped table-hover table-responsive-xl">'
+                          + '<thead>'
+                          + '<tr>'
+                          + '   <th colspan="5" class="text-center">' + item.code + ': ' + item.name + '</th>'
+                          + ' </tr>'
+                          + '<tr>'
+                          + '   <th colspan="5" class="text-center"> Số lượng: ' + item.amount + '</th>'
+                          + ' </tr>'
+                          + ' <tr>'
+                          + ' <th>Mã Số</th>'
+                          + ' <th>Tên Công Thức</th>'
+                          + '  <th class="text-center">Thao Tác</th>'
+                          + ' </tr>'
+                          + ' </thead>'
+                          + '<tbody id="tableAddNVL">';
+                      item.allRecipes.forEach(function (it){
+                          str = str + ' <tr>'
+                              + '  <td>'+it.code+'</td>'
+                              + '   <td>'+it.name+'</td>'
+                              + '   <td class="text-center py-0 align-middle">'
+                         + ' <div class="btn-group btn-group-sm">' +
+                              '   <a class="btn btn-success"' +
+                              '     onclick="GetShowRecipes(' + item.id + ',' + it.idRecipes + ',1)" title="Xem">' +
+                              '      <i class="fas fa-eye"></i>' +
+                              '  </a>' +
+                              '  <a class="btn btn-primary"' +
+                              '     onclick="GetAdd(' + item.id + ',' + it.idRecipes + ',\'' + it.code + '\',' + item.amount + ',' + item.max + ')" title="Thêm">' +
+                              '      <i class="fas fa-plus"></i>' +
+                              '   </a>' +
+                              '</div></td ></tr>';
+                      });
+
+                       str = str +'</tbody>'
+                          + ' </table> <br />   ';
+
+                      $("#bodyIdTable").append(str);
+
+                });
+                         if (i == 0) {
+                             toastr.warning('Không tồn tại dữ liệu');
+                              $('#TimKiem').val("");
+
+                         }
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+            }
+        }
+        e.preventDefault();
+    });
+</script>
+
+<!--Modal amount-->
+<div class="modal fade" id="exampleAmount" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Công Thức Sản Phẩm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idAmount" />
+                <input type="hidden" id="nameAmount" />
+                <input type="hidden" id="idSPAmount" />
+                <h5 class="modal-title" id="exampleModalLabel">
+                    <b style="color:red;">Sản Phẩm đã vượt mức hàng tồn kho, bạn có muốn chế biến?</b>
+                </h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxAmount()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal showw pack-->
+<div class="modal fade bd-example-modal-lg" id="examplePack" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Bảng Chuyển Đổi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">ĐVT (mặc định)</label>
+                        <input id="PackMD" class="form-control" disabled />
+                        <small>Giả sử: 1 ĐVT = 100 ĐVT (mặc định)</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Số Lượng Nhập</label>
+                        <input id="PackSL" class="form-control" disabled />
+                    </div>
+                </div>
+                <table id="tableNhPack" class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ĐVT</th>
+                            <th>Giá Trị</th>
+                            <th>Chuyển Đổi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableNPacketert">
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Thêm công thức-->
+<script>
+    function GetAdd(idSP, id, name, amount, max) {
+        if (amount >= max) {
+            $("#idAmount").val(id);
+            $("#nameAmount").val(name);
+            $("#idSPAmount").val(idSP);
+            $("#exampleAmount").modal("show");
+        } else {
+            AddRecipes(idSP, id, name, amount, max);
+        }
+    }
+
+    function ajaxAmount() {
+        var id = $("#idAmount").val();
+        var name = $("#nameAmount").val();
+        var idSP = $("#idSPAmount").val();
+        $("#exampleAmount").modal("hide");
+        AddRecipes(idSP, id, name, 0, 0);
+
+    }
+
+    var recipes = [];
+    function GetDeleteRecipes(idSP) {
+        var de = "#DeleteAmount-" + idSP;
+        $(de).remove();
+        var pos = recipes.indexOf(idSP);
+        recipes.splice(pos, 1);
+    }
+    function AddRecipes(idSP, id, code, amount, max) {
+        var kq = recipes.indexOf(idSP);
+        if (kq < 0) {
+            recipes.push(id);
+
+            var str = ' <tr id="DeleteAmount-' + idSP + '">'
+           + ' <td><input name="IdMaterials[]" type="hidden" value="' + id + '" />' + code + '</td>' 
+                + ' <td>'
+               +'<select id="Se-' + idSP + '" class="form-control" name="Pack[]" required></select> '
+                +'</td> '
+                + ' <td>'
+                +'<input type="number" name="Amount[]" value="0" min="0" id="Amount-'+idSP+'" class="form-control" required />'
+                +'</td > '
+                + ' <td class="text-center py-0 align-middle">'
+                + '   <div class="btn-group btn-group-sm">'
+                + '       <a class="btn btn-success" data-toggle="modal" data-target="#examplePack"'
+                + '         onclick="GetViewAmount(' + idSP + ')" title="Xem">'
+                + '         <i class="fas fa-question"></i>'
+                + '     </a>'
+                + '     <a class="btn btn-danger"'
+                + '        onclick="GetDeleteRecipes(' + idSP + ')" title="Xóa">'
+                + '         <i class="fas fa-minus-square"></i>'
+                + '     </a>'
+                + '  </div>'
+                + ' </td>'
+                + ' </tr >';
+
+            $("#tableAddru").append(str);
+            GetListPack(idSP);
+
+        } else {
+            toastr.error('Dữ liệu đã được thêm rồi');
+        }
+    }
+
+    function GetListPack(id) {
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetListPacksProduct")",
+            data: { id:id},
+            dataType: "json",
+            success: function (data) {
+
+                data.forEach(function (item) {
+                    var op = '<option  value="' + item.name + '">' + item.name + '</option>';
+                    var str = "#Se-" + id;
+                    $(str).append(op);
+                });
+            }
+        });
+    }
+    function GetViewAmount(idSP) {
+        $("#tableNPacketert").remove();
+        $("#tableNhPack").append('<tbody id="tableNPacketert"></tbody>');
+        var dvt = "#Se-" + idSP;
+        var amount = "#Amount-" + idSP;
+        var unit = $(dvt).val();
+        var sl = $(amount).val();
+
+        $("#PackSL").val(sl);
+
+         $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetListPacksById")",
+             data: { id: idSP},
+            dataType: "json",
+            success: function (data) {
+                data.forEach(function (item) {
+                    if (item.default) {
+                        $("#PackMD").val(item.name);
+                    }
+                    else {
+                        var slN = sl * item.value;
+                        if (item.name == unit) {
+                            var str = '<tr>'
+                                + '<td style="color:red;">' + item.name + '</td>'
+                                + '<td style="color:red;">' + item.value + '</td>'
+                                + '<td style="color:red;">' + slN + '</td>'
+                                + '</tr> ';
+                        }
+                        else {
+                            var str = '<tr>'
+                                + '<td>' + item.name + '</td>'
+                                + '<td>' + item.value + '</td>'
+                                + '<td>' + slN + '</td>'
+                                + '</tr> ';
+                        }
+                        $("#tableNPacketert").append(str);
+
+                    }
+
+                });
+            }
+        });
+    }
+</script>
+
+<!--Tìm kiếm nhân viên-->
+<script>
+    var frmNV = $('#frmTKNV');
+    frmNV.submit(function (e) {
+        var keyWord = $('#TimKiemNV').val();
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetEmployee")",
+            data: { key: keyWord },
+            dataType: "json",
+            success: function (data) {
+                if (data.length < 1) {
+                    toastr.warning('Không tìm thấy dữ liệu');
+                }
+                else {
+                    $('#tableNVIEN').remove();
+                    $('#tableNhanVien3').append('<tbody id="tableNVIEN"></tbody>');
+
+                }
+                data.forEach(function (item) {
+                     var str = '<tr>'
+                         + ' <td>'+item.code+'</td>'
+                         + '  <td>'+item.card+'</td>'
+                         + '  <td>' + item.lastName +'</td>'
+                         + '    <td>' + item.firstName +'</td>'
+                         + '    <td class="text-center">'
+                         + '       <a class="btn btn-success btn-sm"'
+                         + '           onclick="GetAddNhanVien(\'' + item.id + '\',\'' + item.code +'\')" title="Thêm">'
+                         + '            <i class="fas fa-plus"></i>'
+                         + '         </a>'
+                         + '       </td>'
+                         + '     </tr >';
+
+                    $('#tableNVIEN').append(str);
+                });
+
+            }
+        });
+        e.preventDefault();
+    });
+
+    //GetAddNhanVien,,ajaxNhanVien
+    function GetAddNhanVien(id,code)
+    {
+        $("#idGV").val(id);
+        $('#IdResponsible').val(id);
+        document.getElementById('ShowNV').innerHTML = code;
+        $('#exampleGiaoViec').modal('hide');
+    }
+</script>
+
+<!--Lưu kế hoạch-->
+<script>
+    var AddSaveSP = $("#AddSaveSP");
+    AddSaveSP.submit(function (e) {
+               var btn = $("#IdResponsible").val();
+        if (btn=="") {
+            toastr.error('Vui lòng chọn người nhận kế hoạch');
+        } else {
+            if (recipes.length < 1) {
+            toastr.error('Vui lòng chọn thêm công thức');
+        } else {
+             $.ajax({
+                type: "POST",
+                 url: "@Url.Action("Create")",
+                 data: AddSaveSP.serialize(),
+                dataType: "json",
+                 success: function (msg) {
+                     toastr.success('Tạo thành công');
+                     recipes = [];
+                     $('#AddSaveSP').trigger("reset");
+                     document.getElementById('ShowNV').innerHTML = "";
+                     $('#tableAddru').remove();
+                         $("#table3ty").append('<tbody id="tableAddru"></tbody>');
+                     DeUpdateCreateCen();
+                     ShowCensorship();
+                },
+                error: function (req, status, error) {
+                    toastr.error('Tạo thất bại');
+                }
+            });
+        }
+        }
+        e.preventDefault();
+    });
+</script>

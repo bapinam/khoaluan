@@ -44,6 +44,8 @@ using KhoaLuan.Service.RecipeService;
 using KhoaLuan.Service.ManageCodeService;
 using KhoaLuan.Service.OrderPlanService;
 using KhoaLuan.Service.BillService;
+using KhoaLuan.Service.ProcessPlanService;
+using KhoaLuan.Service.ProcessingDetailService;
 
 namespace KhoaLuan.API
 {
@@ -93,6 +95,8 @@ namespace KhoaLuan.API
 
             //Declare DI
             services.AddTransient<IManageCodeService, ManageCodeService>();
+            services.AddTransient<IProcessPlanService, ProcessPlanService>();
+            services.AddTransient<IProcessingDetailService, ProcessingDetailService>();
             services.AddTransient<IRecipeService, RecipeService>();
             services.AddTransient<IProductTypeGroupService, ProductTypeGroupService>();
             services.AddTransient<IProductTypeService, ProductTypeService>();

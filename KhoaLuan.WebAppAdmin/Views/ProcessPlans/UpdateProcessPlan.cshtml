@@ -1,0 +1,261 @@
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
+@using KhoaLuan.Data.Enums;
+<style>
+    #exampleEditKH {
+        overflow-y: scroll
+    }
+</style>
+<div class="modal fade bd-example-modal-lg" id="exampleEditKH" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Tạo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="UpdateSaveNVLSua" method="post">
+                    <input type="hidden" id="idUpdateKH" name="Id" />
+                    <h3 class="text-primary"><i class="fas fa-paint-brush"></i>Phiếu Kế Hoạch</h3>
+                    <h5 class="mt-5 text-muted"></h5>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Mã Số</label>
+                            <input id="CodeUpdate" name="Code" class="form-control" disabled />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Tên</label>
+                            <input type="text" class="form-control" name="Name" id="NameSua" placeholder="Tên kế hoạch" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail4">Ngày Dự Kiến</label>
+                        <input type="date" class="form-control" name="ExpectedDate" id="DateSua" placeholder="Tên kế hoạch" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputAddress">Ghi Chú</label>
+                        <input type="text" class="form-control" name="Note" id="NoteSua" placeholder="Ghi chú">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAddress">Giao Phiếu</label>
+                        <button type="button" class="form-control" onclick="GiaoViecSua()"
+                                data-toggle="modal" data-target="#exampleGiaoViecSua"
+                                id="IdResponsibleSua">
+                            <div id="ShowNVSua"></div>
+                        </button>
+                        @{
+                            var user = User.Identity.Name;
+                        }
+                        <input name="NameCreator" value="@user" type="hidden" />
+                        <input name="IdResponsible" id="idGVSua" type="hidden" />
+                    </div>
+
+                    <!---->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" onclick="" class="btn btn-primary">Lưu Lại</button>
+                    </div>
+                </form>
+            </div>
+            <!---->
+        </div>
+    </div>
+</div>
+
+<!--Modal tìm kiếm nhân viên sửa-->
+<div class="modal fade bd-example-modal-lg" id="exampleGiaoViecSua" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Tạo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-group">
+                    <form id="frmTKNVSua" method="post">
+                        <input class="form-control" type="search" style="width:93%; float:left; margin-right:7px;" id="TimKiemNVSua"
+                               placeholder="Tìm kiếm mã số, chứng minh thư, tên nhân viên" aria-label="Search" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <br />
+                    <h5>Danh Sách Nhân Viên</h5>
+                    <table id="tableNhanVien3Sua" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã Số</th>
+                                <th>Chứng Minh Thư</th>
+                                <th>Họ</th>
+                                <th>Tên</th>
+                                <th class="text-center">Giao Việc</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableNVIENSua">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //sửa kế hoạch vừa thêm
+    function GetSUpdateKH(id, count) {
+        $("#exampleEditKH").modal("show");
+        $("#idUpdateKH").val(id);
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetProcessPlanById")",
+            data: {id: id},
+                dataType: "json",
+                 success: function (msg) {
+                     $("#CodeUpdate").val(msg.resultObj.code);
+                     $("#NameSua").val(msg.resultObj.name);
+                     $("#DateSua").val(msg.resultObj.dateMan);
+                     document.getElementById('ShowNVSua').innerHTML = msg.resultObj.codeResponsible;
+                     $("#idGVSua").val(msg.resultObj.idResponsible);
+                     $("#NoteSua").val(msg.resultObj.note);
+                },
+                error: function (req, status, error) {
+                }
+            });
+    }
+</script>
+
+<!--Tìm kiếm nhân viên-->
+<script>
+    var frmNVSua = $('#frmTKNVSua');
+    frmNVSua.submit(function (e) {
+        var keyWord = $('#TimKiemNVSua').val();
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetEmployee")",
+            data: { key: keyWord },
+            dataType: "json",
+            success: function (data) {
+                if (data.length < 1) {
+                    toastr.warning('Không tìm thấy dữ liệu');
+                }
+                else {
+                    $('#tableNVIENSua').remove();
+                    $('#tableNhanVien3Sua').append('<tbody id="tableNVIENSua"></tbody>');
+
+                }
+                data.forEach(function (item) {
+                     var str = '<tr>'
+                         + ' <td>'+item.code+'</td>'
+                         + '  <td>'+item.card+'</td>'
+                         + '  <td>' + item.lastName +'</td>'
+                         + '    <td>' + item.firstName +'</td>'
+                         + '    <td class="text-center">'
+                         + '       <a class="btn btn-success btn-sm"'
+                         + '           onclick="GetAddNhanVienSua(\'' + item.id + '\',\'' + item.code +'\')" title="Thêm">'
+                         + '            <i class="fas fa-plus"></i>'
+                         + '         </a>'
+                         + '       </td>'
+                         + '     </tr >';
+
+                    $('#tableNVIENSua').append(str);
+                });
+
+            }
+        });
+        e.preventDefault();
+    });
+
+    //GetAddNhanVienSua,,ajaxNhanVien
+    function GetAddNhanVienSua(id,code)
+    {
+        $("#idGVSua").val(id);
+        $('#IdResponsibleSua').val(id);
+        document.getElementById('ShowNVSua').innerHTML = code;
+        $('#exampleGiaoViecSua').modal('hide');
+    }
+</script>
+
+<script>
+    var frmAddSua = $('#UpdateSaveNVLSua');
+    frmAddSua.submit(function (e) {
+        var btn = $("#idGVSua").val();
+        if (btn=="") {
+            toastr.error('Vui lòng chọn người nhận kế hoạch');
+        } else {
+            var date = $("#DateSua").val();
+            var note = $("#NoteSua").val();
+            var name = $("#NameSua").val();
+            var code = $("#CodeUpdate").val();
+            var id = $("#idUpdateKH").val();
+
+            var bundle =
+            {
+                Id: id,
+                Name: name,
+                Code: code,
+                Note: note,
+                IdResponsible: btn,
+                ExpectedDate: date
+            };
+            $.ajax({
+                type: "PUT",
+                url: "@Url.Action("Update")",
+                data: bundle,
+                dataType: "json",
+                 success: function (msg) {
+                     toastr.success('Cập nhật thành công');
+                     $('#UpdateSaveNVL').trigger("reset");
+                     document.getElementById('ShowNVSua').innerHTML = "";
+
+                     var nameSet = "TenKHView" + id;
+                     var noteSet = "GhiChuView" + id;
+                     var resSet = "NguoiNhanView" + id;
+                     var dateSet = "NgayDuKienView" + id
+
+                     var nvduyet = "#NVDuyet-" + id;
+                     $(nvduyet).val(msg.resultObj.nameResponsible);
+
+                     document.getElementById(nameSet).innerHTML = msg.resultObj.name;
+                     document.getElementById(noteSet).innerHTML = msg.resultObj.note;
+                     document.getElementById(resSet).innerHTML = msg.resultObj.codeResponsible;
+                     document.getElementById(dateSet).innerHTML = msg.resultObj.expectedDate;
+                     var du = "#DurationShow-" + id;
+                     $(du).val(msg.resultObj.duration);
+                     $("#exampleEditKH").modal("hide");
+                     var ribonDe = "#DeRibbon-" + id;
+                     if (msg.resultObj.duration) {
+                         $(ribonDe).remove();
+                     } else {
+                         $(ribonDe).remove();
+                         var str = '<div class="ribbon-wrapper" id="DeRibbon-'+id+'"> '
+                             + ' <div class="ribbon bg-danger"> '
+                             + '     Hết Hạn '
+                             + '</div> '
+                             + ' </div> ';
+                         var top = "#topShow" + id;
+                         $(top).prepend(str);
+
+                     }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Cập nhật thất bại');
+                }
+            });
+
+        }
+
+        e.preventDefault();
+    });
+</script>

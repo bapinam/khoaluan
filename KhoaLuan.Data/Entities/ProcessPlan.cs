@@ -13,7 +13,7 @@ namespace KhoaLuan.Data.Entities
         public DateTime CreatedDate { get; set; }
         public DateTime ExpectedDate { get; set; }
         public string Note { get; set; }
-        public bool Status { set; get; }
+        public StatusProcessPlan Status { set; get; }
         public bool Censorship { set; get; }
         public List<ProcessingDetail> ProcessingDetails { get; set; }
 
@@ -21,5 +21,7 @@ namespace KhoaLuan.Data.Entities
         public Guid IdCreator { get; set; }
         public AppUser Responsible { get; set; }
         public Guid IdResponsible { get; set; }
+        public AppUser Authority { get; set; }
+        public Guid? IdAuthority { get; set; }
     }
 }

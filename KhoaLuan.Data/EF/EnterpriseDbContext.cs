@@ -33,6 +33,7 @@ namespace KhoaLuan.Data.EF
             modelBuilder.ApplyConfiguration(new ProductCF());
             modelBuilder.ApplyConfiguration(new ProductTypeGroupCF());
             modelBuilder.ApplyConfiguration(new ManageCodeCF());
+            modelBuilder.ApplyConfiguration(new NotificationCF());
 
             modelBuilder.ApplyConfiguration(new AppUserCF());
             modelBuilder.ApplyConfiguration(new AppRoleCF());
@@ -68,6 +69,7 @@ namespace KhoaLuan.Data.EF
 
         //public DbSet<VIngredientRecipe> VIngredientRecipes { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<ManageCode> ManageCodes { get; set; }
         public DbSet<ProcessingDetail> ProcessingDetails { get; set; }
         public DbSet<RecipeDetail> RecipeDetails { get; set; }

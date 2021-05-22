@@ -47,5 +47,19 @@ namespace KhoaLuan.API.Controllers
             var result = await _notificationService.Delete(id);
             return Ok(result);
         }
+
+        [HttpDelete("all/{name}")]
+        public async Task<IActionResult> DeleteAll(string name)
+        {
+            var result = await _notificationService.DeleteAll(name);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateView bundle)
+        {
+            var result = await _notificationService.Update(bundle);
+            return Ok(result);
+        }
     }
 }

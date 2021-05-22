@@ -19,6 +19,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
             builder.Property(x => x.Prioritize).HasDefaultValue(false);
             builder.Property(x => x.Note).HasMaxLength(250);
+            builder.HasIndex(p => new { p.Code, p.Name }).IsUnique();
 
             builder.HasOne(x => x.Product).WithMany(x => x.Recipes).HasForeignKey(x => x.IdProduct);
         }

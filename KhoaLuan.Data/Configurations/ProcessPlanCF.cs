@@ -23,6 +23,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Status).HasDefaultValue(StatusProcessPlan.Processing);
             builder.Property(x => x.Censorship).HasDefaultValue(false);
             builder.Property(x => x.Note).HasMaxLength(250);
+            builder.HasIndex(x => x.Code).IsUnique();
 
             builder.HasOne(x => x.Creator).WithMany(x => x.ProcessPlanCreators).HasForeignKey(x => x.IdCreator);
             builder.HasOne(x => x.Responsible).WithMany(x => x.ProcessPlanResponsibles).HasForeignKey(x => x.IdResponsible);

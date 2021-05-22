@@ -139,9 +139,18 @@ namespace KhoaLuan.Data.Extensions
                     PackType = PackType.Materials,
                     IdMaterials = 1
                 },
+                new Pack()
+                {
+                    Id = 3,
+                    Name = "Trái",
+                    Value = 1,
+                    Default = true,
+                    PackType = PackType.Materials,
+                    IdMaterials = 2
+                },
                  new Pack()
                  {
-                     Id = 3,
+                     Id = 4,
                      Name = "Bánh",
                      Value = 1,
                      Default = true,
@@ -162,78 +171,6 @@ namespace KhoaLuan.Data.Extensions
                   Address = "Cần Thơ"
               }
               );
-
-            modelBuilder.Entity<OrderPlan>().HasData(
-              new OrderPlan()
-              {
-                  Id = 1,
-                  Code = "KHDH1",
-                  Name = "Đặt hàng bột gạo và cam",
-                  CreatedDate = DateTime.Now,
-                  ExpectedDate = DateTime.Now,
-                  Status = StatusOrderPlan.Accomplished,
-                  Censorship = true,
-                  IdResponsible = adminId,
-                  IdCreator = adminId
-              }
-              );
-
-            modelBuilder.Entity<OrderDetail>().HasData(
-               new OrderDetail()
-               {
-                   Id = 1,
-                   Amount = 2,
-                   Unit = "kg",
-                   IdOrderPlan = 1,
-                   IdMaterials = 1
-               },
-               new OrderDetail()
-               {
-                   Id = 2,
-                   Amount = 3,
-                   Unit = "Trái",
-                   IdOrderPlan = 1,
-                   IdMaterials = 2,
-                   IdSupplier = 1
-               }
-               );
-
-            modelBuilder.Entity<Bill>().HasData(
-               new Bill()
-               {
-                   Id = 1,
-                   CodeBill = "01",
-                   StorageCode = "AP1",
-                   PurchaseDate = DateTime.Now,
-                   CreatedDate = DateTime.Now,
-                   PaymentStatus = PaymentStatus.Paid,
-                   AmountPaid = 50000,
-                   IdSupplier = 1,
-                   IdPlan = 1,
-                   IdCreator = adminId
-               }
-               );
-
-            modelBuilder.Entity<BillDetail>().HasData(
-               new BillDetail()
-               {
-                   Id = 1,
-                   Unit = "kg",
-                   Amount = 2,
-                   Price = 30000,
-                   IdMaterials = 1,
-                   IdBill = 1
-               },
-               new BillDetail()
-               {
-                   Id = 2,
-                   Unit = "Trái",
-                   Amount = 3,
-                   Price = 20000,
-                   IdMaterials = 1,
-                   IdBill = 1
-               }
-               );
 
             modelBuilder.Entity<Recipe>().HasData(
              new Recipe()
@@ -264,30 +201,6 @@ namespace KhoaLuan.Data.Extensions
                   IdMaterials = 2
               }
              );
-
-            modelBuilder.Entity<ProcessPlan>().HasData(
-              new ProcessPlan()
-              {
-                  Id = 1,
-                  Code = "KHCB1",
-                  Name = "Chế Biến bánh cam",
-                  CreatedDate = DateTime.Now,
-                  ExpectedDate = DateTime.Now,
-                  IdResponsible = adminId,
-                  IdCreator = adminId
-              }
-              );
-
-            modelBuilder.Entity<ProcessingDetail>().HasData(
-               new ProcessingDetail()
-               {
-                   Id = 1,
-                   Amount = 1,
-                   Unit = "Bánh",
-                   IdRecipe = 1,
-                   IdProcessPlan = 1
-               }
-               );
         }
     }
 }

@@ -36,6 +36,8 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         [HttpGet]
         public async Task<IActionResult> GetFiveNotifications(string name)
         {
+            // name nay la gi vay? username ,ak?ddusng roi anh
+            // name nay la user dang login? dung roi anh, sao ko lay tu cookie ? em
             var result = await _notificationApiClient.GetFiveNotifications(name);
             return Ok(result);
         }
@@ -51,6 +53,20 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         public async Task<IActionResult> Delete(long id)
         {
             var result = await _notificationApiClient.Delete(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAll(string name)
+        {
+            var result = await _notificationApiClient.DeleteAll(name);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateView bundle)
+        {
+            var result = await _notificationApiClient.Update(bundle);
             return Ok(result);
         }
     }

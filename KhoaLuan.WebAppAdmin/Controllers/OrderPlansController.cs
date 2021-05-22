@@ -51,6 +51,13 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetListPacksById(int id)
+        {
+            var result = await _orderPlanApiClient.GetListPacksById(id);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateOrderPlan bundle)
         {
@@ -59,6 +66,7 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetEmployee(string key)
         {
             var result = await _orderPlanApiClient.GetEmployee(key);

@@ -24,6 +24,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Amount).HasDefaultValue(0);
             builder.Property(x => x.ReminderStartDate).HasDefaultValue(DateTime.Now);
             builder.Property(x => x.ReminderEndDate).HasDefaultValue(DateTime.Now);
+            builder.HasIndex(p => new { p.Code, p.Name }).IsUnique();
 
             builder.HasOne(x => x.ProductType).WithMany(x => x.Products).HasForeignKey(x => x.IdProductType);
         }

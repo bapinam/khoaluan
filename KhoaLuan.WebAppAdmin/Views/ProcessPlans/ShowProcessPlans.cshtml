@@ -148,7 +148,7 @@
            + '                    <div class="card-body">'
            + '      <div class="modal-body">'
             + '             <div class="form-group">'
-            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <label>Tên Kế Hoạch:</label>'
             + '                 <span class="form-control" id="TenKHView'+item.id+'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.name
             + '      </span>'
@@ -260,11 +260,13 @@
     </div>
 </div>
 
+
 <script>
      function GetDeleteKH(id, count) {
         $("#exampleDeleteKH").modal("show");
         $("#idKHDeleteC").val(id);
     }
+
     function ajaxDeleteKH()
     {
         var idKH = $("#idKHDeleteC").val();
@@ -289,7 +291,6 @@
         });
     }
 </script>
-
 <!--Duyệt đơn hàng-->
 <script>
     function GetSaveCen(id, count, name) {
@@ -328,13 +329,20 @@
                     ShowCensorship();
                     $("#exampleHoiDuyet").modal("hide");
 
-                    // gửi singralR đến người nhận
+                    // ben nay gui va luu duyet... kem theo gui qua
                     var user = namenv;
                     var message = namenv;
+                    // Lưu tin nhắn
+                    var path = "/ProcessPlans/Index";
+                    var content = "Kế hoạch chế biến";
+                    CreateNotification(content, path, user, message);
 
-                          connection.invoke("SendMessage", user, message).catch(function (err) {
-                                return console.error(err.toString());
-                          });
+                    // gửi singralR đến người nhận
+
+                          //connection.invoke("SendMessage", user, message).catch(function (err) {
+                          //      return console.error(err.toString());
+                          //});
+
                           event.preventDefault();
                 },
                 error: function (req, status, error) {

@@ -117,14 +117,16 @@ namespace KhoaLuan.Service.OrderPlanService
             oderPlan.IdCreator = user.Id;
 
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            var stt = 1;
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
             var checkCode = await _context.OrderPlans.AnyAsync(x => x.Code == str);
             if (checkCode)
             {
+                stt++;
                 goto Location;
             }
 
@@ -433,6 +435,22 @@ namespace KhoaLuan.Service.OrderPlanService
             }).FirstOrDefaultAsync();
 
             return new ApiSuccessResult<GetByOrderPlan>(result);
+        }
+
+        public async Task<List<GetListPacksById>> GetListPacksById(int id)
+        {
+            var pack = await _context.Materials.Include(x => x.Packs)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            var result = pack.Packs.Select(
+                x => new GetListPacksById()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Default = x.Default,
+                    Value = x.Value
+                }).ToList();
+            return new List<GetListPacksById>(result);
         }
     }
 }

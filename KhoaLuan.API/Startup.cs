@@ -95,51 +95,53 @@ namespace KhoaLuan.API
             });
 
             //Declare DI
-            services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient<IManageCodeService, ManageCodeService>();
-            services.AddTransient<IProcessPlanService, ProcessPlanService>();
-            services.AddTransient<IProcessingDetailService, ProcessingDetailService>();
-            services.AddTransient<IRecipeService, RecipeService>();
-            services.AddTransient<IProductTypeGroupService, ProductTypeGroupService>();
-            services.AddTransient<IProductTypeService, ProductTypeService>();
-            services.AddTransient<IProductService, ProductService>();
-            services.AddTransient<ISupplierService, SupplierService>();
-            services.AddTransient<IMaterialService, MaterialService>();
-            services.AddTransient<IMaterialsTypeService, MaterialsTypeService>();
-            services.AddTransient<IOrderPlanService, OrderPlanService>();
-            services.AddTransient<IBillService, BillService>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IRoleService, RoleService>();
+            // doi voi db thi nen dung Scoped, ko nen dung Transient, do la li do tai sao return ve 15, nhung debug ra 16
+            // Transient thi lifetime cua no la moi khi dc inject no se thanh new instance, scoped la xuyen suot Request
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IManageCodeService, ManageCodeService>();
+            services.AddScoped<IProcessPlanService, ProcessPlanService>();
+            services.AddScoped<IProcessingDetailService, ProcessingDetailService>();
+            services.AddScoped<IRecipeService, RecipeService>();
+            services.AddScoped<IProductTypeGroupService, ProductTypeGroupService>();
+            services.AddScoped<IProductTypeService, ProductTypeService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<IMaterialService, MaterialService>();
+            services.AddScoped<IMaterialsTypeService, MaterialsTypeService>();
+            services.AddScoped<IOrderPlanService, OrderPlanService>();
+            services.AddScoped<IBillService, BillService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
 
-            services.AddTransient<UserManager<AppUser>, UserManager<AppUser>>();
-            services.AddTransient<SignInManager<AppUser>, SignInManager<AppUser>>();
-            services.AddTransient<RoleManager<AppRole>, RoleManager<AppRole>>();
+            services.AddScoped<UserManager<AppUser>, UserManager<AppUser>>();
+            services.AddScoped<SignInManager<AppUser>, SignInManager<AppUser>>();
+            services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
 
-            services.AddTransient<IStorageService, FileStorageService>();
+            services.AddScoped<IStorageService, FileStorageService>();
 
             // Khai báo fluent validation
-            services.AddTransient<IValidator<CreateMaterialsType>, CreateMaterialsTypeValidor>();
-            services.AddTransient<IValidator<UpdateMaterialsType>, UpdateMaterialsTypeValidor>();
+            services.AddScoped<IValidator<CreateMaterialsType>, CreateMaterialsTypeValidor>();
+            services.AddScoped<IValidator<UpdateMaterialsType>, UpdateMaterialsTypeValidor>();
 
-            services.AddTransient<IValidator<MaterialCreate>, MaterialCreateValidator>();
-            services.AddTransient<IValidator<MaterialUpdate>, MaterialUpdateValidator>();
+            services.AddScoped<IValidator<MaterialCreate>, MaterialCreateValidator>();
+            services.AddScoped<IValidator<MaterialUpdate>, MaterialUpdateValidator>();
 
-            services.AddTransient<IValidator<CreateProductTypeGroup>, CreateProductTypeGroupValidor>();
-            services.AddTransient<IValidator<UpdateProductTypeGroup>, UpdateProductTypeGroupValidor>();
+            services.AddScoped<IValidator<CreateProductTypeGroup>, CreateProductTypeGroupValidor>();
+            services.AddScoped<IValidator<UpdateProductTypeGroup>, UpdateProductTypeGroupValidor>();
 
-            services.AddTransient<IValidator<ProductCreate>, ProductCreateValidator>();
-            services.AddTransient<IValidator<ProductUpdate>, ProductUpdateValidator>();
+            services.AddScoped<IValidator<ProductCreate>, ProductCreateValidator>();
+            services.AddScoped<IValidator<ProductUpdate>, ProductUpdateValidator>();
 
-            services.AddTransient<IValidator<CreateProductType>, CreateProductTypeValidor>();
-            services.AddTransient<IValidator<UpdateProductType>, UpdateProductTypeValidor>();
+            services.AddScoped<IValidator<CreateProductType>, CreateProductTypeValidor>();
+            services.AddScoped<IValidator<UpdateProductType>, UpdateProductTypeValidor>();
 
-            services.AddTransient<IValidator<SupplierCreate>, SupplierCreateValidator>();
-            services.AddTransient<IValidator<SupplierUpdate>, SupplierUpdateValidator>();
+            services.AddScoped<IValidator<SupplierCreate>, SupplierCreateValidator>();
+            services.AddScoped<IValidator<SupplierUpdate>, SupplierUpdateValidator>();
 
-            services.AddTransient<IValidator<RegisterRequest>, RegisterRequestValidator>();
-            services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
-            services.AddTransient<IValidator<UserUpdatePassword>, UserUpdatePasswordValidator>();
-            services.AddTransient<IValidator<UserUpdateRequest>, UserUpdateRequestValidator>();
+            services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
+            services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+            services.AddScoped<IValidator<UserUpdatePassword>, UserUpdatePasswordValidator>();
+            services.AddScoped<IValidator<UserUpdateRequest>, UserUpdateRequestValidator>();
 
             //-------
             services.AddControllers()

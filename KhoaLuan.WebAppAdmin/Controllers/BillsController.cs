@@ -40,6 +40,13 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CombinedBills(CombinedBills bundle)
+        {
+            var result = await _billApiClient.CombinedBills(bundle);
+            return Ok(result);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetByIdOrderPlanBills(long id)
         {
@@ -51,6 +58,20 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         public async Task<IActionResult> GetAllSuppliers(string key)
         {
             var result = await _billApiClient.GetAllSuppliers(key);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CancelBills(long id)
+        {
+            var result = await _billApiClient.CancelBills(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SplitBills(long id)
+        {
+            var result = await _billApiClient.SplitBills(id);
             return Ok(result);
         }
 

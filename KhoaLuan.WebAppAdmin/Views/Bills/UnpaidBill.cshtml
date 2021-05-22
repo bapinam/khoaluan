@@ -244,7 +244,7 @@
                    GetByOrderPlanBills("");
 
                } else {
-                   toastr.error('Xóa thất bại');
+                   toastr.error(msg.message);
 
                }
             },
@@ -287,7 +287,6 @@
                    toastr.success('Cập nhật thành công');
                    $("#exampleEditMoeny").modal("hide");
                    location.reload();
-
 
                } else {
                    toastr.error('Cập nhật thất bại');

@@ -35,6 +35,13 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("pack/{id}")]
+        public async Task<IActionResult> GetListPacksById(int id)
+        {
+            var result = await _orderPlanService.GetListPacksById(id);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderPlan request)
         {

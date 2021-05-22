@@ -70,26 +70,27 @@
                     </a>
                 </li>
             </ul>
-
             <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">             
+            <ul class="navbar-nav ml-auto">
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown" onclick="ShowResetTB()">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">0</span>
+                        <span class="badge badge-warning navbar-badge" id="SoThongBao">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header" id="SoThongBao">0 Tin Thông Báo</span>
+                        <span class="dropdown-item dropdown-header" id="CountThongBao">0 Tin</span>
                         <div id="ThongBaoNhan">
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-briefcase mr-2"></i> NHIỆM VỤ
-                                <span class="float-right text-muted text-sm">3 mins</span>
-                            </a>
-                        </div>                   
+                            <div id="ShowThongBaoNhan">
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-briefcase mr-2"></i> NHIỆM VỤ
+                                    <span class="float-right text-muted text-sm">3 mins</span>
+                                </a>
+                            </div>
+                        </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">Xem Tất Cả</a>
+                        <a href="/Notifications/Index?name=@User.Identity.Name.ToString()" class="dropdown-item dropdown-footer">Xem Tất Cả</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown open" style="padding-top: 8px;">
@@ -133,7 +134,7 @@
                                 <a asp-controller="Bills" asp-action="Index"><i class="fa fa-file-text-o" style="color:#F1AF00"></i> &nbsp;Hóa Đơn</a>
                             </li>
                             <li>
-                                <a asp-controller="CheBien" asp-action="Index"><i class="fa fa-cogs"></i> &nbsp;Chế Biến</a>
+                                <a asp-controller="ProcessingDetails" asp-action="Index"><i class="fa fa-cogs"></i> &nbsp;Chế Biến</a>
                             </li>
                         </ul>
                     </div>
@@ -150,7 +151,7 @@
                     </div>
 
                     @{ var records = User.Claims.Any(x => x.Value == SystemConstants.ListRole.Admin
-                                                               || x.Value == SystemConstants.ListRole.RecordsManagement); }
+                                                                     || x.Value == SystemConstants.ListRole.RecordsManagement); }
                     <div class="menu_section">
                         @{ if (records)
                             { <h3>Hồ Sơ</h3>}}
@@ -225,7 +226,8 @@
             <i class="fas fa-chevron-up"></i>
         </a>
     </div>
-
+    <!--Thông Báo-->
+    @await Html.PartialAsync("Notification")
     <!--Modal Cập nhật mật khẩu-->
     <div class="modal fade" id="examplePassWord" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

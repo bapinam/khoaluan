@@ -150,7 +150,7 @@
                                     <th>Tên</th>
                                     <th style="width:140px;">ĐVT</th>
                                     <th style="width:100px;">Số Lượng</th>
-                                    <th class="text-center">Xóa</th>
+                                    <th class="text-center">Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody id="tableAdd">
@@ -241,6 +241,52 @@
         </div>
     </div>
 </div>
+<!--Modal showw pack-->
+<div class="modal fade bd-example-modal-lg" id="examplePack" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Bảng Chuyển Đổi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">ĐVT (mặc định)</label>
+                        <input id="PackMD" class="form-control" disabled />
+                        <small>Giả sử: 1 ĐVT = 100 ĐVT (mặc định)</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Số Lượng Nhập</label>
+                        <input id="PackSL" class="form-control" disabled />
+                    </div>
+                </div>
+                <table id="tableNhPack" class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ĐVT</th>
+                            <th>Giá Trị</th>
+                            <th>Chuyển Đổi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableNPacketert">
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function addClassFunc1() {
         var id1 = document.getElementById('class1');
@@ -380,10 +426,6 @@
                              ' <td>' + item.amount + '</td>' +
                              ' <td class="text-center py-0 align-middle">' +
                              ' <div class="btn-group btn-group-sm">' +
-                             //'   <a class="btn btn-success" data-toggle="modal" data-target="#exampleView"' +
-                             //'     onclick="GetView()" title="Xem">' +
-                             //'      <i class="fas fa-eye"></i>' +
-                             //'  </a>' +
                              '  <a class="btn btn-primary"' +
                              '     onclick="GetAdd('+item.id+',\''+item.name+'\','+item.amount+','+item.max+')" title="Thêm">' +
                              '      <i class="fas fa-plus"></i>' +
@@ -452,6 +494,10 @@
                 '</td>' +
                 ' <td class="text-center py-0 align-middle">' +
                 ' <div class="btn-group btn-group-sm">' +
+                '       <a class="btn btn-success" data-toggle="modal" data-target="#examplePack"' +
+                '         onclick="GetViewAmount(' + id + ')" title="Xem">' +
+                '         <i class="fas fa-question"></i>' +
+                '     </a>' +
                 '   <a class="btn btn-danger"' +
                 '     onclick="GetDelete(' + id + ')" title="Xóa">' +
                 '      <i class="fa fa-minus"></i>' +
@@ -530,7 +576,7 @@
          $.ajax({
              type: "GET",
               url: "@Url.Action("GetAll","ManageCodes")",
-          //   url: "/ManageCodes/GetAll?type=" + typeMVL,     
+          //   url: "/ManageCodes/GetAll?type=" + typeMVL,
              data: {type: typeMVL} ,
              dataType: "json",
           //   cache: false,
@@ -598,4 +644,50 @@
         document.getElementById('ShowNV').innerHTML = code;
         $('#exampleGiaoViec').modal('hide');
     }
+
+    function GetViewAmount(id) {
+        $("#tableNPacketert").remove();
+        $("#tableNhPack").append('<tbody id="tableNPacketert"></tbody>');
+        var dvt = "#Se-" + id;
+        var amount = "#SL-" + id;
+        var unit = $(dvt).val();
+        var sl = $(amount).val();
+        $("#PackSL").val(sl);
+
+         $.ajax({
+            type: "GET",
+            url: "@Url.Action("GetListPacksById")",
+             data: { id: id},
+            dataType: "json",
+            success: function (data) {
+                data.forEach(function (item) {
+                    if (item.default) {
+                        $("#PackMD").val(item.name);
+                    }
+                    else {
+                        var slN = sl * item.value;
+                        if (item.name == unit) {
+                            var str = '<tr>'
+                                + '<td style="color:red;">' + item.name + '</td>'
+                                + '<td style="color:red;">' + item.value + '</td>'
+                                + '<td style="color:red;">' + slN + '</td>'
+                                + '</tr> ';
+                        }
+                        else {
+                            var str = '<tr>'
+                                + '<td>' + item.name + '</td>'
+                                + '<td>' + item.value + '</td>'
+                                + '<td>' + slN + '</td>'
+                                + '</tr> ';
+                        }
+                        $("#tableNPacketert").append(str);
+
+                    }
+
+                });
+            }
+        });
+    }
 </script>
+
+

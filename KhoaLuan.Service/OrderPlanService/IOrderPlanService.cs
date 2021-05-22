@@ -36,5 +36,7 @@ namespace KhoaLuan.Service.OrderPlanService
         Task<ApiResult<GetOrderPlan>> GetOrderPlan(long id);
 
         Task<ApiResult<long>> Update(UpdateOrderPlan bundle);
+
+        Task<List<GetListPacksById>> GetListPacksById(int id);
     }
 }

@@ -130,14 +130,16 @@ namespace KhoaLuan.Service.MaterialsTypeService
         {
             var materialsType = _mapper.Map<MaterialsType>(bundle);
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            var stt = 1;
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
             var checkCode = await _context.MaterialsTypes.AnyAsync(x => x.Code == str);
             if (checkCode)
             {
+                stt++;
                 goto Location;
             }
 

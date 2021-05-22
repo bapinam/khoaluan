@@ -104,5 +104,28 @@ namespace KhoaLuan.WebAppAdmin.Services
             var result = await Update(url, httpContent);
             return result;
         }
+
+        public async Task<ApiResult<bool>> CancelBills(long id)
+        {
+            var url = $"/api/Bill/cance-bill/{id}";
+            var result = await GetIdAsync<bool>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> SplitBills(long id)
+        {
+            var url = $"/api/Bill/split-bill/{id}";
+            var result = await GetIdAsync<bool>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> CombinedBills(CombinedBills bundle)
+        {
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"/api/Bill/combined-bills";
+            var result = await Create<bool>(url, httpContent);
+            return result;
+        }
     }
 }

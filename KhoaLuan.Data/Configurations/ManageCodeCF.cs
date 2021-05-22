@@ -20,6 +20,8 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Name).IsRequired().HasMaxLength(20);
             builder.Property(x => x.Top).HasDefaultValue(false);
             builder.Property(x => x.Location).HasDefaultValue(0);
+
+            builder.HasIndex(p => p.Name).IsUnique();
         }
     }
 }

@@ -57,8 +57,11 @@
                             <h4>Danh Sách Tìm Kiếm</h4>
                         </div>
                         <div class="card-body">
-                            <div id="bodyIdTable">
+                            <div id="showbodyIdTable">
+                                <div id="bodyIdTable">
+                                </div>
                             </div>
+                           
                         </div>
                     </div>
                 </div>
@@ -279,7 +282,11 @@
         var str = '<option selected>Chọn dữ liệu...</option>';
         $("#ProductType").append(str);
     }
+    function DeleteFormTimKiem() {
 
+        $('#bodyIdTable').remove();
+        $("#showbodyIdTable").append('<div id="bodyIdTable"></div >');
+    }
     // tìm kiếm
     var frmTK = $("#frmTK");
     frmTK.submit(function (e) {
@@ -300,6 +307,7 @@
               data: { id: idType, key: key},
              dataType: "json",
                      success: function (msg) {
+                         DeleteFormTimKiem();
                          var i = 0;
                   msg.forEach(function (item) {
                       i++;

@@ -54,7 +54,7 @@ namespace KhoaLuan.Data.Migrations
                         new
                         {
                             Id = new Guid("88a28f0b-99cd-4893-ab70-0189c8c7fec5"),
-                            ConcurrencyStamp = "769fd1e8-bc22-4e26-aae5-fb44a2e8d9a0",
+                            ConcurrencyStamp = "a4d10c53-42fc-423d-a375-29f2e0f84e03",
                             Description = "Vai trò Administrator",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -166,6 +166,9 @@ namespace KhoaLuan.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("Code", "Card")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers");
 
                     b.HasData(
@@ -178,7 +181,7 @@ namespace KhoaLuan.Data.Migrations
                             BirthDay = new DateTime(2020, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Card = "0123456789",
                             Code = "Admin",
-                            ConcurrencyStamp = "f4cc6f80-205c-4414-a82c-2ee8f057e956",
+                            ConcurrencyStamp = "ae5cc740-9e22-4007-91ac-b8001d258bff",
                             Email = "khoaluan@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Nam",
@@ -188,7 +191,7 @@ namespace KhoaLuan.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "khoaluan@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAEAACcQAAAAED4s7sdH/L8TEhEKuPFCvDBPR9lL8W2GVqTrPAz832mukdngPcoX+2Yq8/0wFTrZHA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEI20QoH6W9IhIU32THJX5rPGDk4/D8SLmWxWuySOvjnpwVCaQ0rLDVD0KAOEEaOJRw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -219,7 +222,7 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 816, DateTimeKind.Local).AddTicks(1147));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 819, DateTimeKind.Local).AddTicks(2864));
 
                     b.Property<Guid>("IdCreator")
                         .HasColumnType("uniqueidentifier");
@@ -241,7 +244,7 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 818, DateTimeKind.Local).AddTicks(2078));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 820, DateTimeKind.Local).AddTicks(8182));
 
                     b.Property<string>("StorageCode")
                         .IsRequired()
@@ -264,23 +267,10 @@ namespace KhoaLuan.Data.Migrations
 
                     b.HasIndex("IdSupplier");
 
-                    b.ToTable("Bills");
+                    b.HasIndex("StorageCode")
+                        .IsUnique();
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            AmountPaid = 50000m,
-                            CodeBill = "01",
-                            CreatedDate = new DateTime(2021, 5, 19, 19, 43, 37, 996, DateTimeKind.Local).AddTicks(7675),
-                            IdCreator = new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"),
-                            IdPlan = 1L,
-                            IdSupplier = 1,
-                            PaymentStatus = 1,
-                            PurchaseDate = new DateTime(2021, 5, 19, 19, 43, 37, 996, DateTimeKind.Local).AddTicks(6294),
-                            StorageCode = "AP1",
-                            TotalMoney = 0m
-                        });
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.BillDetail", b =>
@@ -325,28 +315,6 @@ namespace KhoaLuan.Data.Migrations
                     b.HasIndex("IdMaterials");
 
                     b.ToTable("BillDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Amount = 2,
-                            IdBill = 1L,
-                            IdMaterials = 1,
-                            Price = 30000m,
-                            TotalPrice = 0m,
-                            Unit = "kg"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Amount = 3,
-                            IdBill = 1L,
-                            IdMaterials = 1,
-                            Price = 20000m,
-                            TotalPrice = 0m,
-                            Unit = "Trái"
-                        });
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.ManageCode", b =>
@@ -375,6 +343,9 @@ namespace KhoaLuan.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("ManageCodes");
                 });
@@ -425,16 +396,19 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("ReminderEndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 903, DateTimeKind.Local).AddTicks(8976));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 858, DateTimeKind.Local).AddTicks(3620));
 
                     b.Property<DateTime>("ReminderStartDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 903, DateTimeKind.Local).AddTicks(8405));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 858, DateTimeKind.Local).AddTicks(3209));
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdMaterialsType");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("Materials");
 
@@ -450,8 +424,8 @@ namespace KhoaLuan.Data.Migrations
                             Min = 1L,
                             Name = "Bột gạo",
                             Reminder = false,
-                            ReminderEndDate = new DateTime(2021, 5, 19, 19, 43, 37, 988, DateTimeKind.Local).AddTicks(6012),
-                            ReminderStartDate = new DateTime(2021, 5, 19, 19, 43, 37, 988, DateTimeKind.Local).AddTicks(4671)
+                            ReminderEndDate = new DateTime(2021, 5, 21, 14, 16, 19, 927, DateTimeKind.Local).AddTicks(8315),
+                            ReminderStartDate = new DateTime(2021, 5, 21, 14, 16, 19, 927, DateTimeKind.Local).AddTicks(7491)
                         },
                         new
                         {
@@ -464,8 +438,8 @@ namespace KhoaLuan.Data.Migrations
                             Min = 10L,
                             Name = "Cam",
                             Reminder = false,
-                            ReminderEndDate = new DateTime(2021, 5, 19, 19, 43, 37, 988, DateTimeKind.Local).AddTicks(8410),
-                            ReminderStartDate = new DateTime(2021, 5, 19, 19, 43, 37, 988, DateTimeKind.Local).AddTicks(8399)
+                            ReminderEndDate = new DateTime(2021, 5, 21, 14, 16, 19, 928, DateTimeKind.Local).AddTicks(106),
+                            ReminderStartDate = new DateTime(2021, 5, 21, 14, 16, 19, 928, DateTimeKind.Local).AddTicks(96)
                         });
                 });
 
@@ -491,6 +465,9 @@ namespace KhoaLuan.Data.Migrations
                         .UseCollation("SQL_Latin1_General_CP1_CI_AI");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("MaterialsTypes");
 
@@ -533,7 +510,7 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("Time")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 924, DateTimeKind.Local).AddTicks(6334));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 872, DateTimeKind.Local).AddTicks(3894));
 
                     b.Property<bool>("View")
                         .ValueGeneratedOnAdd()
@@ -544,7 +521,7 @@ namespace KhoaLuan.Data.Migrations
 
                     b.HasIndex("IdReceiver");
 
-                    b.ToTable("NotificationCFs");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.OrderDetail", b =>
@@ -599,29 +576,6 @@ namespace KhoaLuan.Data.Migrations
                     b.HasIndex("IdSupplier");
 
                     b.ToTable("OrderDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Amount = 2,
-                            EnterAmount = 0,
-                            IdMaterials = 1,
-                            IdOrderPlan = 1L,
-                            Status = false,
-                            Unit = "kg"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Amount = 3,
-                            EnterAmount = 0,
-                            IdMaterials = 2,
-                            IdOrderPlan = 1L,
-                            IdSupplier = 1,
-                            Status = false,
-                            Unit = "Trái"
-                        });
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.OrderPlan", b =>
@@ -644,12 +598,12 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 867, DateTimeKind.Local).AddTicks(4013));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 841, DateTimeKind.Local).AddTicks(7766));
 
                     b.Property<DateTime>("ExpectedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 867, DateTimeKind.Local).AddTicks(4688));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 841, DateTimeKind.Local).AddTicks(8184));
 
                     b.Property<Guid?>("IdAuthority")
                         .HasColumnType("uniqueidentifier");
@@ -679,6 +633,9 @@ namespace KhoaLuan.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("IdAuthority");
 
                     b.HasIndex("IdCreator");
@@ -686,21 +643,6 @@ namespace KhoaLuan.Data.Migrations
                     b.HasIndex("IdResponsible");
 
                     b.ToTable("OrderPlans");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Censorship = true,
-                            Code = "KHDH1",
-                            CreatedDate = new DateTime(2021, 5, 19, 19, 43, 37, 994, DateTimeKind.Local).AddTicks(2809),
-                            ExpectedDate = new DateTime(2021, 5, 19, 19, 43, 37, 994, DateTimeKind.Local).AddTicks(4036),
-                            IdCreator = new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"),
-                            IdResponsible = new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"),
-                            Name = "Đặt hàng bột gạo và cam",
-                            Order = false,
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.Pack", b =>
@@ -765,6 +707,15 @@ namespace KhoaLuan.Data.Migrations
                         {
                             Id = 3L,
                             Default = true,
+                            IdMaterials = 2,
+                            Name = "Trái",
+                            PackType = 0,
+                            Value = 1L
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Default = true,
                             IdProduct = 1,
                             Name = "Bánh",
                             PackType = 1,
@@ -792,12 +743,12 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 829, DateTimeKind.Local).AddTicks(5129));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 826, DateTimeKind.Local).AddTicks(5205));
 
                     b.Property<DateTime>("ExpectedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 829, DateTimeKind.Local).AddTicks(6223));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 826, DateTimeKind.Local).AddTicks(5677));
 
                     b.Property<Guid?>("IdAuthority")
                         .HasColumnType("uniqueidentifier");
@@ -824,6 +775,9 @@ namespace KhoaLuan.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("IdAuthority");
 
                     b.HasIndex("IdCreator");
@@ -831,20 +785,6 @@ namespace KhoaLuan.Data.Migrations
                     b.HasIndex("IdResponsible");
 
                     b.ToTable("ProcessPlans");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Censorship = false,
-                            Code = "KHCB1",
-                            CreatedDate = new DateTime(2021, 5, 19, 19, 43, 38, 1, DateTimeKind.Local).AddTicks(4),
-                            ExpectedDate = new DateTime(2021, 5, 19, 19, 43, 38, 1, DateTimeKind.Local).AddTicks(1322),
-                            IdCreator = new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"),
-                            IdResponsible = new Guid("0275d5a7-da4a-41c3-85ed-15e53cd1b7a0"),
-                            Name = "Chế Biến bánh cam",
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.ProcessingDetail", b =>
@@ -886,17 +826,6 @@ namespace KhoaLuan.Data.Migrations
                     b.HasIndex("IdRecipe");
 
                     b.ToTable("ProcessingDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Amount = 1,
-                            IdProcessPlan = 1L,
-                            IdRecipe = 1,
-                            Status = false,
-                            Unit = "Bánh"
-                        });
                 });
 
             modelBuilder.Entity("KhoaLuan.Data.Entities.Product", b =>
@@ -945,16 +874,19 @@ namespace KhoaLuan.Data.Migrations
                     b.Property<DateTime>("ReminderEndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 913, DateTimeKind.Local).AddTicks(7810));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 865, DateTimeKind.Local).AddTicks(8998));
 
                     b.Property<DateTime>("ReminderStartDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 19, 19, 43, 37, 913, DateTimeKind.Local).AddTicks(6714));
+                        .HasDefaultValue(new DateTime(2021, 5, 21, 14, 16, 19, 865, DateTimeKind.Local).AddTicks(7627));
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdProductType");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("Products");
 
@@ -970,8 +902,8 @@ namespace KhoaLuan.Data.Migrations
                             Min = 0L,
                             Name = "Bánh Cam",
                             Reminder = false,
-                            ReminderEndDate = new DateTime(2021, 5, 19, 19, 43, 37, 991, DateTimeKind.Local).AddTicks(4309),
-                            ReminderStartDate = new DateTime(2021, 5, 19, 19, 43, 37, 991, DateTimeKind.Local).AddTicks(3003)
+                            ReminderEndDate = new DateTime(2021, 5, 21, 14, 16, 19, 929, DateTimeKind.Local).AddTicks(5439),
+                            ReminderStartDate = new DateTime(2021, 5, 21, 14, 16, 19, 929, DateTimeKind.Local).AddTicks(4651)
                         });
                 });
 
@@ -999,6 +931,9 @@ namespace KhoaLuan.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdProductTypeGroup");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("ProductTypes");
 
@@ -1031,6 +966,9 @@ namespace KhoaLuan.Data.Migrations
                         .UseCollation("SQL_Latin1_General_CP1_CI_AI");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("ProductTypeGroups");
 
@@ -1075,6 +1013,9 @@ namespace KhoaLuan.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdProduct");
+
+                    b.HasIndex("Code", "Name")
+                        .IsUnique();
 
                     b.ToTable("Recipes");
 
@@ -1175,6 +1116,9 @@ namespace KhoaLuan.Data.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.ToTable("Suppliers");
 

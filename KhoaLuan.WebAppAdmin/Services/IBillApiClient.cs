@@ -28,5 +28,11 @@ namespace KhoaLuan.WebAppAdmin.Services
         Task<ApiResult<bool>> Delete(long id);
 
         Task<ApiResult<bool>> UpdateUnpaid(UpdateUnpaid bundle);
+
+        Task<ApiResult<bool>> CancelBills(long id);
+
+        Task<ApiResult<bool>> SplitBills(long id);
+
+        Task<ApiResult<bool>> CombinedBills(CombinedBills bundle);
     }
 }

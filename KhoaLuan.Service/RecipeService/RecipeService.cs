@@ -269,14 +269,16 @@ namespace KhoaLuan.Service.RecipeService
             };
 
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            var stt = 1;
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
             var checkCode = await _context.Recipes.AnyAsync(x => x.Code == str);
             if (checkCode)
             {
+                stt++;
                 goto Location;
             }
 

@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="card-body" style="background-color: #F5F5F5;" >
+        <div class="card-body" style="background-color: #F5F5F5;">
             <section class="content">
                 <div class="container-fluid">
                     <div class="row" id="pePNV">
@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </section>
-        </div>    
+        </div>
     </div>
 </section>
 <script>
@@ -186,27 +186,27 @@
     }
 </script>
 
-<!--Gửi singalR realtime-->
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chat.js"></script>
-<script>
-    "use strict";
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+    <script>
+        "use strict";
 
-    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-    connection.on("ReceiveMessage", function (user, message) {
-            var name = "@User.Identity.Name";
-        if (user == name) {
-            GetMisonOrderPlan(user);
-        }
-    });
+        connection.on("ReceiveMessage", function (user, message) {
+                var name = "@User.Identity.Name";
+            if (user == name) {
+                    GetMisonOrderPlan(user);
+              //  GetShowNotification(user);
+            }
+        });
 
-    // khởi động
-    connection.start().then(function () {
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
-</script>
+        // khởi động
+        connection.start().then(function () {
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+    </script>
 
 <!--In đơn hàng-->
 <script>

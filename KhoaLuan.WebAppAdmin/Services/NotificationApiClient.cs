@@ -45,11 +45,26 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
+        public async Task<ApiResult<bool>> DeleteAll(string name)
+        {
+            var result = await Delete($"/api/Notification/all/" + name);
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> Update(UpdateView bundle)
+        {
+            var json = JsonConvert.SerializeObject(bundle);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"/api/Notification/";
+            var result = await Update(url, httpContent);
+            return result;
+        }
+
         public async Task<ApiResult<PagedResult<GetNotification>>>
             GetAllNotifications(GetNotificationPagingRequest bundle)
         {
             var url = $"/api/Notification/paging?pageIndex=" +
-              $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}";
+              $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}&name={bundle.Name}";
             var result = await GetListAsync<GetNotification>(url);
             return result;
         }

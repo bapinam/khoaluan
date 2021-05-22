@@ -66,6 +66,9 @@ namespace KhoaLuan.WebAppAdmin.Controllers
                 IsPersistent = remember
             };
 
+            // token cua api cu nhet vao cookie la dc roi
+            // nhet luon cai user_id vao cookie, request tu web call sang api thi lay token ra send, con duoi api thi get ra dc user_id, ko can cai name kia
+
             // lưu token vào session
             HttpContext.Session.SetString(SystemConstants.AppSettings.DefaultLanguageId, _configuration[SystemConstants.AppSettings.DefaultLanguageId]);
             HttpContext.Session.SetString(SystemConstants.AppSettings.Token, result.ResultObj);

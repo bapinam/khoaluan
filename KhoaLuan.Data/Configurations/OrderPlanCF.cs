@@ -25,6 +25,8 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Note).HasMaxLength(250);
             builder.Property(x => x.IdAuthority).HasDefaultValue(null);
 
+            builder.HasIndex(x => x.Code).IsUnique();
+
             builder.HasOne(x => x.Creator).WithMany(x => x.OrderPlanCreators).HasForeignKey(x => x.IdCreator);
             builder.HasOne(x => x.Responsible).WithMany(x => x.OrderPlanResponsible).HasForeignKey(x => x.IdResponsible);
             builder.HasOne(x => x.Authority).WithMany(x => x.OrderPlanAuthority).HasForeignKey(x => x.IdAuthority);

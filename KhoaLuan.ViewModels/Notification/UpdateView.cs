@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace KhoaLuan.ViewModels.Notification
 {
-    public class CreateNotification
+    public class UpdateView
     {
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public string NameReceiver { get; set; }
+        public long Id { get; set; }
     }
 }

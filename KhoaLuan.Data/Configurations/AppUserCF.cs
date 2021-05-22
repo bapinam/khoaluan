@@ -20,6 +20,8 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Address).IsRequired().HasMaxLength(250);
             builder.Property(x => x.AccountType).HasDefaultValue(false);
             builder.Property(x => x.PathImage).HasDefaultValue(null);
+
+            builder.HasIndex(p => new { p.Code, p.Card }).IsUnique();
         }
     }
 }

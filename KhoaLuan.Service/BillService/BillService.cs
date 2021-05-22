@@ -104,6 +104,9 @@ namespace KhoaLuan.Service.BillService
             int i = 0;
             var billDetail = new List<BillDetail>();
             double total = 0;
+            List<OrderDetail> listOrderDetails = new List<OrderDetail>();
+            List<Material> listMaterial = new List<Material>();
+
             foreach (var item in bundle.IdMaterials)
             {
                 if (bundle.EnterAmount[i] != 0)
@@ -141,8 +144,26 @@ namespace KhoaLuan.Service.BillService
                         orderDetail.Status = true;
                     }
                     orderDetail.EnterAmount = enterAmountNow;
-                    _context.OrderDetails.Update(orderDetail);
-                    await _context.SaveChangesAsync();
+                    listOrderDetails.Add(orderDetail);
+
+                    // cập nhật số lượng bên nguyên vật liệu
+
+                    var materials = await _context.Materials.Include(x => x.Packs)
+                        .Where(x => x.Id == item).FirstOrDefaultAsync();
+                    var amountDefault = materials.Packs.Where(x => x.Default == true).First();
+                    var materialsDefault = materials.Amount;
+                    if (amountDefault.Name == bundle.Unit[i])
+                    {
+                        materials.Amount = materialsDefault + bundle.EnterAmount[i];
+                    }
+                    else
+                    {
+                        var amountPack = materials.Packs.Where(x => x.Name == bundle.Unit[i]).First();
+
+                        var resultAmount = (long)(bundle.EnterAmount[i]) * amountPack.Value;
+                        materials.Amount = materialsDefault + resultAmount;
+                    }
+                    listMaterial.Add(materials);
                 }
                 i++;
             }
@@ -193,16 +214,17 @@ namespace KhoaLuan.Service.BillService
             // tạo code
             var user = await _userManager.FindByNameAsync(bundle.NameCreator);
             bill.IdCreator = user.Id;
-
+            var stt = 1;
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.StorageCode);
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
             var checkCode = await _context.Bills.AnyAsync(x => x.StorageCode == str);
             if (checkCode)
             {
+                stt++;
                 goto Location;
             }
 
@@ -211,6 +233,13 @@ namespace KhoaLuan.Service.BillService
             await _context.SaveChangesAsync();
 
             bill.StorageCode = str;
+
+            //tạo hóa đơn
+            _context.OrderDetails.UpdateRange(listOrderDetails);
+            _context.Materials.UpdateRange(listMaterial);
+
+            _context.Bills.Add(bill);
+            await _context.SaveChangesAsync();
 
             // cập nhật trạng thái kế hoạch đặt hàng
             var check = true;
@@ -230,9 +259,6 @@ namespace KhoaLuan.Service.BillService
                 orderPlan.Status = StatusOrderPlan.Accomplished;
                 _context.OrderPlans.Update(orderPlan);
             }
-
-            //tạo hóa đơn
-            _context.Bills.Add(bill);
             await _context.SaveChangesAsync();
 
             return new ApiSuccessResult<long>(bill.Id);
@@ -282,17 +308,14 @@ namespace KhoaLuan.Service.BillService
                 bill = _context.Bills.Include(x => x.BillDetails).Include(s => s.OrderPlan)
                     .Where(b => (b.StorageCode.Contains(bundle.Keyword) ||
                     b.CodeBill.Contains(bundle.Keyword) || b.OrderPlan.Code.Contains(bundle.Keyword))
-                    && b.PaymentStatus == PaymentStatus.Paid &&
-                                            b.OrderPlan.Status == StatusOrderPlan.Accomplished);
+                    && b.PaymentStatus == PaymentStatus.Paid);
             }
             else
             {
-                bill = _context.Bills.Include(x => x.BillDetails)
-                                    .Where(b => b.PaymentStatus == PaymentStatus.Paid &&
-                                            b.OrderPlan.Status == StatusOrderPlan.Accomplished);
+                bill = _context.Bills.Include(x => x.BillDetails).Include(s => s.OrderPlan)
+                                    .Where(b => b.PaymentStatus == PaymentStatus.Paid);
             }
 
-            bill = bill.Include(x => x.OrderPlan);
             bill = bill.Include(x => x.Creator);
 
             var result = await bill.OrderByDescending(x => x.Id).
@@ -501,6 +524,8 @@ namespace KhoaLuan.Service.BillService
             }
 
             var billDetails = new List<BillDetail>();
+            List<OrderDetail> listOrderDetails = new List<OrderDetail>();
+            List<Material> listMaterial = new List<Material>();
             var i = 0;
             double total = 0;
             foreach (var item in bundle.IdMaterials)
@@ -531,6 +556,25 @@ namespace KhoaLuan.Service.BillService
                 var amountNew = howAmount + orderD.EnterAmount;
 
                 orderD.EnterAmount = amountNew;
+
+                // cập nhật số lượng bên nguyên vật liệu
+                var materials = await _context.Materials.Include(x => x.Packs)
+                    .Where(x => x.Id == item).FirstOrDefaultAsync();
+                var amountDefault = materials.Packs.Where(x => x.Default == true).First();
+                var materialsDefault = materials.Amount;
+                if (amountDefault.Name == bd.Unit)
+                {
+                    materials.Amount = materialsDefault + howAmount;
+                }
+                else
+                {
+                    var amountPack = materials.Packs.Where(x => x.Name == bd.Unit).First();
+
+                    var resultAmount = (long)(howAmount) * amountPack.Value;
+                    materials.Amount = materialsDefault + resultAmount;
+                }
+                listMaterial.Add(materials);
+
                 // cập nhật số lượng chi tiết đặt hàng
                 if (amountNew >= orderD.Amount)
                 {
@@ -541,8 +585,7 @@ namespace KhoaLuan.Service.BillService
                     orderD.Status = false;
                 }
 
-                _context.OrderDetails.Update(orderD);
-                await _context.SaveChangesAsync();
+                listOrderDetails.Add(orderD);
 
                 bd.Price = (decimal)bundle.Price[i];
                 bd.Discount = bundle.Discount[i];
@@ -551,6 +594,10 @@ namespace KhoaLuan.Service.BillService
 
                 i++;
             }
+
+            List<OrderDetail> listOrderDetailsCreate = new List<OrderDetail>();
+            List<Material> listMaterialCreate = new List<Material>();
+            List<BillDetail> listBillDetailsCreate = new List<BillDetail>();
 
             // khởi tạo thêm nguyên vật liệu vào hóa đơn
             if (bundle.EnterAmountCreate != null)
@@ -585,8 +632,7 @@ namespace KhoaLuan.Service.BillService
                             TotalPrice = (decimal)money,
                             IdMaterials = bundle.IdMaterialsCreate[y]
                         };
-                        _context.BillDetails.Add(billOr);
-
+                        listBillDetailsCreate.Add(billOr);
                         // cập nhật số lượng chi tiết đặt hàng
                         var orderD = await _context.OrderDetails.FirstOrDefaultAsync(x => x.IdOrderPlan == bill.IdPlan);
                         var enterAmountNow = orderD.EnterAmount + bundle.EnterAmountCreate[y];
@@ -599,12 +645,31 @@ namespace KhoaLuan.Service.BillService
                             orderD.Status = false;
                         }
                         orderD.EnterAmount = enterAmountNow;
-                        _context.OrderDetails.Update(orderD);
-                        await _context.SaveChangesAsync();
+                        listOrderDetailsCreate.Add(orderD);
+
+                        // cập nhật số lượng bên nguyên vật liệu
+
+                        var materials = await _context.Materials.Include(x => x.Packs)
+                            .Where(x => x.Id == bundle.IdMaterialsCreate[y]).FirstOrDefaultAsync();
+                        var amountDefault = materials.Packs.Where(x => x.Default == true).First();
+                        var materialsDefault = materials.Amount;
+                        if (amountDefault.Name == bundle.UnitCreate[y])
+                        {
+                            materials.Amount = materialsDefault + create;
+                        }
+                        else
+                        {
+                            var amountPack = materials.Packs.Where(x => x.Name == bundle.UnitCreate[y]).First();
+
+                            var resultAmount = (long)(create) * amountPack.Value;
+                            materials.Amount = materialsDefault + resultAmount;
+                        }
+                        listMaterialCreate.Add(materials);
                     }
                     y++;
                 }
             }
+            //////////////
 
             if (bundle.Tax != 0)
             {
@@ -644,6 +709,18 @@ namespace KhoaLuan.Service.BillService
                 bill.PaymentStatus = PaymentStatus.Paid;
             }
 
+            // Cập nhật hóa đơn và chi tiết hóa đơn
+            _context.OrderDetails.UpdateRange(listOrderDetails);
+            _context.Materials.UpdateRange(listMaterial);
+
+            //Khởi tạo chi tiết hóa đơn
+            _context.BillDetails.AddRange(listBillDetailsCreate);
+            _context.OrderDetails.UpdateRange(listOrderDetailsCreate);
+            _context.Materials.UpdateRange(listMaterialCreate);
+
+            _context.Bills.Update(bill);
+            await _context.SaveChangesAsync();
+
             // cập nhật trạng thái kế hoạch đặt hàng
             var check = true;
             var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
@@ -665,8 +742,6 @@ namespace KhoaLuan.Service.BillService
                 orderPlan.Status = StatusOrderPlan.Unfinished;
             }
             _context.OrderPlans.Update(orderPlan);
-
-            _context.Bills.Update(bill);
             await _context.SaveChangesAsync();
 
             var countBills = await _context.BillDetails.Where(x => x.IdBill == bill.Id).ToListAsync();
@@ -706,51 +781,143 @@ namespace KhoaLuan.Service.BillService
 
             if (delete)
             {
-                await this.Delete(result.Id);
+                await this.DeleteNotMaterials(result.Id);
             }
             return new ApiSuccessResult<ReturnUpdate>(result);
         }
 
+        private async Task<ApiResult<bool>> DeleteNotMaterials(long id)
+        {
+            try
+            {
+                var bill = await _context.Bills
+               .Include(x => x.BillDetails)
+               .Include(x => x.OrderPlan)
+               .FirstOrDefaultAsync(x => x.Id == id);
+
+                List<OrderPlan> listOrderPlan = new List<OrderPlan>();
+                List<OrderDetail> listOrderDetails = new List<OrderDetail>();
+
+                if (bill == null)
+                {
+                    return new ApiErrorResult<bool>("Không tồn tại hóa đơn");
+                }
+
+                if (bill.BillDetails != null)
+                {
+                    foreach (var item in bill.BillDetails)
+                    {
+                        var orderD = await _context.OrderDetails.FirstOrDefaultAsync(x => x.IdOrderPlan == bill.IdPlan
+                      && x.IdMaterials == item.IdMaterials);
+
+                        // cập nhật số lượng orderplan:
+                        var bd = bill.BillDetails.FirstOrDefault(x => x.IdMaterials == item.IdMaterials);
+                        var amountNew = orderD.EnterAmount - bd.Amount;
+
+                        orderD.EnterAmount = amountNew;
+                        orderD.Status = false;
+
+                        listOrderDetails.Add(orderD);
+
+                        var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
+                                       .Where(x => x.Id == bill.IdPlan).FirstOrDefaultAsync();
+                        orderPlan.Status = StatusOrderPlan.Unfinished;
+                        listOrderPlan.Add(orderPlan);
+                    }
+                }
+
+                _context.OrderDetails.UpdateRange(listOrderDetails);
+                _context.OrderPlans.UpdateRange(listOrderPlan);
+
+                _context.Bills.Remove(bill);
+                await _context.SaveChangesAsync();
+
+                return new ApiSuccessResult<bool>();
+            }
+            catch
+            {
+                return new ApiErrorResult<bool>("Xóa thất bại");
+            }
+        }
+
         public async Task<ApiResult<bool>> Delete(long id)
         {
-            var bill = await _context.Bills
-                .Include(x => x.BillDetails)
-                .FirstOrDefaultAsync(x => x.Id == id);
-            if (bill == null)
+            try
             {
-                return new ApiErrorResult<bool>("Không tồn tại hóa đơn");
-            }
+                var bill = await _context.Bills
+               .Include(x => x.BillDetails)
+               .Include(x => x.OrderPlan)
+               .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (bill.BillDetails != null)
-            {
-                foreach (var item in bill.BillDetails)
+                List<Material> listMaterials = new List<Material>();
+                List<OrderPlan> listOrderPlan = new List<OrderPlan>();
+                List<OrderDetail> listOrderDetails = new List<OrderDetail>();
+
+                if (bill == null)
                 {
-                    // cập nhật số lượng:
-                    var bd = bill.BillDetails.FirstOrDefault(x => x.IdMaterials == item.IdMaterials);
-
-                    var orderD = await _context.OrderDetails.FirstOrDefaultAsync(x => x.IdOrderPlan == bill.IdPlan
-                    && x.IdMaterials == item.IdMaterials);
-
-                    var amountNew = orderD.EnterAmount - bd.Amount;
-
-                    orderD.EnterAmount = amountNew;
-                    orderD.Status = false;
-
-                    _context.OrderDetails.Update(orderD);
-
-                    var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
-                                   .Where(x => x.Id == bill.IdPlan).FirstOrDefaultAsync();
-                    orderPlan.Status = StatusOrderPlan.Unfinished;
-                    _context.OrderPlans.Update(orderPlan);
-
-                    await _context.SaveChangesAsync();
+                    return new ApiErrorResult<bool>("Không tồn tại hóa đơn");
                 }
+
+                if (bill.BillDetails != null)
+                {
+                    foreach (var item in bill.BillDetails)
+                    {
+                        var orderD = await _context.OrderDetails.FirstOrDefaultAsync(x => x.IdOrderPlan == bill.IdPlan
+                      && x.IdMaterials == item.IdMaterials);
+
+                        // cập nhật số lượng materials:
+                        var materials = await _context.Materials.Include(x => x.Packs)
+                            .Where(x => x.Id == item.IdMaterials).FirstAsync();
+                        var packDefault = await _context.Packs.
+                            Where(x => x.IdMaterials == materials.Id && x.Default == true).FirstOrDefaultAsync();
+                        var amountM = materials.Amount;
+                        if (packDefault.Name == orderD.Unit)
+                        {
+                            materials.Amount = amountM - orderD.EnterAmount;
+                        }
+                        else
+                        {
+                            var amountPack = materials.Packs.Where(x => x.Name == orderD.Unit).FirstOrDefault();
+
+                            materials.Amount = amountM - ((long)(orderD.EnterAmount) * amountPack.Value);
+                        }
+
+                        if (materials.Amount < 0)
+                        {
+                            return new ApiErrorResult<bool>("Xóa thất bại, vì số lượng mới so với sẵn có không tồn tại");
+                        }
+
+                        listMaterials.Add(materials);
+
+                        // cập nhật số lượng orderplan:
+                        var bd = bill.BillDetails.FirstOrDefault(x => x.IdMaterials == item.IdMaterials);
+                        var amountNew = orderD.EnterAmount - bd.Amount;
+
+                        orderD.EnterAmount = amountNew;
+                        orderD.Status = false;
+
+                        listOrderDetails.Add(orderD);
+
+                        var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
+                                       .Where(x => x.Id == bill.IdPlan).FirstOrDefaultAsync();
+                        orderPlan.Status = StatusOrderPlan.Unfinished;
+                        listOrderPlan.Add(orderPlan);
+                    }
+                }
+
+                _context.Materials.UpdateRange(listMaterials);
+                _context.OrderDetails.UpdateRange(listOrderDetails);
+                _context.OrderPlans.UpdateRange(listOrderPlan);
+
+                _context.Bills.Remove(bill);
+                await _context.SaveChangesAsync();
+
+                return new ApiSuccessResult<bool>();
             }
-
-            _context.Bills.Remove(bill);
-            await _context.SaveChangesAsync();
-
-            return new ApiSuccessResult<bool>();
+            catch
+            {
+                return new ApiErrorResult<bool>("Xóa thất bại");
+            }
         }
 
         public async Task<ApiResult<bool>> UpdateUnpaid(UpdateUnpaid bundle)
@@ -781,6 +948,161 @@ namespace KhoaLuan.Service.BillService
             }
 
             _context.Bills.Update(bill);
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<bool>> CancelBills(long id)
+        {
+            var order = await _context.OrderPlans.FindAsync(id);
+            if (order == null)
+            {
+                return new ApiErrorResult<bool>("Kế hoạch không tồn tại");
+            }
+
+            var bill = await _context.Bills.Where(x => x.IdPlan == id).CountAsync();
+            if (bill < 1)
+            {
+                order.Status = StatusOrderPlan.Cancel;
+                _context.Update(order);
+                await _context.SaveChangesAsync();
+                return new ApiSuccessResult<bool>();
+            }
+            return new ApiErrorResult<bool>("Hủy thất bại, vì có hóa đơn tồn tại một phần kế hoạch. Vui lòng tách!");
+        }
+
+        public async Task<ApiResult<bool>> SplitBills(long id)
+        {
+            var order = await _context.OrderPlans
+                .Include(x => x.OrderDetails)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            var listOrderDetails = new List<OrderDetail>();
+
+            foreach (var item in order.OrderDetails)
+            {
+                var amount = item.Amount - item.EnterAmount;
+                if (amount > 0)
+                {
+                    var orderDetails = new OrderDetail()
+                    {
+                        Amount = amount,
+                        IdMaterials = item.IdMaterials,
+                        IdOrderPlan = item.IdOrderPlan,
+                        IdSupplier = item.IdSupplier,
+                        Price = item.Price,
+                        Unit = item.Unit
+                    };
+                    listOrderDetails.Add(orderDetails);
+                }
+            }
+
+            var stt = 1;
+            Location:
+            string code = order.Code + "-" + stt.ToString();
+
+            var checkCode = await _context.OrderPlans.AnyAsync(x => x.Code == code);
+            if (checkCode)
+            {
+                stt++;
+                goto Location;
+            }
+
+            var orderPlan = new OrderPlan()
+            {
+                Code = code,
+                IdAuthority = order.IdAuthority,
+                IdCreator = order.IdCreator,
+                IdResponsible = order.IdResponsible,
+                Censorship = false,
+                CreatedDate = DateTime.Now,
+                ExpectedDate = DateTime.Now,
+                Name = order.Name + " (Tách)",
+                Note = order.Note,
+                Status = StatusOrderPlan.Unfinished,
+                OrderDetails = listOrderDetails
+            };
+
+            _context.OrderPlans.Add(orderPlan);
+            await _context.SaveChangesAsync();
+
+            order.Status = StatusOrderPlan.Accomplished;
+            var note = order.Note + " (Đã từng tách kế hoạch)";
+            order.Note = note;
+            _context.OrderPlans.Update(order);
+            await _context.SaveChangesAsync();
+
+            return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<bool>> CombinedBills(CombinedBills bundle)
+        {
+            if (bundle.Combined.Length < 2)
+            {
+                return new ApiErrorResult<bool>("Gộp thất bại");
+            }
+            List<OrderDetail> listOrderDetails = new List<OrderDetail>();
+            foreach (var item in bundle.Combined)
+            {
+                var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
+                    .Where(x => x.Id == item).FirstOrDefaultAsync();
+
+                foreach (var x in orderPlan.OrderDetails)
+                {
+                    var orderDetail = new OrderDetail()
+                    {
+                        IdMaterials = x.IdMaterials,
+                        IdSupplier = x.IdSupplier,
+                        Amount = x.Amount - x.EnterAmount,
+                        Note = x.Note,
+                        Price = x.Price,
+                        Unit = x.Unit
+                    };
+                    listOrderDetails.Add(orderDetail);
+                }
+            }
+
+            // tạo code
+            var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            var stt = 1;
+            Location:
+            var location = code.Location + stt;
+
+            var str = code.Name + location;
+
+            var checkCode = await _context.OrderPlans.AnyAsync(x => x.Code == str);
+            if (checkCode)
+            {
+                stt++;
+                goto Location;
+            }
+            var idcreate = await _userManager.FindByNameAsync(bundle.NameCreator);
+
+            var order = new OrderPlan()
+            {
+                Code = str,
+                Name = "(Gộp kế hoạch)",
+                CreatedDate = DateTime.Now,
+                ExpectedDate = DateTime.Now,
+                Note = "(Gộp kế hoạch)",
+                OrderDetails = listOrderDetails,
+                IdCreator = idcreate.Id,
+                IdResponsible = bundle.IdResponsible
+            };
+
+            _context.OrderPlans.Add(order);
+            await _context.SaveChangesAsync();
+
+            List<OrderPlan> orderPlanUpdate = new List<OrderPlan>();
+            foreach (var item in bundle.Combined)
+            {
+                var orderPlan = await _context.OrderPlans.Include(x => x.OrderDetails)
+                    .Where(x => x.Id == item).FirstOrDefaultAsync();
+
+                orderPlan.Status = StatusOrderPlan.Accomplished;
+                orderPlanUpdate.Add(orderPlan);
+            }
+            _context.OrderPlans.UpdateRange(orderPlanUpdate);
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
         }

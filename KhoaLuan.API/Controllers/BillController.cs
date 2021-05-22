@@ -33,6 +33,20 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("cance-bill/{id}")]
+        public async Task<IActionResult> CancelBills(long id)
+        {
+            var result = await _billService.CancelBills(id);
+            return Ok(result);
+        }
+
+        [HttpGet("split-bill/{id}")]
+        public async Task<IActionResult> SplitBills(long id)
+        {
+            var result = await _billService.SplitBills(id);
+            return Ok(result);
+        }
+
         [HttpGet("suppliers/{key}")]
         public async Task<IActionResult> GetAllSuppliers(string key)
         {
@@ -71,6 +85,13 @@ namespace KhoaLuan.API.Controllers
             }
 
             var result = await _billService.GetBillById(resultId.ResultObj);
+            return Ok(result);
+        }
+
+        [HttpPost("combined-bills")]
+        public async Task<IActionResult> CombinedBills([FromBody] CombinedBills bundle)
+        {
+            var result = await _billService.CombinedBills(bundle);
             return Ok(result);
         }
 

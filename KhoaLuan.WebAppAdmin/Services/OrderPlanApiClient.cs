@@ -46,6 +46,13 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
+        public async Task<List<GetListPacksById>> GetListPacksById(int id)
+        {
+            var url = $"/api/OrderPlan/pack/{id}";
+            var result = await GetAll<GetListPacksById>(url);
+            return result;
+        }
+
         public async Task<ApiResult<GetByOrderPlan>> GetByIdOrderPlan(long id)
         {
             var url = $"/api/OrderPlan/view-order-plan/" + $"{id}";

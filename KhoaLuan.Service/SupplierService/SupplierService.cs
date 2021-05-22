@@ -29,14 +29,16 @@ namespace KhoaLuan.Service.SupplierService
             var supplier = _mapper.Map<Supplier>(bundle);
 
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
+            var stt = 1;
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
-            var check = await _context.Suppliers.AnyAsync(x => x.Code == str);
-            if (check)
+            var checkCode = await _context.Suppliers.AnyAsync(x => x.Code == str);
+            if (checkCode)
             {
+                stt++;
                 goto Location;
             }
 

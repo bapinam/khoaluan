@@ -25,6 +25,8 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.TotalMoney).HasDefaultValue(0);
             builder.Property(x => x.PaymentStatus).IsRequired().HasDefaultValue(PaymentStatus.Unpaid);
 
+            builder.HasIndex(p => p.StorageCode).IsUnique();
+
             builder.HasOne(x => x.Supplier).WithMany(x => x.Bills).HasForeignKey(x => x.IdSupplier);
             builder.HasOne(x => x.OrderPlan).WithMany(x => x.Bills).HasForeignKey(x => x.IdPlan);
             builder.HasOne(x => x.Creator).WithMany(x => x.Bills).HasForeignKey(x => x.IdCreator);

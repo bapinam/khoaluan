@@ -21,6 +21,8 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Phone).HasDefaultValue(null);
             builder.Property(x => x.Email).HasDefaultValue(null).IsUnicode(false);
             builder.Property(x => x.Address).IsRequired().HasMaxLength(250);
+
+            builder.HasIndex(p => p.Code).IsUnique();
         }
     }
 }

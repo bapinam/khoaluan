@@ -202,7 +202,6 @@
         $("#exampleRecipesGiao").modal("show");
 
     }
-
 </script>
 <style>
     #exampleRecipesGiao {
@@ -247,26 +246,27 @@
     </div>
 </div>
 
-<!--Gửi singalR realtime-->
+<!--signlR-->
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
 <script>
-    "use strict";
+        "use strict";
 
-    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-    connection.on("ReceiveMessage", function (user, message) {
-        var name = "@User.Identity.Name";
-        if (user == name) {
-            GetMisonProcessPlan(user);
-        }
-    });
+        connection.on("ReceiveMessage", function (user, message) {
+                var name = "@User.Identity.Name";
+            if (user == name) {
+                GetMisonProcessPlan(user);
+              //  GetShowNotification(user);
+            }
+        });
 
-    // khởi động
-    connection.start().then(function () {
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
+        // khởi động
+        connection.start().then(function () {
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
 </script>
 
 <!--In đơn hàng-->
@@ -308,5 +308,4 @@
             location.reload();
         }, 1000);
     }
-    
 </script>

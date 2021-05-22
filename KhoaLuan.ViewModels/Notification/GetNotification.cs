@@ -11,7 +11,7 @@ namespace KhoaLuan.ViewModels.Notification
         public long Id { get; set; }
         public string Name { get; set; }
         public string Path { get; set; }
-        public bool View { get; set; }
+        public string View { get; set; }
         public int Time { get; set; }
         public int Count { get; set; }
         public Guid IdReceiver { get; set; }

@@ -380,7 +380,7 @@
             + '                    <div class="card-body">'
             + '      <div class="modal-body">'
             + '             <div class="form-group">'
-            + '                 <label>Ngày Khởi Tạo:</label>'
+            + '                 <label>Tên Kế Hoạch:</label>'
             + '                 <span class="form-control" id="TenKHView'+item.id+'" style="border:none; border-bottom:1px solid #EEEEEE;">'
             + item.name
             + '      </span>'
@@ -498,7 +498,8 @@
         return str;
     }
 
-    function GetSaveCen(id, count,name) {
+    function GetSaveCen(id, count, name) {
+    
         $("#deleteHoiDuyet").remove();
         var bt = '<button type="submit" onclick="ajaxHoiDuyet(' + id + ',\''+name+'\')" class="btn btn-primary"' +
             'id="deleteHoiDuyet" > Đồng Ý</button > ';
@@ -603,11 +604,11 @@
                     // gửi singralR đến người nhận
                     var user = namenv;
                     var message = namenv;
+                    // Lưu tin nhắn
+                    var path = "/OrderPlans/Index";
+                    var content = "Kế hoạch đặt hàng";
+                    CreateNotification(content, path, user,message);
 
-                          connection.invoke("SendMessage", user, message).catch(function (err) {
-                                return console.error(err.toString());
-                          });
-                          event.preventDefault();
                 },
                 error: function (req, status, error) {
                     toastr.error('Duyệt thất bại');

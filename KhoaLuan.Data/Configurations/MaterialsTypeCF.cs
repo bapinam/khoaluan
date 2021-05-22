@@ -19,6 +19,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Code).IsRequired().HasMaxLength(20);
             builder.Property(x => x.Name).IsRequired().HasMaxLength(150).UseCollation(SystemConstants.Collate_AI);
             builder.Property(x => x.GroupType).IsRequired();
+            builder.HasIndex(p => new { p.Code, p.Name }).IsUnique();
         }
     }
 }

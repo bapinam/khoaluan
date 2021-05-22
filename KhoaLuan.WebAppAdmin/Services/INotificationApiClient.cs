@@ -16,5 +16,9 @@ namespace KhoaLuan.WebAppAdmin.Services
         Task<ApiResult<PagedResult<GetNotification>>> GetAllNotifications(GetNotificationPagingRequest bundle);
 
         Task<ApiResult<bool>> Delete(long id);
+
+        Task<ApiResult<bool>> DeleteAll(string name);
+
+        Task<ApiResult<bool>> Update(UpdateView bundle);
     }
 }

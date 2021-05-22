@@ -79,7 +79,7 @@ namespace KhoaLuan.Service.UserService
             }
 
             var claims = new List<Claim>{
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim("Image", user.PathImage!= null ? user.PathImage : "OK")
@@ -113,15 +113,16 @@ namespace KhoaLuan.Service.UserService
         public async Task<ApiResult<Guid>> Register(RegisterRequest bundle)
         {
             var code = await _context.ManageCodes.FirstOrDefaultAsync(x => x.Name == bundle.Code);
-
+            var stt = 1;
             Location:
-            var location = code.Location + 1;
+            var location = code.Location + stt;
 
             var str = code.Name + location;
 
             var check = await _userManager.Users.AnyAsync(x => x.Code == str);
             if (check)
             {
+                stt++;
                 goto Location;
             }
             var userName = str;

@@ -1,2 +1,149 @@
 ﻿@{ ViewData["Title"] = "Thông Báo";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
+@using KhoaLuan.ViewModels.Common;
+@model PagedResult<KhoaLuan.ViewModels.Notification.GetNotification>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6" style="margin-bottom:8px; ">
+                <h1>Tin Thông Báo</h1>
+            </div>
+            <div class="col-sm-6">
+                <div class="float-sm-right" style="margin-bottom:5px;">
+                    <button type="button" 
+                            onclick="window.location.href = '/Notifications/Index?name=@User.Identity.Name.ToString()'" 
+                            class="btn btn-dark">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content" id="main">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh Sách</h3>
+                        <div class="col-md-5" style="float:right;" onload="document.frm1.submit()">
+                            <form asp-action="Index" method="get" name="frm1">
+                                <div class="form-group">
+                                    <div class="col-md-9" style="float:left; margin-bottom:5px;">
+                                        <input type="hidden" value="@User.Identity.Name" name="name" />
+                                        <input type="text" value="@ViewBag.Keyword" name="keyword" class="form-control" placeholder="Nhập nội dung thông báo " />
+                                    </div>
+                                    <div class="cold-md-6" >
+                                        <button type="submit" class="btn btn-primary">Tìm</button>                                    
+                                        <button type="button" onclick="DeleteAllNo()" class="btn btn-danger" title="Xóa Tất Cả">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nội Dung</th>
+                                    <th>Ngày Thông Báo</th>
+                                    <th>Tình Trạng</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addTR">
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr id="Xoa-@Html.DisplayFor(modelItem => item.Id)">
+                                        <td id="Code-@Html.DisplayFor(modelItem => item.Id)">
+                                            <a href="@item.Path" onclick="SaveViewNoti('@item.Id')">
+                                                <i class="fas fa-briefcase mr-2"></i>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </a>
+                                        </td>
+                                        <td id="Name-@Html.DisplayFor(modelItem => item.Id)">
+                                            @Html.DisplayFor(modelItem => item.Time)
+                                        </td>
+                                        <td id="GroupType-@Html.DisplayFor(modelItem => item.Id)">
+                                            @Html.DisplayFor(modelItem => item.View)
+                                        </td>
+                                        <td class="text-center py-0 align-middle">
+                                            <div class="btn-group btn-group-sm">
+                                                <a class="btn btn-danger" data-toggle="modal" data-target="#exampleDelete"
+                                                   onclick="GetDeleteNo('@item.Id')" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Nội Dung</th>
+                                    <th>Ngày Thông Báo</th>
+                                    <th>Tình Trạng</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        @await Component.InvokeAsync("Pager", Model)
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<script>
+    function GetDeleteNo(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id:id},
+            dataType: "json",
+            success: function (data) {
+                var str = "#Xoa-" + id;
+                $(str).remove();
+                  toastr.success('Xóa thành công')
+                  var name = '@User.Identity.Name';
+    GetShowNotification(name);
+            },
+            error: function (data) {
+                toastr.error('Xóa thất bại')
+            }
+        });
+    }
+
+    function DeleteAllNo() {
+        var name = '@User.Identity.Name.ToString()';
+             $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("DeleteAll")",
+            data: {name:name},
+            dataType: "json",
+                 success: function (data) {
+                     location.reload();
+                  toastr.success('Xóa tất cả thành công')
+
+            },
+            error: function (data) {
+                toastr.error('Xóa tất cả thất bại')
+            }
+        });
+    }
+</script>

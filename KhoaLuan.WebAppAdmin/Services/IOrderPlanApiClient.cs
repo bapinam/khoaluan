@@ -18,6 +18,8 @@ namespace KhoaLuan.WebAppAdmin.Services
 
         Task<ApiResult<bool>> Create(CreateOrderPlan bundle);
 
+        Task<List<GetListPacksById>> GetListPacksById(int id);
+
         Task<List<GetEmployee>> GetEmployee(string key);
 
         Task<List<GetListSuppliersPlan>> GetListSuppliersPlan(string key);

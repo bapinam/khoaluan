@@ -71,28 +71,28 @@ namespace KhoaLuan.WebAppAdmin
               });
 
             ///------
-            services.AddTransient<IValidator<MaterialCreate>, MaterialCreateValidator>();
-            services.AddTransient<IValidator<MaterialUpdate>, MaterialUpdateValidator>();
+            services.AddScoped<IValidator<MaterialCreate>, MaterialCreateValidator>();
+            services.AddScoped<IValidator<MaterialUpdate>, MaterialUpdateValidator>();
 
-            services.AddTransient<IValidator<CreateMaterialsType>, CreateMaterialsTypeValidor>();
-            services.AddTransient<IValidator<UpdateMaterialsType>, UpdateMaterialsTypeValidor>();
+            services.AddScoped<IValidator<CreateMaterialsType>, CreateMaterialsTypeValidor>();
+            services.AddScoped<IValidator<UpdateMaterialsType>, UpdateMaterialsTypeValidor>();
 
-            services.AddTransient<IValidator<CreateProductTypeGroup>, CreateProductTypeGroupValidor>();
-            services.AddTransient<IValidator<UpdateProductTypeGroup>, UpdateProductTypeGroupValidor>();
+            services.AddScoped<IValidator<CreateProductTypeGroup>, CreateProductTypeGroupValidor>();
+            services.AddScoped<IValidator<UpdateProductTypeGroup>, UpdateProductTypeGroupValidor>();
 
-            services.AddTransient<IValidator<CreateProductType>, CreateProductTypeValidor>();
-            services.AddTransient<IValidator<UpdateProductType>, UpdateProductTypeValidor>();
+            services.AddScoped<IValidator<CreateProductType>, CreateProductTypeValidor>();
+            services.AddScoped<IValidator<UpdateProductType>, UpdateProductTypeValidor>();
 
-            services.AddTransient<IValidator<ProductCreate>, ProductCreateValidator>();
-            services.AddTransient<IValidator<ProductUpdate>, ProductUpdateValidator>();
+            services.AddScoped<IValidator<ProductCreate>, ProductCreateValidator>();
+            services.AddScoped<IValidator<ProductUpdate>, ProductUpdateValidator>();
 
-            services.AddTransient<IValidator<SupplierCreate>, SupplierCreateValidator>();
-            services.AddTransient<IValidator<SupplierUpdate>, SupplierUpdateValidator>();
+            services.AddScoped<IValidator<SupplierCreate>, SupplierCreateValidator>();
+            services.AddScoped<IValidator<SupplierUpdate>, SupplierUpdateValidator>();
 
-            services.AddTransient<IValidator<RegisterRequest>, RegisterRequestValidator>();
-            services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
-            services.AddTransient<IValidator<UserUpdatePassword>, UserUpdatePasswordValidator>();
-            services.AddTransient<IValidator<UserUpdateRequest>, UserUpdateRequestValidator>();
+            services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
+            services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+            services.AddScoped<IValidator<UserUpdatePassword>, UserUpdatePasswordValidator>();
+            services.AddScoped<IValidator<UserUpdateRequest>, UserUpdateRequestValidator>();
 
             //------
             services.AddControllersWithViews();
@@ -105,21 +105,21 @@ namespace KhoaLuan.WebAppAdmin
             //DI
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddTransient<IUserApiClient, UserApiClient>();
-            services.AddTransient<IRoleApiClient, RoleApiClient>();
+            services.AddScoped<IUserApiClient, UserApiClient>();
+            services.AddScoped<IRoleApiClient, RoleApiClient>();
 
-            services.AddTransient<IManageCodeApiClient, ManageCodeApiClient>();
-            services.AddTransient<IRecipeApiClient, RecipeApiClient>();
-            services.AddTransient<ISupplierApiClient, SupplierApiClient>();
-            services.AddTransient<IMaterialApiClient, MaterialApiClient>();
-            services.AddTransient<IMaterialsTypeApiClient, MaterialsTypeApiClient>();
-            services.AddTransient<IProductTypeApiClient, ProductTypeApiClient>();
-            services.AddTransient<IProductTypeGroupApiClient, ProductTypeGroupApiClient>();
-            services.AddTransient<IProductApiClient, ProductApiClient>();
-            services.AddTransient<IOrderPlanApiClient, OrderPlanApiClient>();
-            services.AddTransient<IBillApiClient, BillApiClient>();
-            services.AddTransient<IProcessPlanApiClient, ProcessPlanApiClient>();
-            services.AddTransient<INotificationApiClient, NotificationApiClient>();
+            services.AddScoped<IManageCodeApiClient, ManageCodeApiClient>();
+            services.AddScoped<IRecipeApiClient, RecipeApiClient>();
+            services.AddScoped<ISupplierApiClient, SupplierApiClient>();
+            services.AddScoped<IMaterialApiClient, MaterialApiClient>();
+            services.AddScoped<IMaterialsTypeApiClient, MaterialsTypeApiClient>();
+            services.AddScoped<IProductTypeApiClient, ProductTypeApiClient>();
+            services.AddScoped<IProductTypeGroupApiClient, ProductTypeGroupApiClient>();
+            services.AddScoped<IProductApiClient, ProductApiClient>();
+            services.AddScoped<IOrderPlanApiClient, OrderPlanApiClient>();
+            services.AddScoped<IBillApiClient, BillApiClient>();
+            services.AddScoped<IProcessPlanApiClient, ProcessPlanApiClient>();
+            services.AddScoped<INotificationApiClient, NotificationApiClient>();
 
             // SignalR
             services.AddSignalR();

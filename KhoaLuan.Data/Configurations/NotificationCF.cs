@@ -13,7 +13,7 @@ namespace KhoaLuan.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
-            builder.ToTable("NotificationCFs");
+            builder.ToTable("Notifications");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
 

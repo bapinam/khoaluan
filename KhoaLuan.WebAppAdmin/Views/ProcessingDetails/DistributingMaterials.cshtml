@@ -1,0 +1,192 @@
+﻿<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="PhatNguyenVatLieu">
+        <div class="card-header">
+            <h3 class="card-title">Phân Phối Nguyên Vật Liệu</h3>
+
+            <div class="card-tools">
+
+                <span title="Kế Hoạch Chế Biến" data-toggle="tooltip" data-placement="top" class="badge badge-warning" id="SoHDCTT" style="float:left;">
+                </span>
+
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="frmChuaTT" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="keywordChuaTT"
+                               placeholder="Nhập mã, tên kế hoạch hoặc mã người nhận">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <section class="content">
+                <div class="container-fluid">
+                    <table id="example112" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        <thead>
+                            <tr>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Tên </th>
+                                <th>Ngày Tạo </th>
+                                <th>Người Nhận</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addTRHDCTT">
+                            <tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Tên </th>
+                                <th>Ngày Tạo </th>
+                                <th>Người Nhận</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+<!--Tìm kiếm-->
+<script>
+
+    var frmChuaTT = $("#frmChuaTT");
+    frmChuaTT.submit(function (e) {
+        var keyword = $("#keywordChuaTT").val();
+        GetDistributingKey(keyword);
+        e.preventDefault();
+    });
+</script>
+<!--Lấy thông tin kế hoạch để phát-->
+<script>
+    GetDistributingKey("");
+   document.getElementById("SoHDCTT").style.display = "none";
+    function GetDistributingKey(key) {
+        DeleteTableDistributing();
+          $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetDistributing")",
+                data: { key: key },
+                dataType: "json",
+              success: function (msg) {
+                    if (msg.resultObj.count != 0) {
+                        document.getElementById("SoHDCTT").style.display = "block";
+                        document.getElementById("SoHDCTT").innerHTML = msg.resultObj.count;
+                        msg.resultObj.processingPlanVms.forEach(function (item) {
+                            var str = '<tr id="Distri-'+item.id+'">'
+                                + '<td>'+item.code+'</td>'
+                                    + '<td>'+item.name+'</td>'
+                                + '<td>' + item.createdDate+'</td>'
+                                + '<td>' + item.codeResponsible+'</td>'
+                                                + '<td class="text-center py-0 align-middle">'
+                                                + ' <div class="btn-group btn-group-sm">'
+                                                + '  <a class="btn btn-primary" data-toggle="modal" data-target="#exampleGetDistributing"'
+                                                + '     onclick="GetDistributing('+item.id+',\''+item.code+'\')" title="Phân phối">'
+                                                + '     <i class="fas fa-sitemap"></i>'
+                                                + ' </a>'
+                                                + ' <a class="btn btn-success" data-toggle="modal" data-target="#exampleSplitProcess"'
+                                                + '     onclick="SplitProcess('+item.id+')" title="Tách Kế Hoạch">'
+                                                + '     <i class="fas fa-scissors"></i>'
+                                                + '  </a>'
+                                                + '  <a class="btn btn-danger" data-toggle="modal" data-target="#exampleCancelProcess"'
+                                                + '     onclick="GetCancelProcess('+item.id+')" title="Hủy">'
+                                                + '     <i class="fas fa-ban"></i>'
+                                                + '  </a>'
+                                                + ' </div>'
+                                                + ' </td>'
+                                + ' </tr>';
+                            $("#addTRHDCTT").append(str);
+
+                        });
+                    } else {
+                        document.getElementById("SoHDCTT").style.display = "none";
+                        var str = '<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>';
+                        $("#addTRHDCTT").append(str);
+                    }
+               },
+                error: function (req, status, error) {
+                }
+            });
+    }
+
+    function DeleteTableDistributing() {
+        $("#addTRHDCTT").remove();
+        $("#example112").append('<tbody id="addTRHDCTT" ></tbody>');
+    }
+</script>
+
+<!--Phân phối nguyên vật liệu-->
+@await Html.PartialAsync("DistributingMaterials/ModalViewDistributing")
+<!--Modal hủy Kế hoạch-->
+<div class="modal fade" id="exampleCancelProcess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idKHCancelProcess" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn hủy kế hoạch đặt hàng này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxCancelProcess()" class="btn btn-danger">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hủy đơn hàng-->
+<script>
+    function ajaxCancelProcess() {
+        var id = $("#idKHCancelProcess").val();
+                $.ajax({
+            type: "GET",
+             url: "@Url.Action("CancelProcess")",
+            data: { id: id },
+            dataType: "json",
+            success: function (data) {
+                if (data.isSuccessed) {
+                    toastr.success('Hủy thành công');
+                    $("#exampleCancelProcess").modal("hide");
+                    var or = "#Distri-" + id;
+                    $(or).remove();
+                    var hd = document.getElementById("SoHDCTT").innerText;
+                    var so = hd -1 ;
+                    if (so < 1) {
+                        document.getElementById("SoHDCTT").style.display = "none";
+                    }
+                    document.getElementById("SoHDCTT").innerText = so;
+                    
+                } else {
+                    toastr.error(data.message);
+                }
+            },
+            error: function (req, status, error) {
+                toastr.error('Hủy thất bại');
+            }
+        });
+
+    }
+</script>
+<!--Hủy Kế Hoạch-->
+<script>
+    function GetCancelProcess(id) {
+        $("#idKHCancelProcess").val(id);
+    }
+</script>

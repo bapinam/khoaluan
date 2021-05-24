@@ -16,6 +16,7 @@ namespace KhoaLuan.Data.Entities
         public StatusProcessPlan Status { set; get; }
         public bool Censorship { set; get; }
         public List<ProcessingDetail> ProcessingDetails { get; set; }
+        public List<ProcessingVoucher> ProcessingVouchers { get; set; }
 
         public AppUser Creator { get; set; }
         public Guid IdCreator { get; set; }

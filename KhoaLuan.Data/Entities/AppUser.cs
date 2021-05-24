@@ -27,5 +27,6 @@ namespace KhoaLuan.Data.Entities
         public List<OrderPlan> OrderPlanAuthority { get; set; }
         public List<Notification> NotificationReceiver { get; set; }
         public List<Bill> Bills { get; set; }
+        public List<ProcessingVoucher> ProcessingVouchers { get; set; }
     }
 }

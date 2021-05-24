@@ -119,6 +119,7 @@ namespace KhoaLuan.WebAppAdmin
             services.AddScoped<IOrderPlanApiClient, OrderPlanApiClient>();
             services.AddScoped<IBillApiClient, BillApiClient>();
             services.AddScoped<IProcessPlanApiClient, ProcessPlanApiClient>();
+            services.AddScoped<IProcessingDetailApiClient, ProcessingDetailApiClient>();
             services.AddScoped<INotificationApiClient, NotificationApiClient>();
 
             // SignalR

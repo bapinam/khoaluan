@@ -15,5 +15,6 @@ namespace KhoaLuan.Data.Entities
 
         public List<ProcessingDetail> ProcessingDetails { get; set; }
         public List<RecipeDetail> RecipeDetails { get; set; }
+        public List<ProcessingVoucherDetail> ProcessingVoucherDetails { get; set; }
     }
 }

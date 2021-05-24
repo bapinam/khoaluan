@@ -1,0 +1,335 @@
+﻿@using KhoaLuan.Data.Enums;
+<div class="card direct-chat direct-chat-primary table-hover12">
+    <div class="card-header">
+        <h3 class="card-title">Phiếu Chế Biến</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="modal-body">
+            <form id="FormPCB" method="post">
+                <div class="form-row">
+                    <input type="hidden" id="TypePCB" name="TypeCode" value="@CodeType.ProcessingVoucher" />
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NamePCB"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodePCB()" required>
+                    </div>
+                    <span class="text-danger" id="showNamePCB">
+                        Tên mã đã tồn tại
+                    </span>
+                    <div class="form-group col-md-6">
+                        <button type="submit" id="btnthemPCB" class="btn btn-primary">Thêm Vào</button>
+                    </div>
+                    <small>Tên mã + số tự tăng: CODE1</small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-body">
+            <table id="PCBtable" class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Tên Mã</th>
+                        <th class="text-center">Ưu Tiên</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="addPCB">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--Modal xóa-->
+<div class="modal fade" id="exampleDeletePCB" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idDeletePCB" />
+                <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xóa dữ liệu đã chọn?</h5>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxDeletePCB()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Sửa-->
+<div class="modal fade" id="exampleEditPCB" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Mã Số</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <div class="modal-body">
+                <input type="hidden" id="idEditPCB" />
+                <input type="hidden" id="TypeCodePCB" value="@CodeType.ProcessingVoucher" />
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <input type="text" class="form-control" id="NamePCBEdit"
+                               name="Name" placeholder="Tên Mã" onkeyup="iCodePCBEdit()" required>
+                        <span class="text-danger" id="erroGroupPCB">
+                            Tên đã tồn tại
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <select class="form-control" name="Top" id="TopEditPCB">
+                            <option value="true">Bật</option>
+                            <option value="false">Tắt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxSavePCB()" id="btnEditPCB" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Kế Hoạch Chế Biến-->
+<script>
+    //kiểm tra tên
+    document.getElementById('showNamePCB').style.display = "none";
+    function iCodePCB()
+    {
+        var namePCB = $('#NamePCB').val().trim();
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: namePCB} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('showNamePCB').style.display = "none";
+                    document.getElementById('btnthemPCB').style.display = "block";
+                } else {
+                    document.getElementById('showNamePCB').style.display = "block";
+                    document.getElementById('btnthemPCB').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('showNamePCB').style.display = "block";
+                    document.getElementById('btnthemPCB').style.display = "none";
+
+                }
+            });
+    }
+
+    document.getElementById('erroGroupPCB').style.display = "none";
+    document.getElementById('btnEditPCB').style.display = "block";
+
+    function iCodePCBEdit()
+    {
+        var namePCB1 = $('#NamePCBEdit').val().trim();
+        var id = $('#idEditPCB').val().trim();
+        $.ajax({
+                type: "GET",
+                 url: "@Url.Action("iName")",
+             data: {name: namePCB1, id: id} ,
+                dataType: "json",
+            success: function (msg) {
+                if (msg) {
+                    document.getElementById('erroGroupPCB').style.display = "none";
+                    document.getElementById('btnEditPCB').style.display = "block";
+                } else {
+                    document.getElementById('erroGroupPCB').style.display = "block";
+                    document.getElementById('btnEditPCB').style.display = "none";
+
+                }
+                },
+             error: function (req, status, error) {
+                 document.getElementById('erroGroupPCB').style.display = "block";
+                 document.getElementById('btnEditPCB').style.display = "none";
+
+                }
+            });
+    }
+    //
+   GetPCB();
+    // Lấy giá trị của mã PCB
+    function GetPCB() {
+        var typeMVL = $("#TypePCB").val();
+
+         $.ajax({
+                type: "GET",
+                 url: "@Url.Action("GetAll")",
+             data: {type: typeMVL} ,
+                dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+
+                    var str = '<tr id="PCB-' + item.id +'">' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' +
+                        '<select class="form-control select2bs4" >';
+
+                    if (item.top) {
+                        str = str + '      <option  value="true">Bật</option>' ;
+                    } else {
+                        str = str + '      <option  value="false">Tắt</option>';
+                    }
+
+                    str = str + ' </select>' +
+                        '</td>' +
+                        '<td class="text-center py-0 align-middle">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<a class="btn btn-primary" data-toggle="modal" data-target="#exampleEditPCB"' +
+                        '   onclick="GetEditPCB(' + item.id + ', \'' + item.name + '\',' + item.top +')" title="Sửa">' +
+                        '   <i class="fas fa-pencil-alt"></i>' +
+                        '</a>' +
+                        '<a class="btn btn-danger" data-toggle="modal" data-target="#exampleDeletePCB"' +
+                        '   onclick="GetDeletePCB(' + item.id + ')" title="Xóa">' +
+                        '    <i class="fas fa-trash"></i>' +
+                        ' </a>' +
+                        '</div>' +
+                        ' </td>' +
+                        ' </tr >';
+                    $('#addPCB').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Thêm thất bại')
+
+                }
+            });
+    }
+
+    // Thêm : btnthemPCB,NamePCB
+    var formPCB = $('#FormPCB');
+    formPCB.submit(function (e) {
+        var namePCB = $('#NamePCB').val().trim();
+        if (namePCB.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
+        } else {
+            if (namePCB.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create")",
+                    data: formPCB.serialize(),
+                    dataType: "json",
+                    success: function (msg) {
+                        toastr.success('Thêm thành công')
+
+                        $('#addPCB').remove();
+                        $('#PCBtable').append('<tbody id="addPCB"></tbody>');
+                        GetPCB();
+
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Thêm thất bại')
+
+                    }
+                });
+            }
+        }
+        e.preventDefault();
+    });
+
+    // xóa
+    function GetDeletePCB(id) {
+        $("#idDeletePCB").val(id);
+    }
+
+    function ajaxDeletePCB() {
+        var id = $("#idDeletePCB").val();
+        $.ajax({
+            type: "DELETE",
+            url: "@Url.Action("Delete")",
+            data: {id:id},
+                dataType: "json",
+            success: function (msg) {
+                 if (msg.isSuccessed) {
+                     $('#exampleDeletePCB').modal("hide")
+                     toastr.success('Xóa thành công')
+                     var de = "#PCB-" + id;
+                     $(de).remove();
+                 } else {
+                     toastr.error('Xóa thất bại')
+                 }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Xóa thất bại')
+
+                }
+            });
+    }
+
+    // CẬP nhật
+    function GetEditPCB(id, name, top) {
+        document.getElementById('erroGroupPCB').style.display = "none";
+        document.getElementById('btnEditPCB').style.display = "block";
+        $("#idEditPCB").val(id);
+        $("#NamePCBEdit").val(name);
+        if (top) {
+            $("#TopEditPCB").val("true");
+        } else {
+            $("#TopEditPCB").val("false");
+        }
+    }
+
+    function ajaxSavePCB() {
+        var id = $("#idEditPCB").val();
+        var name = $("#NamePCBEdit").val();
+        var top = $("#TopEditPCB").val();
+        var type = $("#TypeCodePCB").val();
+        if (name.length > 8) {
+            toastr.error('Độ dài tên mã không vượt quá 8 ký tự')
+        } else {
+            if (name.length < 4) {
+                toastr.error('Độ dài tên mã ít nhất 4 ký tự')
+            } else {
+                var data =
+                {
+                    Id: id,
+                    Name: name,
+                    Top: top,
+                    TypeCode: type
+                };
+                $.ajax({
+                    type: "PUT",
+                    url: "@Url.Action("Update")",
+                    data: data,
+                    dataType: "json",
+                    success: function (msg) {
+                        $('#exampleEditPCB').modal("hide")
+                        toastr.success('Cập nhật thành công');
+                        $('#addPCB').remove();
+                        $('#PCBtable').append('<tbody id="addPCB"></tbody>');
+                        GetPCB();
+
+                    },
+                    error: function (req, status, error) {
+                        toastr.error('Cập nhật thất bại');
+
+                    }
+                });
+            }
+        }
+    }
+</script>

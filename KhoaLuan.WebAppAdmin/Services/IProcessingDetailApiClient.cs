@@ -1,11 +1,13 @@
 ﻿using KhoaLuan.ViewModels.Common;
 using KhoaLuan.ViewModels.ProcessingDetail;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace KhoaLuan.Service.ProcessingDetailService
+namespace KhoaLuan.WebAppAdmin.Services
 {
-    public interface IProcessingDetailService
+    public interface IProcessingDetailApiClient
     {
         Task<ApiResult<PagedResult<ProcessingPlanVm>>> GetProcessingCompleted(GetDistributingPagingRequest bundle);
 

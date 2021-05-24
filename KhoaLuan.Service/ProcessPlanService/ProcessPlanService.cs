@@ -175,7 +175,7 @@ namespace KhoaLuan.Service.ProcessPlanService
                 Name = bundle.Name
             };
 
-            _context.ProcessPlans.Update(process);
+            _context.ProcessPlans.Add(process);
             await _context.SaveChangesAsync();
 
             return new ApiSuccessResult<bool>();

@@ -95,7 +95,6 @@ namespace KhoaLuan.API
             });
 
             //Declare DI
-            // doi voi db thi nen dung Scoped, ko nen dung Transient, do la li do tai sao return ve 15, nhung debug ra 16
             // Transient thi lifetime cua no la moi khi dc inject no se thanh new instance, scoped la xuyen suot Request
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IManageCodeService, ManageCodeService>();

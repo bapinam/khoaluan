@@ -18,6 +18,7 @@ namespace KhoaLuan.Data.Enums
         ProcessPlan,
         Recipe,
         Supplier,
-        Bill
+        Bill,
+        ProcessingVoucher
     }
 }

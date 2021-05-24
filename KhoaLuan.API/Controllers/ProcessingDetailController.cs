@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using KhoaLuan.Service.ProcessingDetailService;
+using KhoaLuan.ViewModels.ProcessingDetail;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,5 +13,46 @@ namespace KhoaLuan.API.Controllers
     [ApiController]
     public class ProcessingDetailController : ControllerBase
     {
+        private readonly IProcessingDetailService _processingDetailService;
+
+        public ProcessingDetailController(IProcessingDetailService processingDetailService)
+        {
+            _processingDetailService = processingDetailService;
+        }
+
+        [HttpGet("paging")]
+        public async Task<IActionResult> GetProcessingCompleted([FromQuery] GetDistributingPagingRequest bundle)
+        {
+            var result = await _processingDetailService.GetProcessingCompleted(bundle);
+            return Ok(result);
+        }
+
+        [HttpGet("distributing")]
+        public async Task<IActionResult> GetDistributing(string key)
+        {
+            var result = await _processingDetailService.GetDistributing(key);
+            return Ok(result);
+        }
+
+        [HttpGet("process-detail-by/{id}")]
+        public async Task<IActionResult> GetAllProcessDetailById(long id)
+        {
+            var result = await _processingDetailService.GetAllProcessDetailById(id);
+            return Ok(result);
+        }
+
+        [HttpGet("cance-process/{id}")]
+        public async Task<IActionResult> CancelProcess(long id)
+        {
+            var result = await _processingDetailService.CancelProcess(id);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateProcess bundle)
+        {
+            var result = await _processingDetailService.Create(bundle);
+            return Ok(result);
+        }
     }
 }

@@ -1,0 +1,203 @@
+﻿@using KhoaLuan.Data.Enums;
+<div class="modal fade  bd-example-modal-lg" id="exampleGetDistributing" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tạo Phiếu Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <form id="CreatePhieuCheBien" method="post">
+
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Mã Lưu Trữ</label>
+                            <select id="Code" name="Code" class="form-control" required>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputEmail4">Mã Kế Hoạch</label>
+                            <input type="hidden" class="form-control" name="IdPlan" id="IdPlan" required>
+                            <input type="text" class="form-control" name="CodeOrder" id="CodeOrder" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row" id="tableRow">
+                        <div class="col-12">
+                            <h5>Danh Sách Nguyên Vật Liệu</h5>
+                        </div>
+                        <input name="NameCreator" type="hidden" value="@User.Identity.Name" />
+                        <table id="DeleteTableNVLcc" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                </div>
+            </form>
+
+            <!---->
+        </div>
+    </div>
+</div>
+<script>
+    function GetDistributing(id, code) {
+        DeleteTableCrateNVL();
+        $("#IdPlan").val(id);
+        $("#CodeOrder").val(code);
+        $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAllProcessDetailById")",
+             data: {id: id} ,
+             dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    var max = item.amountProcess - item.enterAmountProcess;
+                    if (max != 0) {
+                        var str = '<thead>'
+                            + '<tr><th colspan="6" class="text-center">Mã Công Thức: ' + item.codeRecipes
+                            + '<br />Mã Sản Phẩm: ' + item.codeProduct
+                            + '<br />Tên Sản Phẩm: ' + item.nameProduct
+                            +'</th > <tr>'
+                            + '    <tr>'
+                            + '           <th>Mã Số</th>'
+                            + '        <th>Tên</th>'
+                            + '            <th>ĐVT</th>'
+                            + '            <th>Số Lượng Cần</th>'
+                            + '            <th>Số Lượng Tồn</th>'
+                            + '            <th class="text-center">Tổng Phát</th>'
+                            + '        </tr>'
+                            + '    </thead>'
+                            + '   <tbody id="tableAddNVLPP">';
+                        var stt = 1;
+                        item.recipeMaterials.forEach(function (i) {
+                            var amountNew = i.amountMaterials / i.valuePack;
+                            str = str + ' <tr>'
+                                + '<td>' + i.codeMaterials + '</td>'
+                                + ' <td>' + i.nameMaterials + '</td>'
+                                + '<td>' + i.unitRecipe + '</td>'
+                                + '<td id="SLCT-' + item.idProcess +'-'+stt+'">' + i.amountRecipe + '</td>'
+                                + '<td id="SLNVL-' + item.idProcess + '-' + stt + '">' + amountNew + '</td>'
+                                + '<input id="Value-' + item.idProcess + '-' + stt + '" type="hidden" value="'+i.valuePack+'" />'
+                                + '<td id="SLTP-' + item.idProcess + '-' + stt +'">0</td>'
+                                + '</tr>';
+                            stt++;
+                        });
+
+                        str = str + '<tr>'
+                            + '   <td colspan="2" class="text-center"><label>Số Lượng Sản Phẩm</label></td>'
+                            + '  <td>' + item.unitProcess + '</td>'
+                            + '  <td colspan="3">'
+                            + '<input type="hidden" name="IdProcess[]" value="' + item.idProcess + '" />'
+                            + '<input type="number" min="0" max="'+max+'" class="form-control" name="Amount[]" id="AmountNumber-' + item.idProcess + '"'
+                            + '  oninput="ClickSoLuong(' + item.idProcess+','+stt+')"   required /> '
+                            +'<small>Tối đa: '+max+'</small>'
+                            + '</td>'
+                            + '</tr>';
+
+                        str = str + '<tr><td colspan="6"></td><tr>';
+
+                        str = str + ' </tbody>';
+                        $("#DeleteTableNVLcc").append(str);
+                    }
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+
+    }
+
+    function DeleteTableCrateNVL() {
+        $("#DeleteTableNVLcc").remove();
+        $("#tableRow").append('<table id="DeleteTableNVLcc" class="table table-bordered table-striped table-hover table-responsive-xl">'
+                        +'</table> ');
+    }
+</script>
+
+<!-- Lấy mã code kế hoạch đặc hàng-->
+<script>
+    GetCodeOrderPlan();
+    // Lấy giá trị của mã User
+    function GetCodeOrderPlan() {
+        var typeMVL = "@CodeType.ProcessingVoucher";
+         $.ajax({
+             type: "GET",
+              url: "@Url.Action("GetAll","ManageCodes")",
+             data: {type: typeMVL} ,
+             dataType: "json",
+            success: function (msg) {
+                msg.forEach(function (item) {
+                    //Code
+                    str = '<option value="' + item.name +'">'+item.name+'</option>';
+                    $('#Code').append(str);
+                });
+
+                },
+                error: function (req, status, error) {
+
+                }
+            });
+    }
+
+    var CreatePhieuCheBien = $("#CreatePhieuCheBien");
+    CreatePhieuCheBien.submit(function (e) {
+         $.ajax({
+             type: "POST",
+             url: "@Url.Action("Create")",
+             data: CreatePhieuCheBien.serialize(),
+             dataType: "json",
+            success: function (msg) {
+                if (msg.isSuccessed) {
+                    toastr.success('Tạo thành công');
+                    GetDistributingKey("");
+                    $("#exampleGetDistributing").modal("hide");
+                } else {
+                    toastr.error(msg.message);
+
+                }
+
+                },
+                error: function (req, status, error) {
+                    toastr.error('Tạo thất bại');
+                }
+            });
+
+        e.preventDefault();
+    });
+</script>
+
+<!--Tổng Phát số lượng-->
+<script>
+    function ClickSoLuong(idProcess, stt) {
+        ////SLCT-,SLNVL-,SLTP-
+        for (var i = 1; i < stt; i++) {
+            var tp = "SLTP-" + idProcess + "-" + i;
+            var nvl = "SLNVL-" + idProcess + "-" + i;
+            var ct = "SLCT-" + idProcess + "-" + i;
+            var slCT = document.getElementById(ct).innerText;
+            var slNVL = document.getElementById(nvl).innerText;
+            var slA = "#AmountNumber-" + idProcess;
+            var amount = $(slA).val();
+
+            var va = "#Value-" + idProcess + "-" + i;
+            var value = $(va).val();
+
+            var result = slCT  * amount;
+
+            if (result > slNVL) {
+                document.getElementById(tp).innerHTML = "<span style='color: red;'>" + result + "</span>";
+
+            } else {
+                document.getElementById(tp).innerHTML = result;
+            }
+        }
+
+    }
+</script>

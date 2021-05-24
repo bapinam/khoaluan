@@ -964,7 +964,7 @@ namespace KhoaLuan.Service.BillService
             if (bill < 1)
             {
                 order.Status = StatusOrderPlan.Cancel;
-                _context.Update(order);
+                _context.OrderPlans.Update(order);
                 await _context.SaveChangesAsync();
                 return new ApiSuccessResult<bool>();
             }

@@ -7,7 +7,7 @@ namespace KhoaLuan.Service.ProcessingDetailService
 {
     public interface IProcessingDetailService
     {
-        Task<ApiResult<PagedResult<ProcessingPlanVm>>> GetProcessingCompleted(GetDistributingPagingRequest bundle);
+        Task<ApiResult<PagedResult<ProcessingVoucherVm>>> GetProcessComplete(GetProcessCompletePaging bundle);
 
         Task<ApiResult<ProcessingPlanVmCount>> GetDistributing(string key);
 
@@ -16,5 +16,15 @@ namespace KhoaLuan.Service.ProcessingDetailService
         Task<ApiResult<bool>> Create(CreateProcess bundle);
 
         Task<ApiResult<bool>> CancelProcess(long id);
+
+        Task<ApiResult<bool>> SplitProcess(long id);
+
+        Task<ApiResult<ListProcessingVoucher>> GetMarkProcessing(string key);
+
+        Task<ApiResult<bool>> ChangeMarkStatus(long id);
+
+        Task<ApiResult<bool>> Delete(long id);
+
+        Task<ApiResult<GetViewProcessingVocher>> GetViewProcessingVocher(long id);
     }
 }

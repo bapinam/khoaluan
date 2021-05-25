@@ -158,6 +158,8 @@
                     toastr.success('Tạo thành công');
                     GetDistributingKey("");
                     $("#exampleGetDistributing").modal("hide");
+                    GetMarkProcessingKey("");
+
                 } else {
                     toastr.error(msg.message);
 
@@ -189,7 +191,7 @@
             var va = "#Value-" + idProcess + "-" + i;
             var value = $(va).val();
 
-            var result = slCT  * amount;
+            var result = slCT * amount;
 
             if (result > slNVL) {
                 document.getElementById(tp).innerHTML = "<span style='color: red;'>" + result + "</span>";

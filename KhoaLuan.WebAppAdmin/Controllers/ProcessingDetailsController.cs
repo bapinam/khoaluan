@@ -18,20 +18,19 @@ namespace KhoaLuan.WebAppAdmin.Controllers
             _processingDetailApiClient = processingDetailApiClient;
         }
 
-        public async Task<IActionResult> Index(/*string keyword, int pageIndex = 1, int pageSize = 5*/)
+        public async Task<IActionResult> Index(string keyword, int pageIndex = 1, int pageSize = 5)
         {
-            //var request = new GetDistributingPagingRequest()
-            //{
-            //    Keyword = keyword,
-            //    PageIndex = pageIndex,
-            //    PageSize = pageSize
-            //};
-            //var data = await _processingDetailApiClient.GetDistributing(request);
+            var request = new GetProcessCompletePaging()
+            {
+                Keyword = keyword,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+            var data = await _processingDetailApiClient.GetProcessComplete(request);
 
-            //ViewBag.Keyword = keyword;
+            ViewBag.Keyword = keyword;
 
-            //return View(data.ResultObj);
-            return View();
+            return View(data.ResultObj);
         }
 
         public async Task<IActionResult> GetDistributing(string key)
@@ -49,9 +48,37 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetViewProcessingVocher(long id)
+        {
+            var result = await _processingDetailApiClient.GetViewProcessingVocher(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMarkProcessing(string key)
+        {
+            var result = await _processingDetailApiClient.GetMarkProcessing(key);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangeMarkStatus(long id)
+        {
+            var result = await _processingDetailApiClient.ChangeMarkStatus(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CancelProcess(long id)
         {
             var result = await _processingDetailApiClient.CancelProcess(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SplitProcess(long id)
+        {
+            var result = await _processingDetailApiClient.SplitProcess(id);
             return Ok(result);
         }
 
@@ -59,6 +86,13 @@ namespace KhoaLuan.WebAppAdmin.Controllers
         public async Task<IActionResult> Create(CreateProcess bundle)
         {
             var result = await _processingDetailApiClient.Create(bundle);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var result = await _processingDetailApiClient.Delete(id);
             return Ok(result);
         }
     }

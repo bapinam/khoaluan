@@ -20,6 +20,7 @@ namespace KhoaLuan.Data.Configurations
             builder.Property(x => x.Code).IsRequired().HasMaxLength(20);
             builder.Property(x => x.Status).HasDefaultValue(false);
             builder.Property(x => x.CreateDate).HasDefaultValue(DateTime.Now);
+            builder.Property(x => x.CompleteDate).HasDefaultValue(DateTime.Now);
 
             builder.HasIndex(p => p.Code).IsUnique();
 

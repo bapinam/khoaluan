@@ -21,9 +21,9 @@ namespace KhoaLuan.API.Controllers
         }
 
         [HttpGet("paging")]
-        public async Task<IActionResult> GetProcessingCompleted([FromQuery] GetDistributingPagingRequest bundle)
+        public async Task<IActionResult> GetProcessComplete([FromQuery] GetProcessCompletePaging bundle)
         {
-            var result = await _processingDetailService.GetProcessingCompleted(bundle);
+            var result = await _processingDetailService.GetProcessComplete(bundle);
             return Ok(result);
         }
 
@@ -34,10 +34,38 @@ namespace KhoaLuan.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("mark")]
+        public async Task<IActionResult> GetMarkProcessing(string key)
+        {
+            var result = await _processingDetailService.GetMarkProcessing(key);
+            return Ok(result);
+        }
+
         [HttpGet("process-detail-by/{id}")]
         public async Task<IActionResult> GetAllProcessDetailById(long id)
         {
             var result = await _processingDetailService.GetAllProcessDetailById(id);
+            return Ok(result);
+        }
+
+        [HttpGet("view-vocher/{id}")]
+        public async Task<IActionResult> GetViewProcessingVocher(long id)
+        {
+            var result = await _processingDetailService.GetViewProcessingVocher(id);
+            return Ok(result);
+        }
+
+        [HttpGet("change-mark/{id}")]
+        public async Task<IActionResult> ChangeMarkStatus(long id)
+        {
+            var result = await _processingDetailService.ChangeMarkStatus(id);
+            return Ok(result);
+        }
+
+        [HttpGet("split-process/{id}")]
+        public async Task<IActionResult> SplitProcess(long id)
+        {
+            var result = await _processingDetailService.SplitProcess(id);
             return Ok(result);
         }
 
@@ -52,6 +80,13 @@ namespace KhoaLuan.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateProcess bundle)
         {
             var result = await _processingDetailService.Create(bundle);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var result = await _processingDetailService.Delete(id);
             return Ok(result);
         }
     }

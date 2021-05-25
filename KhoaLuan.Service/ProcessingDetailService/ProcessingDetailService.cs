@@ -5,6 +5,7 @@ using KhoaLuan.ViewModels.Common;
 using KhoaLuan.ViewModels.ProcessingDetail;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,48 +91,6 @@ namespace KhoaLuan.Service.ProcessingDetailService
             }).ToListAsync();
 
             return new List<ProcessingDetailVm>(result);
-        }
-
-        public async Task<ApiResult<PagedResult<ProcessingPlanVm>>>
-            GetProcessingCompleted(GetDistributingPagingRequest bundle)
-        {
-            IQueryable<ProcessPlan> query = _context.ProcessPlans.Include(x => x.Responsible);
-
-            query = query.Where(c => c.Status == StatusProcessPlan.Processing && c.Censorship == true);
-
-            if (!string.IsNullOrEmpty(bundle.Keyword))
-            {
-                query = query.Where(c => c.Name.Contains(bundle.Keyword) || c.Code.Contains(bundle.Keyword)
-                                    || c.Responsible.Code.Contains(bundle.Keyword));
-            }
-
-            //3. Paging
-            int totalRow = await query.CountAsync();
-
-            query = query.OrderByDescending(c => c.Id);
-
-            query = query.Include(x => x.Creator).Include(l => l.Responsible);
-
-            var data = await query.Skip((bundle.PageIndex - 1) * bundle.PageSize)
-                .Take(bundle.PageSize)
-                .Select(i => new ProcessingPlanVm()
-                {
-                    Id = i.Id,
-                    Code = i.Code,
-                    Name = i.Name,
-                    CreatedDate = i.CreatedDate.ToString("dd-MM-yyyy"),
-                    CodeResponsible = i.Responsible.Code,
-                }).ToListAsync();
-
-            //4. Select and projection
-            var pagedResult = new PagedResult<ProcessingPlanVm>()
-            {
-                TotalRecords = totalRow,
-                PageIndex = bundle.PageIndex,
-                PageSize = bundle.PageSize,
-                Items = data
-            };
-            return new ApiSuccessResult<PagedResult<ProcessingPlanVm>>(pagedResult);
         }
 
         public async Task<ApiResult<bool>> Create(CreateProcess bundle)
@@ -278,6 +237,286 @@ namespace KhoaLuan.Service.ProcessingDetailService
             }
             return new ApiErrorResult<bool>
                 ("Hủy thất bại, vì có phiếu chế biến tồn tại một phần kế hoạch. Vui lòng tách!");
+        }
+
+        public async Task<ApiResult<bool>> SplitProcess(long id)
+        {
+            var process = await _context.ProcessPlans
+                .Include(x => x.ProcessingDetails)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            var listProcessingDetails = new List<ProcessingDetail>();
+
+            foreach (var item in process.ProcessingDetails)
+            {
+                var amount = item.Amount - item.EnterAmount;
+                if (amount > 0)
+                {
+                    var processingDetails = new ProcessingDetail()
+                    {
+                        Amount = amount,
+                        IdRecipe = item.IdRecipe,
+                        IdProcessPlan = item.IdProcessPlan,
+                        Unit = item.Unit
+                    };
+                    listProcessingDetails.Add(processingDetails);
+                }
+            }
+
+            var stt = 1;
+            Location:
+            string code = process.Code + "-" + stt.ToString();
+
+            var checkCode = await _context.ProcessPlans.AnyAsync(x => x.Code == code);
+            if (checkCode)
+            {
+                stt++;
+                goto Location;
+            }
+
+            var processPlan = new ProcessPlan()
+            {
+                Code = code,
+                IdAuthority = process.IdAuthority,
+                IdCreator = process.IdCreator,
+                IdResponsible = process.IdResponsible,
+                Censorship = false,
+                CreatedDate = DateTime.Now,
+                ExpectedDate = DateTime.Now,
+                Name = process.Name + " (Tách)",
+                Note = process.Note,
+                Status = StatusProcessPlan.Processing,
+                ProcessingDetails = listProcessingDetails
+            };
+
+            _context.ProcessPlans.Add(processPlan);
+            await _context.SaveChangesAsync();
+
+            process.Status = StatusProcessPlan.Processed;
+            var note = process.Note + " (Đã từng tách kế hoạch)";
+            process.Note = note;
+            _context.ProcessPlans.Update(process);
+            await _context.SaveChangesAsync();
+
+            return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<ListProcessingVoucher>> GetMarkProcessing(string key)
+        {
+            var process = _context.ProcessingVouchers.Include(x => x.ProcessingVoucherDetails)
+                .Include(x => x.ProcessPlan).Include(x => x.Creator);
+
+            IQueryable<ProcessingVoucher> processResult;
+            if (!string.IsNullOrEmpty(key))
+            {
+                processResult = process
+                               .Include(x => x.ProcessPlan.Responsible)
+                               .Where(x => x.Code.Contains(key) || x.ProcessPlan.Code.Contains(key)
+                               || x.ProcessPlan.Responsible.Code.Contains(key));
+            }
+            else
+            {
+                processResult = process.Include(x => x.ProcessPlan.Responsible);
+            }
+
+            processResult = processResult.Where(x => x.Status == false);
+            var count = await processResult.CountAsync();
+            var data = await processResult
+                .Select(x => new ProcessingVoucherVm()
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    CreateDate = x.CreateDate.ToString("dd-MM-yyyy"),
+                    IdPlan = x.IdPlan,
+                    CodePlan = x.ProcessPlan.Code,
+                    Creator = x.Creator.Code,
+                    NameResponsible = x.ProcessPlan.Responsible.Code
+                }).ToListAsync();
+
+            var result = new ListProcessingVoucher()
+            {
+                Count = count,
+                ProcessingVoucherVms = data
+            };
+
+            return new ApiSuccessResult<ListProcessingVoucher>(result);
+        }
+
+        public async Task<ApiResult<bool>> ChangeMarkStatus(long id)
+        {
+            var voucher = await _context.ProcessingVouchers.FindAsync(id);
+            if (voucher == null)
+            {
+                return new ApiErrorResult<bool>("Phiếu không tồn tại");
+            }
+            voucher.Status = true;
+            voucher.CompleteDate = DateTime.Now;
+            _context.ProcessingVouchers.Update(voucher);
+            await _context.SaveChangesAsync();
+
+            // cập nhật số lượng sản phẩm:
+            List<Product> products = new List<Product>();
+            var recipes = await _context.ProcessingVoucherDetails.Include(x => x.Recipe)
+                .Where(x => x.IdVoucher == id).ToListAsync();
+
+            foreach (var item in recipes)
+            {
+                var product = await _context.Products.Include(x => x.Packs)
+                   .Where(x => x.Id == item.Recipe.IdProduct).FirstOrDefaultAsync();
+                var unit = product.Packs.Where(x => x.Name == item.Unit).FirstOrDefault();
+                // số lượng
+                var amount = unit.Value * item.Amount;
+                var productNew = amount + product.Amount;
+                product.Amount = productNew;
+                products.Add(product);
+            }
+            _context.Products.UpdateRange(products);
+            await _context.SaveChangesAsync();
+
+            return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<bool>> Delete(long id)
+        {
+            List<Material> materialsListUpdate = new List<Material>();
+            List<Product> productListUpdate = new List<Product>();
+            List<ProcessingDetail> processingDetailListUpdate = new List<ProcessingDetail>();
+
+            var voucher = await _context.ProcessingVouchers
+                .Include(x => x.ProcessingVoucherDetails)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (voucher == null)
+            {
+                return new ApiErrorResult<bool>("Phiếu không tồn tại");
+            }
+
+            var processPlan = await _context.ProcessPlans.Include(x => x.ProcessingDetails)
+                    .Where(x => x.Id == voucher.IdPlan).FirstAsync();
+            //cộng lại số lượng
+
+            foreach (var detail in voucher.ProcessingVoucherDetails)
+            {
+                var recipe = await _context.Recipes.Include(x => x.RecipeDetails)
+                    .Where(x => x.Id == detail.IdRecipe).FirstOrDefaultAsync();
+
+                foreach (var recipeDetail in recipe.RecipeDetails)
+                {
+                    var materials = await _context.Materials.Include(x => x.Packs)
+                        .Where(x => x.Id == recipeDetail.IdMaterials).FirstOrDefaultAsync();
+                    var unit = materials.Packs.Where(x => x.Name == recipeDetail.Unit).FirstOrDefault();
+                    var amount = recipeDetail.Amount * unit.Value * detail.Amount;
+                    // cập nhật số lượng nguyên vật liệu (giảm)
+                    var amountMaterNew = materials.Amount + amount;
+                    materials.Amount = amountMaterNew;
+                    materialsListUpdate.Add(materials);
+                }
+
+                // cập nhật lại số lượng sản phẩm (tăng)
+                var product = await _context.Products.Include(x => x.Packs)
+                  .Where(x => x.Id == detail.Recipe.IdProduct).FirstOrDefaultAsync();
+                var unitProduct = product.Packs.Where(x => x.Name == detail.Unit).FirstOrDefault();
+                var amountProduct = unitProduct.Value * detail.Amount;
+                var amountProductNew = product.Amount - amountProduct;
+                product.Amount = amountProductNew;
+                productListUpdate.Add(product);
+
+                // cập nhật số lượng kế hoạch
+
+                var processingDetails = processPlan.ProcessingDetails.Where(x => x.IdRecipe == recipe.Id).FirstOrDefault();
+                var amountPlanEnterNew = processingDetails.EnterAmount - detail.Amount;
+                processingDetails.EnterAmount = amountPlanEnterNew;
+                processingDetails.Status = false;
+                processingDetailListUpdate.Add(processingDetails);
+            }
+
+            processPlan.Status = StatusProcessPlan.Processing;
+            _context.ProcessPlans.Update(processPlan);
+
+            _context.Materials.UpdateRange(materialsListUpdate);
+            _context.Products.UpdateRange(productListUpdate);
+            _context.ProcessingDetails.UpdateRange(processingDetailListUpdate);
+
+            _context.ProcessingVouchers.Remove(voucher);
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>();
+        }
+
+        public async Task<ApiResult<PagedResult<ProcessingVoucherVm>>> GetProcessComplete(GetProcessCompletePaging bundle)
+        {
+            var process = _context.ProcessingVouchers.Include(x => x.ProcessingVoucherDetails)
+                .Include(x => x.ProcessPlan).Include(x => x.Creator);
+
+            IQueryable<ProcessingVoucher> processResult;
+            if (!string.IsNullOrEmpty(bundle.Keyword))
+            {
+                processResult = process
+                               .Include(x => x.ProcessPlan.Responsible)
+                               .Where(x => x.Code.Contains(bundle.Keyword) || x.ProcessPlan.Code.Contains(bundle.Keyword)
+                               || x.ProcessPlan.Responsible.Code.Contains(bundle.Keyword));
+            }
+            else
+            {
+                processResult = process.Include(x => x.ProcessPlan.Responsible);
+            }
+
+            processResult = processResult.Where(x => x.Status == true);
+            int totalRow = await processResult.CountAsync();
+
+            var data = await processResult
+                .Skip((bundle.PageIndex - 1) * bundle.PageSize)
+                .Take(bundle.PageSize)
+                .Select(x => new ProcessingVoucherVm()
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    CreateDate = x.CreateDate.ToString("dd-MM-yyyy"),
+                    IdPlan = x.IdPlan,
+                    CodePlan = x.ProcessPlan.Code,
+                    Creator = x.Creator.Code,
+                    NameResponsible = x.ProcessPlan.Responsible.Code
+                }).ToListAsync();
+
+            var pagedResult = new PagedResult<ProcessingVoucherVm>()
+            {
+                TotalRecords = totalRow,
+                PageIndex = bundle.PageIndex,
+                PageSize = bundle.PageSize,
+                Items = data
+            };
+
+            return new ApiSuccessResult<PagedResult<ProcessingVoucherVm>>(pagedResult);
+        }
+
+        public async Task<ApiResult<GetViewProcessingVocher>> GetViewProcessingVocher(long id)
+        {
+            var view = await _context.ProcessingVouchers.Include(x => x.ProcessingVoucherDetails)
+                .ThenInclude(x => x.Recipe).ThenInclude(x => x.Product)
+                .Include(x => x.ProcessPlan).Include(x => x.Creator)
+                .Include(x => x.ProcessPlan.Responsible)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            var result = new GetViewProcessingVocher()
+            {
+                Id = view.Id,
+                Code = view.Code,
+                CodePlan = view.ProcessPlan.Code,
+                CodeCreator = view.Creator.Code,
+                CodeResponsible = view.ProcessPlan.Responsible.Code,
+                CreateDate = view.CreateDate.ToString("dd-MM-yyyy"),
+                CompleteDate = view.CompleteDate.ToString("dd-MM-yyyy"),
+                Status = view.Status,
+                ListRecipes = view.ProcessingVoucherDetails.Select(x => new ListRecipes()
+                {
+                    IdRecipes = x.IdRecipe,
+                    Amount = x.Amount,
+                    Unit = x.Unit,
+                    CodeProduct = x.Recipe.Product.Code,
+                    CodeRecipes = x.Recipe.Code,
+                    NameProduct = x.Recipe.Product.Name
+                }).ToList()
+            };
+
+            return new ApiSuccessResult<GetViewProcessingVocher>(result);
         }
     }
 }

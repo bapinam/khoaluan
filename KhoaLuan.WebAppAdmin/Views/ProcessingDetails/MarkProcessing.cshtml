@@ -1,0 +1,335 @@
+﻿<section class="content">
+    <!-- Default box -->
+    <div class="card collapsed-box" id="HoanThanhCB">
+        <div class="card-header">
+            <h3 class="card-title">Cập Nhật Hoàn Thành Chế Biến</h3>
+
+            <div class="card-tools">
+
+                <span title="Số Chế Biến" data-toggle="tooltip" data-placement="top" class="badge badge-warning"
+                      id="SoCheBienHT" style="float:left;">
+                </span>
+
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body" style="display: none;">
+            <form id="frmTimKiemCB" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="keywordCBHT"
+                               placeholder="Nhập mã phiếu, mã kế hoạch hoặc mã người nhận">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <section class="content">
+                <div class="container-fluid">
+                    <table id="exampleTableCB" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        <thead>
+                            <tr>
+                                <th>Mã Phiếu</th>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Ngày Tạo </th>
+                                <th>Người  Tạo </th>
+                                <th>Người Nhận</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addBodyCheBien">
+                            <tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mã Phiếu</th>
+                                <th>Mã Kế Hoạch</th>
+                                <th>Ngày Tạo </th>
+                                <th>Người  Tạo </th>
+                                <th>Người Nhận</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+<!--Tìm kiếm-->
+<script>
+    var frmTimKiemCB = $("#frmTimKiemCB");
+    frmTimKiemCB.submit(function (e) {
+        var keyword = $("#keywordCBHT").val();
+        GetMarkProcessingKey(keyword);
+        e.preventDefault();
+    });</script>
+<!--Lấy thông tin kế hoạch để phát-->
+<script>
+   GetMarkProcessingKey("");
+   document.getElementById("SoCheBienHT").style.display = "none";
+    function GetMarkProcessingKey(key) {
+        DeleteTableMarkProcessing();
+          $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetMarkProcessing")",
+                data: { key: key },
+                dataType: "json",
+              success: function (msg) {
+                    if (msg.resultObj.count != 0) {
+                        document.getElementById("SoCheBienHT").style.display = "block";
+                        document.getElementById("SoCheBienHT").innerHTML = msg.resultObj.count;
+                        msg.resultObj.processingVoucherVms.forEach(function (item) {
+                            var str = '<tr id="Mark-'+item.id+'">'
+                                + '<td>'+item.code+'</td>'
+                                + '<td>' + item.codePlan+'</td>'
+                                + '<td>' + item.createDate + '</td>'
+                                + '<td>' + item.creator + '</td>'
+                                + '<td>' + item.nameResponsible+'</td>'
+                                                + '<td class="text-center py-0 align-middle">'
+                                                + ' <div class="btn-group btn-group-sm">'
+                                + ' <a class="btn btn-success" data-toggle="modal" data-target="#exampleGetMark"'
+                                + '     onclick="GetMark('+item.id+')" title="Hoàn Thành Chế Biến">'
+                                + '     <i class="fas fa-check"></i>'
+                                + '  </a>'
+                                + ' <a class="btn btn-primary" data-toggle="modal" data-target="#exampleGetViewProcessingVocher"'
+                                + '     onclick="GetViewProcessingVocher(' + item.id + ')" title="Xem">'
+                                + '     <i class="fas fa-eye"></i>'
+                                + '  </a>'
+
+                                                + ' </div>'
+                                                + ' </td>'
+                                + ' </tr>';
+                            $("#addBodyCheBien").append(str);
+
+                        });
+                    } else {
+                        document.getElementById("SoCheBienHT").style.display = "none";
+                        var str = '<tr><td colspan="6" class="text-center">Không có dữ liệu</td></tr>';
+                        $("#addBodyCheBien").append(str);
+                    }
+               },
+                error: function (req, status, error) {
+                }
+            });
+    }
+
+    function DeleteTableMarkProcessing() {
+        $("#addBodyCheBien").remove();
+        $("#exampleTableCB").append('<tbody id="addBodyCheBien" ></tbody>');
+    }
+</script>
+
+<!--Duyệt hoàn thành-->
+<div class="modal fade" id="exampleGetMark" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idMark" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn đánh dấu hoàn thành phiếu này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxMark()" class="btn btn-primary">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // exampleGetMark, GetMark
+    function GetMark(id) {
+        $("#idMark").val(id);
+    }
+    function ajaxMark() {
+        var id = $("#idMark").val();
+                  $.ajax({
+                      type: "GET",
+                url: "@Url.Action("ChangeMarkStatus")",
+                data: { id: id },
+                dataType: "json",
+              success: function (msg) {
+                  if (msg.isSuccessed) {
+                      toastr.success('Cập nhật thành công');
+                      $("#exampleGetMark").modal("hide");
+                      var str = "#Mark-" + id;
+                      $(str).remove();
+                      var hd = document.getElementById("SoCheBienHT").innerText;
+                      var so = hd - 1;
+                      if (so < 1) {
+                          document.getElementById("SoCheBienHT").style.display = "none";
+                      }
+                      document.getElementById("SoCheBienHT").innerText = so;
+                      location.reload();
+
+                    } else {
+                        toastr.error('Cập nhật thất bại');
+
+                    }
+               },
+                      error: function (req, status, error) {
+                          toastr.error('Cập nhật thất bại');
+
+                }
+            });
+
+    }
+</script>
+
+<!--Xem view-->
+<div class="modal fade  bd-example-modal-lg" id="exampleGetViewProcessingVocher" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="ribbon-wrapper" id="DaTraRib">
+            <div class="ribbon ribbon-lg bg-success">
+                Hoàn Thành
+            </div>
+        </div>
+        <div class="ribbon-wrapper" id="ChuaTraRib">
+            <div class="ribbon ribbon-lg bg-danger">
+                Chưa Hoàn Thành
+            </div>
+        </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Phiếu Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Mã Lưu Trữ</label>
+                        <span class="form-control" id="MaLT" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Mã Kế Hoạch</label>
+                        <span class="form-control" id="MaKH" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Người Tạo</label>
+                        <span class="form-control" id="ngTao" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Người Nhận</label>
+                        <span class="form-control" id="ngNhan" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Ngày Tạo</label>
+                        <span class="form-control" id="ngayTao" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Ngày Hoàn Thành</label>
+                        <span class="form-control" id="ngayHoanThanh" style="border:none; border-bottom:1px solid #EEEEEE;">
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Danh Sách Sản Phẩm</h5>
+                    </div>
+                    <table id="tableshowNVLHD" class="table table-bordered table-striped table-hover table-responsive-xl">
+                        <thead>
+                            <tr>
+                                <th>Mã Sản Phẩm</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th>Mã Công Thức</th>
+                                <th>Số Lượng</th>
+                                <th>ĐVT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableshoNVLHDbody">
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+
+            <!---->
+        </div>
+    </div>
+</div>
+
+<script>
+    function GetViewProcessingVocher(id) {
+        DeleteTableShowNVL();
+                          $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetViewProcessingVocher")",
+                data: { id: id },
+                dataType: "json",
+              success: function (msg) {
+                  //MaLT,MaKH,ngTao,ngNhan,ngayTao,ngayHoanThanh
+                  document.getElementById("MaLT").innerHTML = msg.resultObj.code;
+                  document.getElementById("MaKH").innerHTML = msg.resultObj.codePlan;
+                  document.getElementById("ngTao").innerHTML = msg.resultObj.codeCreator;
+                  document.getElementById("ngNhan").innerHTML = msg.resultObj.codeResponsible;
+                  document.getElementById("ngayTao").innerHTML = msg.resultObj.createDate;
+                  if (msg.resultObj.status) {
+                      document.getElementById("ngayHoanThanh").innerHTML = msg.resultObj.completeDate;
+                      document.getElementById("DaTraRib").style.display = "block";
+                      document.getElementById("ChuaTraRib").style.display = "none";
+                  } else {
+                      document.getElementById("ngayHoanThanh").innerHTML = "";
+                      document.getElementById("ChuaTraRib").style.display = "block";
+                      document.getElementById("DaTraRib").style.display = "none";
+                  }
+                  msg.resultObj.listRecipes.forEach(function (item) {
+                      var str = '<tr>'
+                          + '<td>' + item.codeProduct+ '</td>'
+                          + '<td>' + item.nameProduct+ '</td>'
+                          + '<td>' + item.codeRecipes+ '</td>'
+                          + '<td>' + item.amount+ '</td>'
+                          + '<td>' + item.unit+ '</td>'
+                          + '</tr>';
+
+                      $("#tableshoNVLHDbody").append(str);
+                  });
+
+               },
+                      error: function (req, status, error) {
+
+                }
+            });
+
+    }
+
+    function DeleteTableShowNVL() {
+        $("#tableshoNVLHDbody").remove();
+        $("#tableshowNVLHD").append('<tbody id="tableshoNVLHDbody"></tbody>');
+    }
+</script>

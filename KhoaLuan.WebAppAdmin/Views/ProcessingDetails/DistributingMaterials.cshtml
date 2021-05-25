@@ -14,7 +14,7 @@
                 </button>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="display: none;">
             <form id="frmChuaTT" method="post">
                 <div class="form-group">
                     <div class="input-group">
@@ -133,7 +133,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Đặt Hàng</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Biến</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -172,7 +172,7 @@
                         document.getElementById("SoHDCTT").style.display = "none";
                     }
                     document.getElementById("SoHDCTT").innerText = so;
-                    
+
                 } else {
                     toastr.error(data.message);
                 }
@@ -188,5 +188,66 @@
 <script>
     function GetCancelProcess(id) {
         $("#idKHCancelProcess").val(id);
+    }
+</script>
+
+<!--Modal tách Kế hoạch-->
+<div class="modal fade" id="exampleSplitProcess" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kế Hoạch Chế Biến</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!---->
+            <input id="idKHSplitProcess" type="hidden" />
+            <div class="modal-body">
+                <h4>Bạn có muốn tách kế hoạch đặt hàng này?</h4>
+            </div>
+            <!---->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="submit" onclick="ajaxSplitProcess()" class="btn btn-success">Đồng Ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Tách kế hoạch-->
+<script>
+    //SplitProcess, exampleSplitProcess
+    function SplitProcess(id) {
+        $("#idKHSplitProcess").val(id);
+    }
+
+    function ajaxSplitProcess() {
+        var id = $("#idKHSplitProcess").val();
+                $.ajax({
+            type: "GET",
+             url: "@Url.Action("SplitProcess")",
+            data: { id: id },
+            dataType: "json",
+            success: function (data) {
+                if (data.isSuccessed) {
+                    toastr.success('Tách thành công');
+                    $("#exampleSplitProcess").modal("hide");
+                    var or = "#Distri-" + id;
+                    $(or).remove();
+                    var hd = document.getElementById("SoHDCTT").innerText;
+                    var so = hd - 1;
+                    if (so < 1) {
+                        document.getElementById("SoHDCTT").style.display = "none";
+                    }
+                    document.getElementById("SoHDCTT").innerText = so;
+                } else {
+                    toastr.error('Tách thất bại');
+                }
+            },
+            error: function (req, status, error) {
+                toastr.error('Tách thất bại');
+            }
+        });
+
     }
 </script>

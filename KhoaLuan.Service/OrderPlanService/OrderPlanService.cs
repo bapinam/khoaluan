@@ -136,7 +136,7 @@ namespace KhoaLuan.Service.OrderPlanService
 
             oderPlan.Code = str;
 
-            _context.OrderPlans.Update(oderPlan);
+            _context.OrderPlans.Add(oderPlan);
             await _context.SaveChangesAsync();
 
             return new ApiSuccessResult<bool>();

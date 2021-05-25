@@ -13,6 +13,8 @@ namespace KhoaLuan.Data.Entities
         public long IdPlan { get; set; }
         public bool Status { get; set; }
         public DateTime CreateDate { get; set; }
+        public DateTime CompleteDate { get; set; }
+
         public ProcessPlan ProcessPlan { get; set; }
         public AppUser Creator { get; set; }
         public Guid IdCreator { get; set; }

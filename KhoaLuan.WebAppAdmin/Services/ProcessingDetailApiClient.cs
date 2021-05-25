@@ -36,12 +36,25 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
+        public async Task<ApiResult<bool>> ChangeMarkStatus(long id)
+        {
+            var url = $"/api/ProcessingDetail/change-mark/{id}";
+            var result = await GetIdAsync<bool>(url);
+            return result;
+        }
+
         public async Task<ApiResult<bool>> Create(CreateProcess bundle)
         {
             var json = JsonConvert.SerializeObject(bundle);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var url = $"/api/ProcessingDetail";
             var result = await Create<bool>(url, httpContent);
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> Delete(long id)
+        {
+            var result = await Delete($"/api/ProcessingDetail/" + id);
             return result;
         }
 
@@ -59,12 +72,32 @@ namespace KhoaLuan.WebAppAdmin.Services
             return result;
         }
 
-        public async Task<ApiResult<PagedResult<ProcessingPlanVm>>>
-            GetProcessingCompleted(GetDistributingPagingRequest bundle)
+        public async Task<ApiResult<ListProcessingVoucher>> GetMarkProcessing(string key)
+        {
+            var url = $"/api/ProcessingDetail/mark?key={key}";
+            var result = await GetIdAsync<ListProcessingVoucher>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<PagedResult<ProcessingVoucherVm>>> GetProcessComplete(GetProcessCompletePaging bundle)
         {
             var url = $"/api/ProcessingDetail/paging?pageIndex=" +
-               $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}";
-            var result = await GetListAsync<ProcessingPlanVm>(url);
+                      $"{bundle.PageIndex}&pageSize={bundle.PageSize}&keyword={bundle.Keyword}";
+            var result = await GetListAsync<ProcessingVoucherVm>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<GetViewProcessingVocher>> GetViewProcessingVocher(long id)
+        {
+            var url = $"/api/ProcessingDetail/view-vocher/{id}";
+            var result = await GetIdAsync<GetViewProcessingVocher>(url);
+            return result;
+        }
+
+        public async Task<ApiResult<bool>> SplitProcess(long id)
+        {
+            var url = $"/api/ProcessingDetail/split-process/{id}";
+            var result = await GetIdAsync<bool>(url);
             return result;
         }
     }
